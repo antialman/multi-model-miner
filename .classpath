@@ -8,5 +8,9 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.apache.ivyde.eclipse.cpcontainer.IVYDE_CONTAINER/?project=multi-model-miner&amp;ivyXmlPath=ivy.xml&amp;confs=*&amp;ivySettingsPath=ivysettings.xml&amp;loadSettingsOnDemand=false&amp;ivyUserDir=&amp;propertyFiles="/>
+	<classpathentry kind="lib" path="lib/TheMiner-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/OpenXES-20181205.jar"/>
+	<classpathentry kind="lib" path="lib/Spex-1.1.jar"/>
+	<classpathentry kind="lib" path="lib/resources-1.0.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
