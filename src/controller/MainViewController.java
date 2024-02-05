@@ -10,6 +10,7 @@ import org.apache.commons.lang3.StringUtils;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.ScrollEvent;
@@ -30,6 +31,8 @@ public class MainViewController {
 
 	@FXML
 	private HBox mainHeader;
+	@FXML
+	private Button redescoverButton;
 	@FXML
 	private Label eventLogLabel;
 	@FXML
@@ -53,7 +56,7 @@ public class MainViewController {
 	@FXML
 	private void initialize() {
 		resultTabPane.setDisable(true);
-		
+		redescoverButton.setDisable(true);
 		setupVisualizationWebView();
 	}
 
@@ -64,11 +67,12 @@ public class MainViewController {
 		if (logFile != null) {
 			this.logFile = logFile;
 			eventLogLabel.setText(logFile.getAbsolutePath());
+			redescoverButton.setDisable(false);
 			discoverModel();
 		}
 	}
 
-
+	@FXML
 	private void discoverModel() {
 		System.out.println("Starting model discovery from event log: " + logFile.getAbsolutePath());
 
@@ -115,7 +119,7 @@ public class MainViewController {
 		discoveryTaskDeclare.setLogFile(logFile);
 		discoveryTaskDeclare.setVacuityDetection(false);
 		discoveryTaskDeclare.setConsiderLifecycle(false);
-		discoveryTaskDeclare.setPruningType(DeclarePruningType.TRANSITIVE_CLOSURE);
+		discoveryTaskDeclare.setPruningType(DeclarePruningType.ALL_REDUCTIONS);
 		discoveryTaskDeclare.setSelectedTemplates(templates);
 		discoveryTaskDeclare.setMinSupport(100);
 

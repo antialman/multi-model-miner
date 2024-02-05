@@ -18,6 +18,7 @@
             <Label style="-fx-font-weight: bold; -fx-font-size: 14;" text="Event Log:" />
             <Label fx:id="eventLogLabel" maxWidth="1.7976931348623157E308" style="-fx-font-size: 14;" HBox.hgrow="ALWAYS" />
             <Button mnemonicParsing="false" onAction="#selectLog" text="Select log..." />
+            <Button fx:id="redescoverButton" mnemonicParsing="false" onAction="#discoverModel" text="Rediscover" />
          </children>
       </HBox>
       <Separator prefWidth="200.0" />

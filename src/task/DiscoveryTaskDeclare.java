@@ -156,7 +156,16 @@ public class DiscoveryTaskDeclare extends Task<DiscoveryTaskResult> {
 				List<String> parametersList = declareMinerOutput.getVisibleConstraintParametersMap().get(key);
 
 				DiscoveredActivity activationActivity = activityMap.get(parametersList.get(0));
-				DiscoveredActivity targetActivity = template.getIsBinary() ? activityMap.get(parametersList.get(1)) : null;
+				DiscoveredActivity targetActivity = null;
+				
+				if (template.getIsBinary()) {
+					if (template.getReverseActivationTarget()) {
+						activationActivity = activityMap.get(parametersList.get(1));
+						targetActivity = activityMap.get(parametersList.get(0));
+					} else {
+						targetActivity = activityMap.get(parametersList.get(1));
+					}
+				}
 				DiscoveredConstraint constraint = new DiscoveredConstraint(template, activationActivity, targetActivity, constraintSupport);
 
 				discoveredConstraints.add(constraint);
