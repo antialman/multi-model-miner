@@ -130,7 +130,7 @@ public class MainViewController {
 			discoveryTaskResult = task.getValue();
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
-			AlertUtils.showSuccess("Success!");
+			AlertUtils.showSuccess("Declare model discovered!");
 			updateVisualization();
 			
 		});
@@ -138,7 +138,7 @@ public class MainViewController {
 		//Handle task failure
 		task.setOnFailed(event -> {
 			mainHeader.setDisable(false);
-			AlertUtils.showSuccess("Fail!");
+			AlertUtils.showError("Running Declare Miner failed!");
 		});
 
 	}
