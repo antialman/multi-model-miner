@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<script src='viz.js'></script>
+	<script src='full.render.js'></script>
+	<style type="text/css">
+        #rootDiv {
+            font-family: Helvetica;
+            font-size: small;
+        }
+    </style>
+</head>
+<body>
+	<div id="rootDiv"></div>
+	<script>
+		var rootDiv = document.getElementById("rootDiv");
+		
+		var activitiesTitle = document.createElement("h2");
+		activitiesTitle.innerHTML = "Activities";
+		var activitiesDiv = document.createElement("div");
+		
+		var hrTag1 = document.createElement("hr");
+		var hrTag2 = document.createElement("hr");
+		
+		var constraintsTitle = document.createElement("h2");
+		constraintsTitle.innerHTML = "Constraints";
+		var constraintsDiv = document.createElement("div");
+		
+
+		//Function to display dot graph visualization (Declare and automaton views)
+		function setModel(model) {
+			
+			var viz = new Viz();
+			viz.renderSVGElement(model)
+				.then(function(element) {
+					//clears the page
+					rootDiv.innerHTML = '';
+				
+					//show the new model graph
+					rootDiv.appendChild(element);
+					//test to see if the craph could be clickable
+					//rum_application.addGraphClickHandlers();
+				})
+				.catch(error => {
+					// Create a new Viz instance (@see Caveats page for more info)
+					viz = new Viz();
+
+					// Possibly display the error
+					console.error(error);
+			});
+		}
+		
+		
+		//Function to display textual model description
+		function setText(activities, constraints) {
+			//clears the page
+			rootDiv.innerHTML = '';
+			
+			if(activities !== "null" && activities !== "") {
+				rootDiv.appendChild(activitiesTitle);
+				activitiesDiv.innerHTML = '';
+				var actArr = activities.split("\n");
+				var index = 1;
+				actArr.forEach(a => {
+					if(a !== '') {
+						var p = document.createElement("p");
+						p.innerHTML = a;
+						activitiesDiv.appendChild(p);
+						index = index + 1;
+					}
+				});
+				rootDiv.appendChild(activitiesDiv);
+			}
+
+			if(constraints !== "null" && constraints !== "") {
+				rootDiv.appendChild(hrTag1);
+				rootDiv.appendChild(constraintsTitle);
+				constraintsDiv.innerHTML = '';
+				var actArr = constraints.split("\n");
+				index = 1;
+				actArr.forEach(a => {
+					if(a !== '') {
+						var p = document.createElement("p");
+						p.innerHTML = a;
+						constraintsDiv.appendChild(p);
+						index = index + 1;
+					}
+				});
+				rootDiv.appendChild(constraintsDiv);
+			}
+		}
+		
+		function clearModel() {
+			rootDiv.innerHTML = '';
+		}
+
+		
+		//setModel('digraph "" {id = "graphRoot"ranksep = ".6"nodesep = ".5"node [style="filled", shape=box, fontsize="8", fontname="Helvetica"]edge [fontsize="8", fontname="Helvetica" arrowsize=".8"]node2 [label="Resit\\n"fillcolor="#0000ff;1.0:#000000" gradientangle=90 fontcolor="#ffffff" tooltip="Resit"]node3 [label="Test_Failed\\n"fillcolor="#0000ff;1.0:#000000" gradientangle=90 fontcolor="#ffffff" tooltip="Test_Failed"]node0 [shape=none, margin=0, label=<<table border="0" cellborder="1" cellspacing="0" cellpadding="4"><tr><td width="60" bgcolor="#d44942">Init[][]</td></tr><tr><td  width="60" bgcolor="#ffd700">Existence[][]</td></tr><tr><td bgcolor="blue"><font color="white">Driving_Test</font></td></tr></table>>]node1 [label="Getting_License\\n"fillcolor="#0000ff" fontcolor="#ffffff" tooltip="Getting_License"]node0 -> node1 [dir="both", edgetooltip="Response", labeltooltip="Response", arrowhead="normal", arrowtail="dot", label="Response\n[A.Grade>4][][]",]node0 -> node2 [dir="both", edgetooltip="Response", labeltooltip="Response", arrowhead="normal", arrowtail="dot", label="Response\n[A.Grade<=4][][]",]node0 -> node3 [dir="both", edgetooltip="Response", labeltooltip="Response", arrowhead="normal", arrowtail="dot", label="Response\n[A.Grade<=4][][]",]}');
+		//setText("act1_80%\nact2_90%\n","Response(act1, act2)_50%\nPrecedence(act1, act2)_80%\n");
+		//rootDiv.innerHTML = ''
+		//setText('1) Leucocytes : Exists in 100.00% of traces in the log\n2) ER Sepsis Triage : Exists in 100.00% of traces in the log\n3) CRP : Exists in 100.00% of traces in the log\n4) ER Registration : Exists in 100.00% of traces in the log\n5) ER Triage : Exists in 100.00% of traces in the log\n6) LacticAcid : Exists in 90.00% of traces in the log\n7) IV Antibiotics : Exists in 90.00% of traces in the log\n8) Admission NC : Exists in 90.00% of traces in the log\n','1) In 100.00% of traces in the log, Each time ER Sepsis Triage occurs, then CRP occurs afterwards before ER Sepsis Triage recurs\n<p style = "margin-left : 30px;"> => (CRP >= 9.0 && CRP <= 43.0 && org:group = B)   (sup = 0.40, conf = 0.40, ruleLength = 4.00)</p>\n2) In 100.00% of traces in the log, Each time ER Sepsis Triage occurs, it is preceded by ER Registration and no other ER Sepsis Triage can recur in between\n<p style = "margin-left : 30px;"> => (InfectionSuspected = true && org:group = A && DiagnosticBlood = true && DisfuncOrg = false && SIRSCritTachypnea = true && Hypotensie = false && SIRSCritHeartRate = true && Infusion = true && DiagnosticArtAstrup = false && Age >= 45.0 && Age <= 80.0 && DiagnosticIC = true && DiagnosticSputum = false && DiagnosticLiquor = false && DiagnosticOther = false && SIRSCriteria2OrMore = true && DiagnosticXthorax = true && SIRSCritTemperature = true && DiagnosticUrinaryCulture = false && SIRSCritLeucos = false && Oligurie = false && DiagnosticLacticAcid = true && Hypoxie = false && DiagnosticUrinarySediment = false && DiagnosticECG = true)   (sup = 0.00, conf = 0.00, ruleLength = 26.00)</p>\n3) In 100.00% of traces in the log, Each time ER Registration occurs, then Leucocytes occurs afterwards before ER Registration recurs\n<p style = "margin-left : 30px;"> => (Leucocytes >= 7.7 && Leucocytes <= 18.8 && org:group = B)   (sup = 0.89, conf = 0.89, ruleLength = 4.00)</p>\n4) In 100.00% of traces in the log, Each time ER Triage occurs, then CRP occurs afterwards before ER Triage recurs\n<p style = "margin-left : 30px;"> => (CRP >= 109.0 && CRP <= 171.0 && org:group = B)   (sup = 0.40, conf = 0.40, ruleLength = 4.00)</p>\n5) In 100.00% of traces in the log, Each time ER Triage occurs, then Leucocytes occurs afterwards before ER Triage recurs\n<p style = "margin-left : 30px;"> => (Leucocytes >= 7.7 && Leucocytes <= 11.0 && org:group = B)   (sup = 0.50, conf = 0.50, ruleLength = 4.00)</p>\n6) In 100.00% of traces in the log, Each time ER Registration occurs, then ER Sepsis Triage occurs afterwards before ER Registration recurs\n<p style = "margin-left : 30px;"> => Class=(org:group = A) (9.0/9.0)</p>\n7) In 100.00% of traces in the log, Each time ER Registration occurs, then CRP occurs afterwards before ER Registration recurs\n<p style = "margin-left : 30px;"> => (CRP >= 15.0 && CRP <= 240.0 && org:group = B)   (sup = 0.89, conf = 0.89, ruleLength = 4.00)</p>\n')
+	</script>
+</body>
+</html>
