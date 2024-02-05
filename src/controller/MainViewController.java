@@ -7,11 +7,13 @@ import java.util.concurrent.Executors;
 
 import org.apache.commons.lang3.StringUtils;
 
+import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
 import javafx.concurrent.Worker;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.HBox;
@@ -39,6 +41,8 @@ public class MainViewController {
 	private TabPane resultTabPane;
 	@FXML
 	private WebView visualizationWebView;
+	@FXML
+	private ListView<String> constraintLabelListView;
 
 	private Stage stage;
 
@@ -136,6 +140,7 @@ public class MainViewController {
 			resultTabPane.setDisable(false);
 			AlertUtils.showSuccess("Declare model discovered!");
 			updateVisualization();
+			updateConstraintLabels();
 			
 		});
 
@@ -146,8 +151,7 @@ public class MainViewController {
 		});
 
 	}
-	
-	
+
 	private void updateVisualization() {
 		if (discoveryTaskResult != null) {
 			String visualizationString;
@@ -169,6 +173,16 @@ public class MainViewController {
 			initialWebViewScript = null; //Has to be set to null because it will otherwise be executed after reload
 			visualizationWebView.getEngine().reload();
 		}
+	}
+	
+	
+
+	private void updateConstraintLabels() {
+		constraintLabelListView.getItems().clear();
+		for (DiscoveredConstraint constraint : discoveryTaskResult.getConstraints()) {
+			constraintLabelListView.getItems().add(constraint.toString());
+		}
+		
 	}
 
 
