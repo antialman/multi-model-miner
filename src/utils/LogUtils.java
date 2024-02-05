@@ -1,10 +1,19 @@
 package utils;
 
 import java.io.File;
+import java.util.Date;
 
+import org.deckfour.xes.extension.std.XConceptExtension;
+import org.deckfour.xes.extension.std.XLifecycleExtension;
+import org.deckfour.xes.extension.std.XTimeExtension;
+import org.deckfour.xes.extension.std.XLifecycleExtension.StandardModel;
 import org.deckfour.xes.in.XMxmlParser;
 import org.deckfour.xes.in.XesXmlParser;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
+import org.deckfour.xes.model.impl.XAttributeMapImpl;
+import org.deckfour.xes.model.impl.XEventImpl;
 
 public class LogUtils {
 
@@ -37,6 +46,31 @@ public class LogUtils {
 			}
 		}
 		return xlog;
+	}
+	
+	
+	public static XLog addArtificialStartEnd(XLog xLog) {
+		XEvent artifStart = new XEventImpl(new XAttributeMapImpl());
+		XConceptExtension.instance().assignName(artifStart, "_start_");
+		XLifecycleExtension.instance().assignStandardTransition(artifStart, StandardModel.COMPLETE);
+		
+		XEvent artifEnd = new XEventImpl(new XAttributeMapImpl());
+		XConceptExtension.instance().assignName(artifEnd, "_end_");
+		XLifecycleExtension.instance().assignStandardTransition(artifEnd, StandardModel.COMPLETE);
+		
+		for (XTrace xTrace : xLog) {
+			Date startDate = (Date) XTimeExtension.instance().extractTimestamp(xTrace.get(0)).clone();
+			startDate.setTime(startDate.getTime() - 5000);
+			XTimeExtension.instance().assignTimestamp(artifStart, startDate);
+			xTrace.add(0, artifStart);
+			
+			Date endDate = (Date) XTimeExtension.instance().extractTimestamp(xTrace.get(xTrace.size()-1)).clone();
+			endDate.setTime(endDate.getTime() + 5000);
+			XTimeExtension.instance().assignTimestamp(artifEnd, endDate);
+			xTrace.add(xTrace.size(), artifEnd);
+		}
+		
+		return xLog;
 	}
 
 }

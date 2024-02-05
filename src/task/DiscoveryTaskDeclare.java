@@ -42,7 +42,7 @@ public class DiscoveryTaskDeclare extends Task<DiscoveryTaskResult> {
 	private DeclarePruningType pruningType;
 	private List<ConstraintTemplate> selectedTemplates;
 	
-	private XLog xlog;
+	private XLog xLog;
 
 	public void setLogFile(File logFile) {
 		this.logFile = logFile;
@@ -75,8 +75,12 @@ public class DiscoveryTaskDeclare extends Task<DiscoveryTaskResult> {
 			System.out.println("Discovering Declare model started at: " + taskStartTime);
 
 			Configuration configuration = new Configuration();
-			xlog = LogUtils.convertToXlog(logFile.getAbsolutePath());
-			configuration.log = xlog;
+			xLog = LogUtils.convertToXlog(logFile.getAbsolutePath());
+			
+			xLog = LogUtils.addArtificialStartEnd(xLog);
+			
+			
+			configuration.log = xLog;
 
 			DeclareMinerInput input = new DeclareMinerInput();
 			input.setMinSupport(minSupport);
@@ -143,7 +147,7 @@ public class DiscoveryTaskDeclare extends Task<DiscoveryTaskResult> {
 
 			// Building a map for an easy identification in constraints discovery
 			Map<String, DiscoveredActivity> activityMap = new HashMap<>();
-			for (DiscoveredActivity act : ConstraintUtils.getAllActivitiesFromLog(xlog, considerLifecycle) ) {
+			for (DiscoveredActivity act : ConstraintUtils.getAllActivitiesFromLog(xLog, considerLifecycle) ) {
 				String identifier = act.getActivityFullName();
 				activityMap.put(identifier, act);
 			}
