@@ -1,0 +1,17 @@
+bin/
+*.xes
+*.mxml
+*.txt
+*.dot
+*.tmp
+*.als
+*.iml
+.DS_Store
+examples/
+dist/
+others/
+.idea/
+.metadata/
+/zlib1.dll
+/temp.xml
+/target/
