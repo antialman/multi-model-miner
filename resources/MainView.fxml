@@ -31,7 +31,7 @@
                   <SplitPane dividerPositions="0.9" orientation="VERTICAL">
                      <items>
                         <WebView fx:id="declareWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" />
-                        <ListView fx:id="constraintLabelListView" prefHeight="200.0" prefWidth="200.0" />
+                        <ListView fx:id="constraintLabelListView" />
                      </items>
                   </SplitPane>
                </content>
@@ -42,36 +42,40 @@
                      <items>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <Label style="-fx-font-weight: bold;" text="Explicitly Required" />
-                              <Label maxHeight="55.0" text="Triggered by start and/or required for end of each trace" wrapText="true" />
-                              <WebView fx:id="reqWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+                              <Label style="-fx-font-weight: bold;" text="Cardinalities" />
+                              <Label text="Mandatory:" wrapText="true" />
+                              <ListView fx:id="reqActivitiesListView" VBox.vgrow="ALWAYS" />
+                              <Label text="Never Repeated:" />
+                              <ListView fx:id="noRepActivitiesListview" VBox.vgrow="ALWAYS" />
+                              <Label text="Unconstrained cardinality:" />
+                              <ListView fx:id="noCardActivitiesListview" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
                               <Label style="-fx-font-weight: bold;" text="Successions" />
-                              <Label maxHeight="55.0" text="Potentially optional activities with fixed execution order" wrapText="true" />
+                              <Label maxHeight="55.0" minHeight="55.0" prefHeight="55.0" text="Potentially optional activities with fixed execution order" wrapText="true" />
                               <WebView fx:id="sucWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
                               <Label style="-fx-font-weight: bold;" text="Precedences" />
-                              <Label maxHeight="55.0" text="Prerequisite activities of each potentially optional activity" wrapText="true" />
+                              <Label maxHeight="55.0" minHeight="55.0" prefHeight="55.0" text="Prerequisite activities of each potentially optional activity" wrapText="true" />
                               <WebView fx:id="preWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
                               <Label style="-fx-font-weight: bold;" text="Responses" />
-                              <Label maxHeight="55.0" text="Mandatory followers of potentially optional activities" wrapText="true" />
+                              <Label maxHeight="55.0" minHeight="55.0" prefHeight="55.0" text="Mandatory followers of potentially optional activities" wrapText="true" />
                               <WebView fx:id="resWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
                               <Label style="-fx-font-weight: bold;" text="Not Co-Existences" />
-                              <Label maxHeight="55.0" text="Mutually exclusive (and potentially optional) activities" wrapText="true" />
+                              <Label maxHeight="55.0" minHeight="55.0" prefHeight="55.0" text="Mutually exclusive (and potentially optional) activities" wrapText="true" />
                               <WebView fx:id="notcoWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
