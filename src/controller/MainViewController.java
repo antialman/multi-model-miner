@@ -10,16 +10,18 @@ import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
 import task.DiscoveryTaskDeclare;
 import task.DiscoveryTaskResult;
-import task.InitialRelations;
-import task.InitialRelationsTask;
+import task.ConstraintSubsets;
+import task.ConstraintSubsetsTask;
 import utils.WebViewUtils;
 import utils.AlertUtils;
 import utils.ConstraintTemplate;
@@ -32,6 +34,8 @@ public class MainViewController {
 
 	@FXML
 	private HBox mainHeader;
+	@FXML
+	private ChoiceBox<DeclarePruningType> declarePruningChoice;
 	@FXML
 	private Button redescoverButton;
 	@FXML
@@ -62,13 +66,7 @@ public class MainViewController {
 	private File logFile;
 
 	private DiscoveryTaskResult discoveryTaskResult;
-	private InitialRelations initialRelations;
-
-	private String initialDeclareWebViewScript;
-	private String initialSucWebViewScript;
-	private String initialPreWebViewScript;
-	private String initialResWebViewScript;
-	private String initialNotcoWebViewScript;
+	private ConstraintSubsets constraintSubsets;
 
 
 
@@ -80,7 +78,24 @@ public class MainViewController {
 	private void initialize() {
 		resultTabPane.setDisable(true);
 		redescoverButton.setDisable(true);
-		WebViewUtils.setupWebView(declareWebView, initialDeclareWebViewScript);
+		WebViewUtils.setupWebView(declareWebView);
+		WebViewUtils.setupWebView(sucWebView);
+		WebViewUtils.setupWebView(preWebView);
+		WebViewUtils.setupWebView(resWebView);
+		WebViewUtils.setupWebView(notcoWebView);
+		
+		declarePruningChoice.getItems().setAll(DeclarePruningType.values());
+		declarePruningChoice.getSelectionModel().select(DeclarePruningType.HIERARCHY_BASED);
+		declarePruningChoice.setConverter(new StringConverter<DeclarePruningType>() {
+			@Override
+			public String toString(DeclarePruningType declarePruningType) {
+				return declarePruningType.getDisplayText();
+			}
+			@Override
+			public DeclarePruningType fromString(String string) {
+				return null;
+			}
+		});
 	}
 
 
@@ -115,7 +130,7 @@ public class MainViewController {
 		discoveryTaskDeclare.setLogFile(logFile);
 		discoveryTaskDeclare.setVacuityDetection(false);
 		discoveryTaskDeclare.setConsiderLifecycle(false);
-		discoveryTaskDeclare.setPruningType(DeclarePruningType.HIERARCHY_BASED);
+		discoveryTaskDeclare.setPruningType(declarePruningChoice.getSelectionModel().getSelectedItem());
 		discoveryTaskDeclare.setSelectedTemplates(templates);
 		discoveryTaskDeclare.setMinSupport(100);
 
@@ -128,13 +143,13 @@ public class MainViewController {
 			discoveryTaskResult = task.getValue();
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
-			WebViewUtils.updateDeclareVisualization(discoveryTaskResult, declareWebView, initialDeclareWebViewScript);
+			WebViewUtils.updateDeclareVisualization(discoveryTaskResult, declareWebView);
 			updateConstraintLabels();
-			AlertUtils.showSuccess("Declare model discovered! Finding initial activity relations...");
+			AlertUtils.showSuccess("Declare model discovered! Finding constraint subsets...");
 
-			InitialRelationsTask initialRelationsTask = new InitialRelationsTask(discoveryTaskResult);
-			addInitialRelationsTaskHandlers(initialRelationsTask);
-			executorService.execute(initialRelationsTask);
+			ConstraintSubsetsTask constraintSubsetsTask = new ConstraintSubsetsTask(discoveryTaskResult);
+			addConstraintSubsetsTaskHandlers(constraintSubsetsTask);
+			executorService.execute(constraintSubsetsTask);
 
 		});
 
@@ -147,29 +162,34 @@ public class MainViewController {
 	}
 
 
-	private void addInitialRelationsTaskHandlers(Task<InitialRelations> task) {
+	private void addConstraintSubsetsTaskHandlers(Task<ConstraintSubsets> task) {
 		//Handle task success
 		task.setOnSucceeded(event -> {
-			initialRelations = task.getValue();
+			constraintSubsets = task.getValue();
 			reqActivitiesListView.getItems().clear();
 			noRepActivitiesListview.getItems().clear();
 			noCardActivitiesListview.getItems().clear();
 			
-			for (DiscoveredActivity reqActivity : initialRelations.getReqActivities()) {
+			for (DiscoveredActivity reqActivity : constraintSubsets.getReqActivities()) {
 				reqActivitiesListView.getItems().add(reqActivity.getActivityName());
 			}
-			for (DiscoveredActivity noRepActivity : initialRelations.getNoRepActivities()) {
+			for (DiscoveredActivity noRepActivity : constraintSubsets.getNoRepActivities()) {
 				noRepActivitiesListview.getItems().add(noRepActivity.getActivityName());
 			}
-			for (DiscoveredActivity noCardActivity : initialRelations.getNoCardActivities()) {
+			for (DiscoveredActivity noCardActivity : constraintSubsets.getNoCardActivities()) {
 				noCardActivitiesListview.getItems().add(noCardActivity.getActivityName());
 			}
+			
+			WebViewUtils.updateSubsetsWebView(constraintSubsets.getSucActivities(), constraintSubsets.getSucConstraints(), sucWebView);
+			WebViewUtils.updateSubsetsWebView(constraintSubsets.getPreActivities(), constraintSubsets.getPreConstraints(), preWebView);
+			WebViewUtils.updateSubsetsWebView(constraintSubsets.getResActivities(), constraintSubsets.getResConstraints(), resWebView);
+			WebViewUtils.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
 		});
 		
 		//Handle task failure
 		task.setOnFailed(event -> {
 			mainHeader.setDisable(false);
-			AlertUtils.showError("Finding initial relations failed");
+			AlertUtils.showError("Finding constraint subsets failed");
 		});
 	}
 

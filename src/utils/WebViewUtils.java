@@ -1,7 +1,11 @@
 package utils;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
+import data.DiscoveredActivity;
+import data.DiscoveredConstraint;
 import javafx.concurrent.Worker;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
@@ -13,16 +17,10 @@ public class WebViewUtils {
 	private WebViewUtils() {
 	}
 
-	public static void setupWebView(WebView webView, String initialWebViewScript) {
+	public static void setupWebView(WebView webView) {
 		webView.getEngine().load((WebViewUtils.class.getClassLoader().getResource("test.html")).toString());
 		webView.setContextMenuEnabled(false); //Setting it in FXML causes an IllegalArgumentException
-		
-		webView.getEngine().getLoadWorker().stateProperty().addListener((observable, oldValue, newValue) -> {
-			if(newValue == Worker.State.SUCCEEDED && initialWebViewScript != null) {
-				webView.getEngine().executeScript(initialWebViewScript);
-			}
-		});
-		
+
 		webView.addEventFilter(ScrollEvent.SCROLL, e -> {
 			if (e.isControlDown()) {
 				double deltaY = e.getDeltaY();
@@ -35,30 +33,37 @@ public class WebViewUtils {
 				e.consume();
 			}
 		});
-		
+
 	}
-	
-	
-	public static void updateDeclareVisualization(DiscoveryTaskResult discoveryTaskResult, WebView declareWebView, String initialDeclareWebViewScript) {
+
+
+	public static void updateDeclareVisualization(DiscoveryTaskResult discoveryTaskResult, WebView declareWebView) {
 		if (discoveryTaskResult != null) {
 			String visualizationString;
 			String script;
-			
+
 			visualizationString = GraphGenerator.createDeclareVisualizationString(discoveryTaskResult.getActivities(), discoveryTaskResult.getConstraints(), true, false);
 			if (visualizationString != null) {
 				script = "setModel('" + visualizationString + "')";
-				if (declareWebView.getEngine().getLoadWorker().stateProperty().get() == Worker.State.SUCCEEDED) {
-					System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
-					declareWebView.getEngine().executeScript(script);
-				} else {
-					initialDeclareWebViewScript = script;
-				}
+				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
+				declareWebView.getEngine().executeScript(script);
 			}
-		} else {
-			//Reloading the page in case a previous visualization script is still executing
-			//TODO: Should instead track if a visualization script is still executing and stop it (if it is possible)
-			initialDeclareWebViewScript = null; //Has to be set to null because it will otherwise be executed after reload
-			declareWebView.getEngine().reload();
 		}
+	}
+
+	public static void updateSubsetsWebView(List<DiscoveredActivity> activities, List<DiscoveredConstraint> constraints, WebView webView) {
+		if (constraints != null) {
+			String visualizationString;
+			String script;
+
+
+			visualizationString = GraphGenerator.createDeclareVisualizationString(activities, constraints, true, true);
+			if (visualizationString != null) {
+				script = "setModel('" + visualizationString + "')";
+				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
+				webView.getEngine().executeScript(script);
+			}
+		}
+
 	}
 }
