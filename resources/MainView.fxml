@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.ChoiceBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
@@ -21,6 +22,7 @@
             <Label style="-fx-font-weight: bold; -fx-font-size: 14;" text="Event Log:" />
             <Label fx:id="eventLogLabel" maxWidth="1.7976931348623157E308" style="-fx-font-size: 14;" HBox.hgrow="ALWAYS" />
             <Button mnemonicParsing="false" onAction="#selectLog" text="Select log..." />
+            <CheckBox fx:id="artifStartEndCheckBox" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Artif. start/end" />
             <ChoiceBox fx:id="declarePruningChoice" />
             <Button fx:id="redescoverButton" mnemonicParsing="false" onAction="#discoverModel" text="Rediscover" />
          </children>
@@ -40,11 +42,16 @@
             </Tab>
             <Tab text="Constraint Subsets">
                <content>
-                  <SplitPane dividerPositions="0.1, 0.325, 0.55, 0.775">
+                  <SplitPane fx:id="subsetsSplitPane" dividerPositions="0.1, 0.325, 0.55, 0.775">
                      <items>
                         <VBox>
                            <children>
-                              <Label style="-fx-font-weight: bold;" text="Cardinalities" />
+                              <HBox>
+                                 <children>
+                                    <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-font-weight: bold;" text="Cardinalities" HBox.hgrow="ALWAYS" />
+                                    <Button minWidth="33.0" mnemonicParsing="false" onAction="#expandCard" text="&lt;&gt;" />
+                                 </children>
+                              </HBox>
                               <Label text="Mandatory:" wrapText="true" />
                               <ListView fx:id="reqActivitiesListView" VBox.vgrow="ALWAYS" />
                               <Label text="Never Repeated:" />
@@ -55,28 +62,48 @@
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <Label style="-fx-font-weight: bold;" text="Successions" />
+                              <HBox>
+                                 <children>
+                                    <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-font-weight: bold;" text="Successions" HBox.hgrow="ALWAYS" />
+                                    <Button minWidth="33.0" mnemonicParsing="false" onAction="#expandSuc" text="&lt;&gt;" />
+                                 </children>
+                              </HBox>
                               <Label maxHeight="55.0" minHeight="55.0" prefHeight="55.0" text="Potentially optional activities with fixed execution order" wrapText="true" />
                               <WebView fx:id="sucWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <Label style="-fx-font-weight: bold;" text="Precedences" />
+                              <HBox>
+                                 <children>
+                                    <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-font-weight: bold;" text="Precedences" HBox.hgrow="ALWAYS" />
+                                    <Button minWidth="33.0" mnemonicParsing="false" onAction="#expandPre" text="&lt;&gt;" />
+                                 </children>
+                              </HBox>
                               <Label maxHeight="55.0" minHeight="55.0" prefHeight="55.0" text="Prerequisite activities of each potentially optional activity" wrapText="true" />
                               <WebView fx:id="preWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <Label style="-fx-font-weight: bold;" text="Responses" />
+                              <HBox>
+                                 <children>
+                                    <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-font-weight: bold;" text="Responses" HBox.hgrow="ALWAYS" />
+                                    <Button minWidth="33.0" mnemonicParsing="false" onAction="#expandRes" text="&lt;&gt;" />
+                                 </children>
+                              </HBox>
                               <Label maxHeight="55.0" minHeight="55.0" prefHeight="55.0" text="Mandatory followers of potentially optional activities" wrapText="true" />
                               <WebView fx:id="resWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
                            <children>
-                              <Label style="-fx-font-weight: bold;" text="Not Co-Existences" />
+                              <HBox>
+                                 <children>
+                                    <Label maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" style="-fx-font-weight: bold;" text="Not Co-Existences" HBox.hgrow="ALWAYS" />
+                                    <Button minWidth="33.0" mnemonicParsing="false" onAction="#expandNotco" text="&lt;&gt;" />
+                                 </children>
+                              </HBox>
                               <Label maxHeight="55.0" minHeight="55.0" prefHeight="55.0" text="Mutually exclusive (and potentially optional) activities" wrapText="true" />
                               <WebView fx:id="notcoWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>

@@ -42,6 +42,8 @@ public class DiscoveryTaskDeclare extends Task<DiscoveryTaskResult> {
 	private DeclarePruningType pruningType;
 	private List<ConstraintTemplate> selectedTemplates;
 	
+	private boolean artifStartEnd;
+	
 	private XLog xLog;
 
 	public void setLogFile(File logFile) {
@@ -67,6 +69,10 @@ public class DiscoveryTaskDeclare extends Task<DiscoveryTaskResult> {
 	public void setSelectedTemplates(List<ConstraintTemplate> selectedTemplates) {
 		this.selectedTemplates = selectedTemplates;
 	}
+	
+	public void setArtifStartEnd(boolean artifStartEnd) {
+		this.artifStartEnd = artifStartEnd;
+	}
 
 	@Override
 	protected DiscoveryTaskResult call() throws Exception {
@@ -77,7 +83,9 @@ public class DiscoveryTaskDeclare extends Task<DiscoveryTaskResult> {
 			Configuration configuration = new Configuration();
 			xLog = LogUtils.convertToXlog(logFile.getAbsolutePath());
 			
-			//xLog = LogUtils.addArtificialStartEnd(xLog); //Adds artificial start and end activities to each trace
+			if (artifStartEnd) {
+				xLog = LogUtils.addArtificialStartEnd(xLog); //Adds artificial start and end activities to each trace
+			}
 			
 			
 			configuration.log = xLog;

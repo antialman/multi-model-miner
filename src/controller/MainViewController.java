@@ -10,9 +10,11 @@ import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
@@ -35,6 +37,8 @@ public class MainViewController {
 	@FXML
 	private HBox mainHeader;
 	@FXML
+	private CheckBox artifStartEndCheckBox;
+	@FXML
 	private ChoiceBox<DeclarePruningType> declarePruningChoice;
 	@FXML
 	private Button redescoverButton;
@@ -46,6 +50,8 @@ public class MainViewController {
 	private WebView declareWebView;
 	@FXML
 	private ListView<String> constraintLabelListView;
+	@FXML
+	private SplitPane subsetsSplitPane;
 	@FXML
 	private ListView<String> reqActivitiesListView;
 	@FXML
@@ -120,6 +126,31 @@ public class MainViewController {
 		addDiscoveryTaskHandlers(task);
 		executorService.execute(task);
 	}
+	
+	@FXML
+	private void expandCard() {
+		subsetsSplitPane.setDividerPositions(0.6, 0.7, 0.8, 0.9);
+	}
+	
+	@FXML
+	private void expandSuc() {
+		subsetsSplitPane.setDividerPositions(0.1, 0.7, 0.8, 0.9);
+	}
+	
+	@FXML
+	private void expandPre() {
+		subsetsSplitPane.setDividerPositions(0.1, 0.2, 0.8, 0.9);
+	}
+	
+	@FXML
+	private void expandRes() {
+		subsetsSplitPane.setDividerPositions(0.1, 0.2, 0.3, 0.9);
+	}
+	
+	@FXML
+	private void expandNotco() {
+		subsetsSplitPane.setDividerPositions(0.1, 0.2, 0.3, 0.4);
+	}
 
 
 
@@ -133,6 +164,8 @@ public class MainViewController {
 		discoveryTaskDeclare.setPruningType(declarePruningChoice.getSelectionModel().getSelectedItem());
 		discoveryTaskDeclare.setSelectedTemplates(templates);
 		discoveryTaskDeclare.setMinSupport(100);
+		
+		discoveryTaskDeclare.setArtifStartEnd(artifStartEndCheckBox.isSelected());
 
 		return discoveryTaskDeclare;
 	}
