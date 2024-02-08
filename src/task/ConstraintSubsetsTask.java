@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
@@ -13,14 +14,16 @@ import utils.ConstraintTemplate;
 public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 
 	private DiscoveryTaskResult discoveryTaskResult;
+	private boolean pruneSubsets;
 
-	public ConstraintSubsetsTask(DiscoveryTaskResult discoveryTaskResult) {
+	public ConstraintSubsetsTask(DiscoveryTaskResult discoveryTaskResult, boolean pruneSubsets) {
 		super();
 		this.discoveryTaskResult = discoveryTaskResult;
 	}
 
 	public void setDiscoveryTaskResult(DiscoveryTaskResult discoveryTaskResult) {
 		this.discoveryTaskResult = discoveryTaskResult;
+		this.pruneSubsets = pruneSubsets;
 	}
 
 
@@ -51,33 +54,31 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 
 
 			//Successions, Precedences, Responses
+			List<DiscoveredConstraint> sucConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Succession).collect(Collectors.toList());
+			List<DiscoveredConstraint> preConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Precedence).collect(Collectors.toList());
+			List<DiscoveredConstraint> resConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Response).collect(Collectors.toList());
+			List<DiscoveredConstraint> notcoConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Not_CoExistence).collect(Collectors.toList());
+			
 			Set<DiscoveredActivity> sucActivities = new HashSet<DiscoveredActivity>();
 			Set<DiscoveredActivity> preActivities = new HashSet<DiscoveredActivity>();
 			Set<DiscoveredActivity> resActivities = new HashSet<DiscoveredActivity>();
 			Set<DiscoveredActivity> notcoActivities = new HashSet<DiscoveredActivity>();
-			List<DiscoveredConstraint> sucConstraints = new ArrayList<DiscoveredConstraint>();
-			List<DiscoveredConstraint> preConstraints = new ArrayList<DiscoveredConstraint>();
-			List<DiscoveredConstraint> resConstraints = new ArrayList<DiscoveredConstraint>();
-			List<DiscoveredConstraint> notcoConstraints = new ArrayList<DiscoveredConstraint>();
-			for (DiscoveredConstraint discoveredConstraint : discoveryTaskResult.getConstraints()) {
-				if (discoveredConstraint.getTemplate() == ConstraintTemplate.Succession) {
-					sucActivities.add(discoveredConstraint.getActivationActivity());
-					sucActivities.add(discoveredConstraint.getTargetActivity());
-					sucConstraints.add(discoveredConstraint);
-				} else if (discoveredConstraint.getTemplate() == ConstraintTemplate.Precedence) {
-					preActivities.add(discoveredConstraint.getActivationActivity());
-					preActivities.add(discoveredConstraint.getTargetActivity());
-					preConstraints.add(discoveredConstraint);
-				} else if (discoveredConstraint.getTemplate() == ConstraintTemplate.Response) {
-					resActivities.add(discoveredConstraint.getActivationActivity());
-					resActivities.add(discoveredConstraint.getTargetActivity());
-					resConstraints.add(discoveredConstraint);
-				} else if (discoveredConstraint.getTemplate() == ConstraintTemplate.Not_CoExistence) {
-					notcoActivities.add(discoveredConstraint.getActivationActivity());
-					notcoActivities.add(discoveredConstraint.getTargetActivity());
-					notcoConstraints.add(discoveredConstraint);
-				}
-			}
+			sucConstraints.forEach(c -> {
+				sucActivities.add(c.getActivationActivity());
+				sucActivities.add(c.getTargetActivity());}
+			);
+			preConstraints.forEach(c -> {
+				preActivities.add(c.getActivationActivity());
+				preActivities.add(c.getTargetActivity());}
+			);
+			resConstraints.forEach(c -> {
+				resActivities.add(c.getActivationActivity());
+				resActivities.add(c.getTargetActivity());}
+			);
+			notcoConstraints.forEach(c -> {
+				notcoActivities.add(c.getActivationActivity());
+				notcoActivities.add(c.getTargetActivity());}
+			);
 
 			
 			//Result object
@@ -85,6 +86,7 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 			constraintSubsets.setReqActivities(reqActivities);
 			constraintSubsets.setNoRepActivities(noRepActivities);
 			constraintSubsets.setNoCardActivities(noCardActivities);
+			
 			constraintSubsets.setSucActivities(new ArrayList<>(sucActivities));
 			constraintSubsets.setPreActivities(new ArrayList<>(preActivities));
 			constraintSubsets.setResActivities(new ArrayList<>(resActivities));

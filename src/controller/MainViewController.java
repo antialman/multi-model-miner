@@ -37,9 +37,11 @@ public class MainViewController {
 	@FXML
 	private HBox mainHeader;
 	@FXML
-	private CheckBox artifStartEndCheckBox;
+	private CheckBox addStartEndCheckBox;
 	@FXML
-	private ChoiceBox<DeclarePruningType> declarePruningChoice;
+	private ChoiceBox<DeclarePruningType> initialPruningChoice;
+	@FXML
+	private CheckBox pruneSubsetsCheckBox;
 	@FXML
 	private Button redescoverButton;
 	@FXML
@@ -90,9 +92,9 @@ public class MainViewController {
 		WebViewUtils.setupWebView(resWebView);
 		WebViewUtils.setupWebView(notcoWebView);
 		
-		declarePruningChoice.getItems().setAll(DeclarePruningType.values());
-		declarePruningChoice.getSelectionModel().select(DeclarePruningType.HIERARCHY_BASED);
-		declarePruningChoice.setConverter(new StringConverter<DeclarePruningType>() {
+		initialPruningChoice.getItems().setAll(DeclarePruningType.values());
+		initialPruningChoice.getSelectionModel().select(DeclarePruningType.HIERARCHY_BASED);
+		initialPruningChoice.setConverter(new StringConverter<DeclarePruningType>() {
 			@Override
 			public String toString(DeclarePruningType declarePruningType) {
 				return declarePruningType.getDisplayText();
@@ -161,11 +163,11 @@ public class MainViewController {
 		discoveryTaskDeclare.setLogFile(logFile);
 		discoveryTaskDeclare.setVacuityDetection(false);
 		discoveryTaskDeclare.setConsiderLifecycle(false);
-		discoveryTaskDeclare.setPruningType(declarePruningChoice.getSelectionModel().getSelectedItem());
+		discoveryTaskDeclare.setPruningType(initialPruningChoice.getSelectionModel().getSelectedItem());
 		discoveryTaskDeclare.setSelectedTemplates(templates);
 		discoveryTaskDeclare.setMinSupport(100);
 		
-		discoveryTaskDeclare.setArtifStartEnd(artifStartEndCheckBox.isSelected());
+		discoveryTaskDeclare.setArtifStartEnd(addStartEndCheckBox.isSelected());
 
 		return discoveryTaskDeclare;
 	}
@@ -180,7 +182,7 @@ public class MainViewController {
 			updateConstraintLabels();
 			AlertUtils.showSuccess("Declare model discovered! Finding constraint subsets...");
 
-			ConstraintSubsetsTask constraintSubsetsTask = new ConstraintSubsetsTask(discoveryTaskResult);
+			ConstraintSubsetsTask constraintSubsetsTask = new ConstraintSubsetsTask(discoveryTaskResult, pruneSubsetsCheckBox.isSelected());
 			addConstraintSubsetsTaskHandlers(constraintSubsetsTask);
 			executorService.execute(constraintSubsetsTask);
 
