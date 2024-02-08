@@ -6,7 +6,6 @@ import org.apache.commons.lang3.StringUtils;
 
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
-import javafx.concurrent.Worker;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
 import task.DiscoveryTaskResult;

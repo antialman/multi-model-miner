@@ -10,6 +10,7 @@ import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
 import utils.ConstraintTemplate;
+import utils.TransitiveClosureUtils;
 
 public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 
@@ -19,11 +20,11 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 	public ConstraintSubsetsTask(DiscoveryTaskResult discoveryTaskResult, boolean pruneSubsets) {
 		super();
 		this.discoveryTaskResult = discoveryTaskResult;
+		this.pruneSubsets = pruneSubsets;
 	}
 
 	public void setDiscoveryTaskResult(DiscoveryTaskResult discoveryTaskResult) {
 		this.discoveryTaskResult = discoveryTaskResult;
-		this.pruneSubsets = pruneSubsets;
 	}
 
 
@@ -55,8 +56,8 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 
 			//Successions, Precedences, Responses
 			List<DiscoveredConstraint> sucConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Succession).collect(Collectors.toList());
-			List<DiscoveredConstraint> preConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Precedence).collect(Collectors.toList());
 			List<DiscoveredConstraint> resConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Response).collect(Collectors.toList());
+			List<DiscoveredConstraint> preConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Precedence).collect(Collectors.toList());
 			List<DiscoveredConstraint> notcoConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Not_CoExistence).collect(Collectors.toList());
 			
 			Set<DiscoveredActivity> sucActivities = new HashSet<DiscoveredActivity>();
@@ -67,18 +68,27 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 				sucActivities.add(c.getActivationActivity());
 				sucActivities.add(c.getTargetActivity());}
 			);
-			preConstraints.forEach(c -> {
-				preActivities.add(c.getActivationActivity());
-				preActivities.add(c.getTargetActivity());}
-			);
 			resConstraints.forEach(c -> {
 				resActivities.add(c.getActivationActivity());
 				resActivities.add(c.getTargetActivity());}
 			);
+			preConstraints.forEach(c -> {
+				preActivities.add(c.getActivationActivity());
+				preActivities.add(c.getTargetActivity());}
+					);
 			notcoConstraints.forEach(c -> {
 				notcoActivities.add(c.getActivationActivity());
 				notcoActivities.add(c.getTargetActivity());}
 			);
+			
+			
+			if (pruneSubsets) {
+				sucConstraints = TransitiveClosureUtils.getTransitiveClosureSuccessionConstraints(sucConstraints);
+				resConstraints = TransitiveClosureUtils.getTransitiveClosureResponseConstraints(resConstraints);
+				preConstraints = TransitiveClosureUtils.getTransitiveClosurePrecedenceConstraints(preConstraints);
+				//Note that Not Co-Existence constraints are not transitive
+			}
+			
 
 			
 			//Result object
