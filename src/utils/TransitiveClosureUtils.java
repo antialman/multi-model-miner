@@ -1,5 +1,6 @@
 package utils;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -11,6 +12,9 @@ import org.jgrapht.EdgeFactory;
 import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.processmining.plugins.declareminer.enumtypes.DeclareTemplate;
+import org.processmining.plugins.declareminer.visualizing.ActivityDefinition;
+import org.processmining.plugins.declareminer.visualizing.ConstraintDefinition;
+
 import data.DiscoveredConstraint;
 
 public class TransitiveClosureUtils {
@@ -573,11 +577,185 @@ public class TransitiveClosureUtils {
 				preConstraints.remove(i);
 			}
 		}
-		
-		
 		return preConstraints;
+	}
+	
+	
+	//Shouldn't really be needed since Not Co-Existence constraints are not transitive, meaning that a Not Co-Existence constraint could never be removed because of any set of other Not Co-Existence constraints
+	public static List<DiscoveredConstraint> getTransitiveClosureNotCoexistenceConstraints(List<DiscoveredConstraint> notcoConstraints) {
+
+		//For reusing Declare miner code as-is
+		HashMap<Integer, List<String>> constraintParametersMap = new HashMap<Integer, List<String>>();
+		HashMap<Integer, DeclareTemplate> constraintTemplateMap = new HashMap<Integer, DeclareTemplate>();
+		Vector<Integer> transitiveClosureNotCoexistenceConstraints = new Vector<Integer>();
+		
+		for (int i = 0; i < notcoConstraints.size(); i++) {
+			//Keys are offset by -1 compared to original implementation, but that should not matter
+			constraintParametersMap.put(i, Arrays.asList(notcoConstraints.get(i).getActivationActivity().getActivityName(),notcoConstraints.get(i).getTargetActivity().getActivityName()));
+			constraintTemplateMap.put(i, TemplateUtils.getDeclareTemplate(notcoConstraints.get(i).getTemplate()));
+		}
+		
+		/*
+		 * Code from Declare miner START
+		 */
+		
+		//	HashMap<String,ArrayList<String>> negativeConnections = new HashMap<String, ArrayList<String>>();
+
+		DefaultDirectedGraph<String, DefaultEdge> coexistenceDiagram = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
+		DefaultDirectedGraph<String, DefaultEdge> notCoexistenceDiagram = new DefaultDirectedGraph<String, DefaultEdge>(DefaultEdge.class);
+
+		EdgeFactory<String, DefaultEdge> ef = new EdgeFactory<String, DefaultEdge>() {
+
+			public DefaultEdge createEdge(String arg0, String arg1) {
+				// TODO Auto-generated method stub
+				DefaultEdge edge = new DefaultEdge();
+				edge.setSource(arg0);
+				edge.setTarget(arg1);
+				return edge;
+			}
+		};
+
+		for(Integer id : constraintParametersMap.keySet()){
+			if((constraintTemplateMap.get(id).equals(DeclareTemplate.Not_CoExistence))){
+				String a = constraintParametersMap.get(id).get(0);
+				String b = constraintParametersMap.get(id).get(1);
+				//	System.out.println(d.toString());
+				notCoexistenceDiagram.addVertex(a);
+				notCoexistenceDiagram.addVertex(b);
+				//		if(DijkstraShortestPath.findPathBetween(notCoexistenceDiagram, a, b)==null){
+				DefaultEdge de =ef.createEdge(a, b);
+				notCoexistenceDiagram.addEdge(a,b,de);
+
+				DefaultEdge ed =ef.createEdge(b, a);
+				notCoexistenceDiagram.addEdge(b,a,ed);
+
+				//				d.addEdge(a, b);
+				//		}			
+			}
 
 
+		}
+
+
+		for(Integer id : constraintParametersMap.keySet()){
+			if((constraintTemplateMap.get(id).equals(DeclareTemplate.Alternate_Succession)) || 
+					(constraintTemplateMap.get(id).equals(DeclareTemplate.Chain_Succession)) || 
+					(constraintTemplateMap.get(id).equals(DeclareTemplate.CoExistence)) || 
+					constraintTemplateMap.get(id).equals(DeclareTemplate.Succession)){
+			//if((constraintTemplateMap.get(id).equals(DeclareTemplate.Alternate_Succession)) || 
+				//	(constraintTemplateMap.get(id).equals(DeclareTemplate.Chain_Succession)) || 
+				//	(constraintTemplateMap.get(id).equals(DeclareTemplate.CoExistence)&& !transitiveClosureCoexistenceConstraints.contains(id)) || 
+				//	constraintTemplateMap.get(id).equals(DeclareTemplate.Succession) && !transitiveClosureSuccessionConstraints.contains(id)){
+				//Removed " && !transitiveClosureCoexistenceConstraints.contains(id) and !transitiveClosureSuccessionConstraints.contains(id)" from original check since I plan to call this method independently from all Successions
+				String a = constraintParametersMap.get(id).get(0);
+				String b = constraintParametersMap.get(id).get(1);
+				//	System.out.println(d.toString());
+				coexistenceDiagram.addVertex(a);
+				coexistenceDiagram.addVertex(b);
+				//	if(DijkstraShortestPath.findPathBetween(coexistenceDiagram, a, b)==null){
+				DefaultEdge de =ef.createEdge(a, b);
+				coexistenceDiagram.addEdge(a,b,de);
+
+				DefaultEdge ed =ef.createEdge(b, a);
+				coexistenceDiagram.addEdge(b,a,ed);
+
+				//				d.addEdge(a, b);
+				//	}			
+			}
+
+
+		}
+		HashMap<String, ArrayList<String>> coexistencePaths = new HashMap<String, ArrayList<String>>();
+		ArrayList<ArrayList<String>> alreadyRemoved = new ArrayList<ArrayList<String>>();
+		for(Integer id : constraintParametersMap.keySet()){
+			if(constraintTemplateMap.get(id).equals(DeclareTemplate.Not_CoExistence)){
+				String a = constraintParametersMap.get(id).get(0);
+				String b = constraintParametersMap.get(id).get(1);
+				coexistenceDiagram.addVertex(a);
+
+				ArrayList<String> coexistencePathsFromA = coexistencePaths.get(a);
+				if(!coexistencePaths.containsKey(a)){
+					coexistencePathsFromA = new ArrayList<String>();
+					coexistencePathsFromA.add(a);
+					for(String node : coexistenceDiagram.vertexSet()){
+						if(DijkstraShortestPath.findPathBetween(coexistenceDiagram, a, node)!=null){
+							coexistencePathsFromA.add(node);
+						}
+					}
+					coexistencePaths.put(a, coexistencePathsFromA);
+				}
+				coexistenceDiagram.addVertex(b);
+				ArrayList<String> coexistencePathsFromB = coexistencePaths.get(b);
+				if(!coexistencePaths.containsKey(b)){
+					coexistencePathsFromB = new ArrayList<String>();
+					coexistencePathsFromB.add(b);
+					for(String node : coexistenceDiagram.vertexSet()){
+						if(DijkstraShortestPath.findPathBetween(coexistenceDiagram, b, node)!=null){
+							coexistencePathsFromB.add(node);
+						}
+					}
+					coexistencePaths.put(b, coexistencePathsFromB);
+				}
+			}
+		}
+
+		for(Integer id : constraintParametersMap.keySet()){
+			if(constraintTemplateMap.get(id).equals(DeclareTemplate.Not_CoExistence)){
+				String a = constraintParametersMap.get(id).get(0);
+				String b = constraintParametersMap.get(id).get(1);
+				ArrayList<String> currentEdge = new ArrayList<String>();
+				currentEdge.add(a);
+				currentEdge.add(b);
+				boolean removed = false;
+				if(!alreadyRemoved.contains(currentEdge)){
+					if(coexistencePaths.get(a)!=null){
+						for(String reachableNodeFromA : coexistencePaths.get(a)){
+							if(coexistencePaths.get(b)!=null){
+								for(String reachableNodeFromB : coexistencePaths.get(b)){
+									ArrayList<String> reachedEdge = new ArrayList<String>();
+									reachedEdge.add(a);
+									reachedEdge.add(b);
+									ArrayList<String> invreachedEdge = new ArrayList<String>();
+									invreachedEdge.add(b);
+									invreachedEdge.add(a);
+									ArrayList<String>  currentNegEdge = new ArrayList<String>();
+									currentNegEdge.add(reachableNodeFromA);
+									currentNegEdge.add(reachableNodeFromB);
+									if(!reachableNodeFromA.equals(a) || !reachableNodeFromB.equals(b)){
+										if(notCoexistenceDiagram.containsEdge(reachableNodeFromA, reachableNodeFromB) && !alreadyRemoved.contains(currentNegEdge)){
+											transitiveClosureNotCoexistenceConstraints.add(id);
+											alreadyRemoved.add(reachedEdge);
+											alreadyRemoved.add(invreachedEdge);
+											removed = true;
+											break;		
+										}
+									}
+								}
+								if(removed){
+									break;
+								}
+
+							}
+						}
+					}
+				}
+			}
+		}
+		
+
+		
+		/*
+		 * Code from Declare miner END
+		 */
+		
+		
+		for (int i = notcoConstraints.size()-1; i >= 0; i--) {
+			if (transitiveClosureNotCoexistenceConstraints.contains(i)) {
+				notcoConstraints.remove(i);
+			}
+		}
+		return notcoConstraints;
+		
 	}
 
 }

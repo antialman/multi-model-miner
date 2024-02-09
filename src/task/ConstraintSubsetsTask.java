@@ -54,12 +54,21 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 			}
 
 
-			//Successions, Precedences, Responses
+			//Filtering constraint subsets
 			List<DiscoveredConstraint> sucConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Succession).collect(Collectors.toList());
 			List<DiscoveredConstraint> resConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Response).collect(Collectors.toList());
 			List<DiscoveredConstraint> preConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Precedence).collect(Collectors.toList());
 			List<DiscoveredConstraint> notcoConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Not_CoExistence).collect(Collectors.toList());
 			
+			//Pruning the constraint subsets
+			if (pruneSubsets) {
+				sucConstraints = TransitiveClosureUtils.getTransitiveClosureSuccessionConstraints(sucConstraints);
+				resConstraints = TransitiveClosureUtils.getTransitiveClosureResponseConstraints(resConstraints);
+				preConstraints = TransitiveClosureUtils.getTransitiveClosurePrecedenceConstraints(preConstraints);
+				//notcoConstraints = TransitiveClosureUtils.getTransitiveClosureNotCoexistenceConstraints(notcoConstraints); //Not Co-Existence is not transitive, so pruning wouldn't make any difference here
+			}
+
+			//Activity lists for the subsets (used by the current visualization script)
 			Set<DiscoveredActivity> sucActivities = new HashSet<DiscoveredActivity>();
 			Set<DiscoveredActivity> preActivities = new HashSet<DiscoveredActivity>();
 			Set<DiscoveredActivity> resActivities = new HashSet<DiscoveredActivity>();
@@ -80,16 +89,6 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 				notcoActivities.add(c.getActivationActivity());
 				notcoActivities.add(c.getTargetActivity());}
 			);
-			
-			
-			if (pruneSubsets) {
-				sucConstraints = TransitiveClosureUtils.getTransitiveClosureSuccessionConstraints(sucConstraints);
-				resConstraints = TransitiveClosureUtils.getTransitiveClosureResponseConstraints(resConstraints);
-				preConstraints = TransitiveClosureUtils.getTransitiveClosurePrecedenceConstraints(preConstraints);
-				//Note that Not Co-Existence constraints are not transitive
-			}
-			
-
 			
 			//Result object
 			ConstraintSubsets constraintSubsets = new ConstraintSubsets();
