@@ -63,9 +63,9 @@ public class MainViewController {
 	@FXML
 	private WebView sucWebView;
 	@FXML
-	private WebView preWebView;
-	@FXML
 	private WebView resWebView;
+	@FXML
+	private WebView preWebView;
 	@FXML
 	private WebView notcoWebView;
 
@@ -88,12 +88,12 @@ public class MainViewController {
 		redescoverButton.setDisable(true);
 		WebViewUtils.setupWebView(declareWebView);
 		WebViewUtils.setupWebView(sucWebView);
-		WebViewUtils.setupWebView(preWebView);
 		WebViewUtils.setupWebView(resWebView);
+		WebViewUtils.setupWebView(preWebView);
 		WebViewUtils.setupWebView(notcoWebView);
 		
 		initialPruningChoice.getItems().setAll(DeclarePruningType.values());
-		initialPruningChoice.getSelectionModel().select(DeclarePruningType.HIERARCHY_BASED);
+		initialPruningChoice.getSelectionModel().select(DeclarePruningType.NONE);
 		initialPruningChoice.setConverter(new StringConverter<DeclarePruningType>() {
 			@Override
 			public String toString(DeclarePruningType declarePruningType) {
@@ -104,6 +104,9 @@ public class MainViewController {
 				return null;
 			}
 		});
+		
+		addStartEndCheckBox.setSelected(true);
+		pruneSubsetsCheckBox.setSelected(true);
 	}
 
 
@@ -138,14 +141,14 @@ public class MainViewController {
 	private void expandSuc() {
 		subsetsSplitPane.setDividerPositions(0.1, 0.7, 0.8, 0.9);
 	}
-	
+		
 	@FXML
-	private void expandPre() {
+	private void expandRes() {
 		subsetsSplitPane.setDividerPositions(0.1, 0.2, 0.8, 0.9);
 	}
 	
 	@FXML
-	private void expandRes() {
+	private void expandPre() {
 		subsetsSplitPane.setDividerPositions(0.1, 0.2, 0.3, 0.9);
 	}
 	

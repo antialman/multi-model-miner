@@ -11,9 +11,6 @@ import org.jgrapht.EdgeFactory;
 import org.jgrapht.alg.DijkstraShortestPath;
 import org.jgrapht.graph.DefaultDirectedGraph;
 import org.processmining.plugins.declareminer.enumtypes.DeclareTemplate;
-import org.processmining.plugins.declareminer.visualizing.ActivityDefinition;
-import org.processmining.plugins.declareminer.visualizing.ConstraintDefinition;
-
 import data.DiscoveredConstraint;
 
 public class TransitiveClosureUtils {
