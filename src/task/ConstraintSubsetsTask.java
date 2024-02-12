@@ -23,10 +23,6 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 		this.pruneSubsets = pruneSubsets;
 	}
 
-	public void setDiscoveryTaskResult(DiscoveryTaskResult discoveryTaskResult) {
-		this.discoveryTaskResult = discoveryTaskResult;
-	}
-
 
 	@Override
 	protected ConstraintSubsets call() throws Exception {

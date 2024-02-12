@@ -1,8 +1,6 @@
 package task;
 
 import java.util.List;
-import java.util.Set;
-
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 
