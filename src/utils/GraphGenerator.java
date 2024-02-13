@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
+import data.ActivityRelations;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import task.InitialFragments;
@@ -255,8 +256,30 @@ public class GraphGenerator {
 		for (DiscoveredActivity da : initialFragments.getActivityRelationsMap().keySet()) {
 			String nodeId = "node"+nodeIds.size();
 			nodeIds.put(da, nodeId);
-			
 			sb.append(buildTransitionString(nodeId, da.getActivityName()));
+			
+			
+			int nodeCounter = 0;
+			String connectTo = nodeId + "_" + nodeCounter;
+			ActivityRelations ar = initialFragments.getActivityRelationsMap().get(da);
+			sb.append(buildPlaceString(connectTo));
+			sb .append(nodeId + " -> " + connectTo + " ");
+			
+			
+			
+			if (!ar.getResponseOut().isEmpty()) {
+				if (ar.getResponseOut().size() > 1) {
+					String connectToNew = nodeId + "_" + ++nodeCounter;
+					sb.append(buildTransitionString(connectToNew, null));
+					sb .append(connectTo + " -> " + connectToNew + " ");
+					connectTo = connectToNew;
+				}
+				
+				for (DiscoveredActivity activity : ar.getResponseOut()) {
+					sb.append(buildTransitionString(nodeId + "_" + ++nodeCounter, activity.getActivityName()));
+					sb.append(connectTo + " -> " + nodeId + "_" + nodeCounter + " ");
+				}
+			}
 		}
 		
 		
@@ -267,7 +290,16 @@ public class GraphGenerator {
 	}
 	
 	private static String buildTransitionString(String nodeId, String label) {
-		return nodeId + " [label=\"" + label + "\",shape=rect,height=0.4,width=.4]";
-		
+		if (label != null) {
+			return nodeId + " [label=\"" + label + "\",shape=rect,height=0.4,width=.4]";
+		} else {
+			return nodeId + " [label=\"\"style=\"filled\",fillcolor=\"#000000\",shape=rect,height=0.4,width=.4]";
+		}
+	}
+	
+
+	
+	private static String buildPlaceString(String nodeId) {
+		return nodeId + "[shape=circle,fixedsize=true,label=\"\", height=.3,width=.3]";
 	}
 }

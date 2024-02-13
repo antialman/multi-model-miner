@@ -59,5 +59,21 @@ public class ActivityRelations {
 		return mutualExclusion.contains(discoveredActivity);
 	}
 	
+	public Set<DiscoveredActivity> getResponseOut() {
+		return responseOut;
+	}
+	public Set<DiscoveredActivity> getResponseIn() {
+		return responseIn;
+	}
+	public Set<DiscoveredActivity> getPrecedenceIn() {
+		return precedenceIn;
+	}
+	public Set<DiscoveredActivity> getPrecedenceOut() {
+		return precedenceOut;
+	}
+	public Set<DiscoveredActivity> getMutualExclusion() {
+		return mutualExclusion;
+	}
+	
 	
 }

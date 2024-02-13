@@ -28,10 +28,10 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 			System.out.println("Discovering constraint subsets started at: " + taskStartTime);
 
 			InitialFragments initialFragments = new InitialFragments();
+			
+			//Making it easier to look up which types of relations each activity has to other activities
 			Map<DiscoveredActivity, ActivityRelations> activityRelationsMap = new HashMap<DiscoveredActivity, ActivityRelations>();
-
 			discoveredActivities.forEach(da -> {activityRelationsMap.put(da, new ActivityRelations(da));});
-
 			for (DiscoveredConstraint dc : constraintSubsets.getResConstraints()) {
 				activityRelationsMap.get(dc.getActivationActivity()).addResponseOut(dc.getTargetActivity());
 				activityRelationsMap.get(dc.getTargetActivity()).addResponseIn(dc.getActivationActivity());
@@ -45,6 +45,12 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 				activityRelationsMap.get(dc.getTargetActivity()).addMutualExclusion(dc.getActivationActivity());
 			}
 			initialFragments.setActivityRelationsMap(activityRelationsMap);
+			
+			
+			//Creating the initial fragments
+			
+			
+			
 
 			return initialFragments;
 
