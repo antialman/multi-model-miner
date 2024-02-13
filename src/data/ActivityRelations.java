@@ -11,7 +11,6 @@ public class ActivityRelations {
 	private Set<DiscoveredActivity> responseIn;
 	private Set<DiscoveredActivity> precedenceOut;
 	private Set<DiscoveredActivity> precedenceIn;
-	
 	private Set<DiscoveredActivity> mutualExclusion;
 	
 	public ActivityRelations(DiscoveredActivity discoveredActivity) {
@@ -21,6 +20,7 @@ public class ActivityRelations {
 		responseIn = new HashSet<DiscoveredActivity>();
 		precedenceOut = new HashSet<DiscoveredActivity>();
 		precedenceIn = new HashSet<DiscoveredActivity>();
+		mutualExclusion = new HashSet<DiscoveredActivity>();
 	}
 	
 	public DiscoveredActivity getActivity() {

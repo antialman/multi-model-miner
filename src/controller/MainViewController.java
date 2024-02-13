@@ -22,6 +22,8 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import task.DiscoveryTaskDeclare;
 import task.DiscoveryTaskResult;
+import task.InitialFragments;
+import task.InitialFragmentsTask;
 import task.ConstraintSubsets;
 import task.ConstraintSubsetsTask;
 import utils.WebViewUtils;
@@ -75,6 +77,7 @@ public class MainViewController {
 
 	private DiscoveryTaskResult discoveryTaskResult;
 	private ConstraintSubsets constraintSubsets;
+	private InitialFragments initialFragments;
 
 
 
@@ -91,7 +94,7 @@ public class MainViewController {
 		WebViewUtils.setupWebView(resWebView);
 		WebViewUtils.setupWebView(preWebView);
 		WebViewUtils.setupWebView(notcoWebView);
-		
+
 		initialPruningChoice.getItems().setAll(DeclarePruningType.values());
 		initialPruningChoice.getSelectionModel().select(DeclarePruningType.NONE);
 		initialPruningChoice.setConverter(new StringConverter<DeclarePruningType>() {
@@ -104,7 +107,7 @@ public class MainViewController {
 				return null;
 			}
 		});
-		
+
 		addStartEndCheckBox.setSelected(true);
 		pruneSubsetsCheckBox.setSelected(true);
 	}
@@ -131,27 +134,27 @@ public class MainViewController {
 		addDiscoveryTaskHandlers(task);
 		executorService.execute(task);
 	}
-	
+
 	@FXML
 	private void expandCard() {
 		subsetsSplitPane.setDividerPositions(0.6, 0.7, 0.8, 0.9);
 	}
-	
+
 	@FXML
 	private void expandSuc() {
 		subsetsSplitPane.setDividerPositions(0.1, 0.7, 0.8, 0.9);
 	}
-		
+
 	@FXML
 	private void expandRes() {
 		subsetsSplitPane.setDividerPositions(0.1, 0.2, 0.8, 0.9);
 	}
-	
+
 	@FXML
 	private void expandPre() {
 		subsetsSplitPane.setDividerPositions(0.1, 0.2, 0.3, 0.9);
 	}
-	
+
 	@FXML
 	private void expandNotco() {
 		subsetsSplitPane.setDividerPositions(0.1, 0.2, 0.3, 0.4);
@@ -169,7 +172,7 @@ public class MainViewController {
 		discoveryTaskDeclare.setPruningType(initialPruningChoice.getSelectionModel().getSelectedItem());
 		discoveryTaskDeclare.setSelectedTemplates(templates);
 		discoveryTaskDeclare.setMinSupport(100);
-		
+
 		discoveryTaskDeclare.setArtifStartEnd(addStartEndCheckBox.isSelected());
 
 		return discoveryTaskDeclare;
@@ -185,6 +188,7 @@ public class MainViewController {
 			updateConstraintLabels();
 			AlertUtils.showSuccess("Declare model discovered! Finding constraint subsets...");
 
+			//Execute constraint filtering and pruning task after successful discovery
 			ConstraintSubsetsTask constraintSubsetsTask = new ConstraintSubsetsTask(discoveryTaskResult, pruneSubsetsCheckBox.isSelected());
 			addConstraintSubsetsTaskHandlers(constraintSubsetsTask);
 			executorService.execute(constraintSubsetsTask);
@@ -207,7 +211,7 @@ public class MainViewController {
 			reqActivitiesListView.getItems().clear();
 			noRepActivitiesListview.getItems().clear();
 			noCardActivitiesListview.getItems().clear();
-			
+
 			for (DiscoveredActivity reqActivity : constraintSubsets.getReqActivities()) {
 				reqActivitiesListView.getItems().add(reqActivity.getActivityName());
 			}
@@ -217,21 +221,45 @@ public class MainViewController {
 			for (DiscoveredActivity noCardActivity : constraintSubsets.getNoCardActivities()) {
 				noCardActivitiesListview.getItems().add(noCardActivity.getActivityName());
 			}
-			
+
 			WebViewUtils.updateSubsetsWebView(constraintSubsets.getSucActivities(), constraintSubsets.getSucConstraints(), sucWebView);
 			WebViewUtils.updateSubsetsWebView(constraintSubsets.getPreActivities(), constraintSubsets.getPreConstraints(), preWebView);
 			WebViewUtils.updateSubsetsWebView(constraintSubsets.getResActivities(), constraintSubsets.getResConstraints(), resWebView);
 			WebViewUtils.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
+
+
+			//Execute initial fragments task after successful constraint filtering and pruning
+			InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryTaskResult.getActivities(), constraintSubsets);
+			addInitialFragmentsTaskHandlers(initialFragmentsTask);
+			executorService.execute(initialFragmentsTask);
+
+
 		});
-		
+
 		//Handle task failure
 		task.setOnFailed(event -> {
-			mainHeader.setDisable(false);
 			AlertUtils.showError("Finding constraint subsets failed");
 		});
 	}
 
 
+
+	private void addInitialFragmentsTaskHandlers(InitialFragmentsTask task) {
+		//Handle task success
+		task.setOnSucceeded(event -> {
+			initialFragments = task.getValue();
+			
+			//TODO: Visualization
+
+			
+
+		});
+
+		//Handle task failure
+		task.setOnFailed(event -> {
+			AlertUtils.showError("Finding initial fragments failed!");
+		});
+	}
 
 	private void updateConstraintLabels() {
 		constraintLabelListView.getItems().clear();

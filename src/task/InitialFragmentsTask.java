@@ -27,28 +27,33 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 			long taskStartTime = System.currentTimeMillis();
 			System.out.println("Discovering constraint subsets started at: " + taskStartTime);
 
-
+			InitialFragments initialFragments = new InitialFragments();
 			Map<DiscoveredActivity, ActivityRelations> activityRelationsMap = new HashMap<DiscoveredActivity, ActivityRelations>();
 
 			discoveredActivities.forEach(da -> {activityRelationsMap.put(da, new ActivityRelations(da));});
 
-			for (DiscoveredConstraint discoveredConstraint : constraintSubsets.getResConstraints()) {
-				activityRelationsMap.get(discoveredConstraint.getActivationActivity()).addResponseOut(discoveredConstraint.getTargetActivity());
-				activityRelationsMap.get(discoveredConstraint.getTargetActivity()).addResponseIn(discoveredConstraint.getActivationActivity());
+			for (DiscoveredConstraint dc : constraintSubsets.getResConstraints()) {
+				activityRelationsMap.get(dc.getActivationActivity()).addResponseOut(dc.getTargetActivity());
+				activityRelationsMap.get(dc.getTargetActivity()).addResponseIn(dc.getActivationActivity());
 			}
-			for (DiscoveredConstraint discoveredConstraint : constraintSubsets.getPreConstraints()) {
-				activityRelationsMap.get(discoveredConstraint.getTargetActivity()).addPrecedenceOut(discoveredConstraint.getActivationActivity());
-				activityRelationsMap.get(discoveredConstraint.getActivationActivity()).addPrecedenceIn(discoveredConstraint.getTargetActivity());
+			for (DiscoveredConstraint dc : constraintSubsets.getPreConstraints()) {
+				activityRelationsMap.get(dc.getTargetActivity()).addPrecedenceOut(dc.getActivationActivity());
+				activityRelationsMap.get(dc.getActivationActivity()).addPrecedenceIn(dc.getTargetActivity());
 			}
-			for (DiscoveredConstraint discoveredConstraint : constraintSubsets.getNotcoConstraints()) {
-				activityRelationsMap.get(discoveredConstraint.getActivationActivity()).addMutualExclusion(discoveredConstraint.getTargetActivity());
-				activityRelationsMap.get(discoveredConstraint.getTargetActivity()).addMutualExclusion(discoveredConstraint.getActivationActivity());
+			for (DiscoveredConstraint dc : constraintSubsets.getNotcoConstraints()) {
+				activityRelationsMap.get(dc.getActivationActivity()).addMutualExclusion(dc.getTargetActivity());
+				activityRelationsMap.get(dc.getTargetActivity()).addMutualExclusion(dc.getActivationActivity());
 			}
-
-
-
-			InitialFragments initialFragments = new InitialFragments();
 			initialFragments.setActivityRelationsMap(activityRelationsMap);
+			
+			
+			
+			
+			
+			
+			
+			
+			
 
 			return initialFragments;
 
