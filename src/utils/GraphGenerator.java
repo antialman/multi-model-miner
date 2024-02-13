@@ -9,6 +9,8 @@ import java.util.NoSuchElementException;
 import data.ActivityRelations;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
+import model.PlaceNode;
+import model.TransitionNode;
 import task.InitialFragments;
 
 public class GraphGenerator {
@@ -246,42 +248,39 @@ public class GraphGenerator {
 	public static String createFragmentsVisualizationString(InitialFragments initialFragments) {
 		StringBuilder sb = new StringBuilder("digraph \"\" {");
 		sb.append("rankdir = \"LR\"");
-		sb.append("ranksep = \".6\"");
-		sb.append("nodesep = \".5\"");
+		sb.append("ranksep = \".4\"");
+		sb.append("nodesep = \".3\"");
 		sb.append("node [fontsize=\"8\", fontname=\"Helvetica\"]");
 		sb.append("edge [fontsize=\"8\", fontname=\"Helvetica\" arrowsize=\".8\"]");
 		
+		int ellipsisCount = 0;
 		
-		Map<DiscoveredActivity, String> nodeIds = new HashMap<>();
-		for (DiscoveredActivity da : initialFragments.getActivityRelationsMap().keySet()) {
-			String nodeId = "node"+nodeIds.size();
-			nodeIds.put(da, nodeId);
-			sb.append(buildTransitionString(nodeId, da.getActivityName()));
+		for (TransitionNode mainTransitionNode : initialFragments.getFragmentMainTransitions()) {
+			sb.append(buildTransitionString(mainTransitionNode));
 			
-			
-			int nodeCounter = 0;
-			String connectTo = nodeId + "_" + nodeCounter;
-			ActivityRelations ar = initialFragments.getActivityRelationsMap().get(da);
-			sb.append(buildPlaceString(connectTo));
-			sb .append(nodeId + " -> " + connectTo + " ");
-			
-			
-			
-			if (!ar.getResponseOut().isEmpty()) {
-				if (ar.getResponseOut().size() > 1) {
-					String connectToNew = nodeId + "_" + ++nodeCounter;
-					sb.append(buildTransitionString(connectToNew, null));
-					sb .append(connectTo + " -> " + connectToNew + " ");
-					connectTo = connectToNew;
+			for (PlaceNode outPlaceNode : mainTransitionNode.getOutgoingPlaces()) {
+				sb.append(buildPlaceString(outPlaceNode));
+				sb.append(" node" + mainTransitionNode.getNodeId() + " -> node" + outPlaceNode.getNodeId());
+				for (TransitionNode outTransitionNode : outPlaceNode.getOutgoingTransitions()) { //Recursion not needed here because initial fragments will not go further
+					sb.append(buildTransitionString(outTransitionNode));
+					sb.append(" node" + outPlaceNode.getNodeId() + " -> node" + outTransitionNode.getNodeId());
+					sb.append(buildEllipsisNodeString(ellipsisCount));
+					sb.append("node" + outTransitionNode.getNodeId() + " -> ellipsis" + ellipsisCount++);
 				}
-				
-				for (DiscoveredActivity activity : ar.getResponseOut()) {
-					sb.append(buildTransitionString(nodeId + "_" + ++nodeCounter, activity.getActivityName()));
-					sb.append(connectTo + " -> " + nodeId + "_" + nodeCounter + " ");
+			}
+			
+			for (PlaceNode inPlaceNode : mainTransitionNode.getIncomingPlaces()) {
+				sb.append(buildPlaceString(inPlaceNode));
+				sb.append(" node" + inPlaceNode.getNodeId() + " -> node" + mainTransitionNode.getNodeId());
+				for (TransitionNode inTransitionNode : inPlaceNode.getIncomingTransitions()) { //Recursion not needed here because initial fragments will not go further
+					sb.append(buildTransitionString(inTransitionNode));
+					sb.append(" node" + inTransitionNode.getNodeId() + " -> node" + inPlaceNode.getNodeId());
+
+					sb.append(buildEllipsisNodeString(ellipsisCount));
+					sb.append("ellipsis" + ellipsisCount++ + " -> node" + inTransitionNode.getNodeId());
 				}
 			}
 		}
-		
 		
 		
 		sb.append("}");
@@ -289,17 +288,20 @@ public class GraphGenerator {
 		return sb.toString();
 	}
 	
-	private static String buildTransitionString(String nodeId, String label) {
-		if (label != null) {
-			return nodeId + " [label=\"" + label + "\",shape=rect,height=0.4,width=.4]";
+	private static String buildTransitionString(TransitionNode transitionNode) {
+		
+		if (transitionNode.isVisible()) {
+			return " node" + transitionNode.getNodeId() + " [label=\"" + transitionNode.getTransitionLabel() + "\",shape=rect,height=0.4,width=.4]";
 		} else {
-			return nodeId + " [label=\"\"style=\"filled\",fillcolor=\"#000000\",shape=rect,height=0.4,width=.4]";
+			return " node" + transitionNode.getNodeId() + " [label=\"\"style=\"filled\",fillcolor=\"#000000\",shape=rect,height=0.4,width=.4]";
 		}
 	}
 	
-
+	private static String buildPlaceString(PlaceNode placeNode) {
+		return " node" + placeNode.getNodeId() + "[shape=circle,fixedsize=true,label=\"\", height=.3,width=.3]";
+	}
 	
-	private static String buildPlaceString(String nodeId) {
-		return nodeId + "[shape=circle,fixedsize=true,label=\"\", height=.3,width=.3]";
+	private static String buildEllipsisNodeString(int ellipsisId) {
+		return " ellipsis" + ellipsisId + "[shape=none,fontsize=\"14\",label=\"...\"]";
 	}
 }

@@ -1,5 +1,6 @@
 package task;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -8,6 +9,8 @@ import data.ActivityRelations;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
+import model.PlaceNode;
+import model.TransitionNode;
 
 public class InitialFragmentsTask extends Task<InitialFragments> {
 
@@ -48,7 +51,34 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 			
 			
 			//Creating the initial fragments
-			
+			int nextNodeId = 0;
+			List<TransitionNode> fragmentMainTransitions = new ArrayList<TransitionNode>();
+			for (ActivityRelations activityRelations : activityRelationsMap.values()) {
+				DiscoveredActivity mainActivity = activityRelations.getActivity();
+				TransitionNode mainTransition = new TransitionNode(nextNodeId++, mainActivity, true);
+				fragmentMainTransitions.add(mainTransition);
+				
+				for (DiscoveredActivity resOutAct : activityRelations.getResponseOut()) {
+					PlaceNode place = new PlaceNode(nextNodeId++);
+					mainTransition.addOutgoingPlace(place);
+					TransitionNode transition = new TransitionNode(nextNodeId++, resOutAct, true);
+					place.addOutgoingTransition(transition);
+				}
+				
+				
+				for (DiscoveredActivity preInAct : activityRelations.getPrecedenceIn()) {
+					PlaceNode place = new PlaceNode(nextNodeId++);
+					mainTransition.addIncomingPlace(place);
+					TransitionNode transition = new TransitionNode(nextNodeId++, preInAct, true);
+					place.addIncomingTransition(transition);
+				}
+				
+				
+				//TODO: Outgoing precedences and incoming responses
+				
+				
+				initialFragments.setFragmentMainTransitions(fragmentMainTransitions);
+			}
 			
 			
 
