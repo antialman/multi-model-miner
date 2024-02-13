@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
+import task.InitialFragments;
 
 public class GraphGenerator {
 
@@ -238,5 +239,35 @@ public class GraphGenerator {
 		if(b2 == 15) s += "f";
 
 		return s;
+	}
+
+
+	public static String createFragmentsVisualizationString(InitialFragments initialFragments) {
+		StringBuilder sb = new StringBuilder("digraph \"\" {");
+		sb.append("rankdir = \"LR\"");
+		sb.append("ranksep = \".6\"");
+		sb.append("nodesep = \".5\"");
+		sb.append("node [fontsize=\"8\", fontname=\"Helvetica\"]");
+		sb.append("edge [fontsize=\"8\", fontname=\"Helvetica\" arrowsize=\".8\"]");
+		
+		
+		Map<DiscoveredActivity, String> nodeIds = new HashMap<>();
+		for (DiscoveredActivity da : initialFragments.getActivityRelationsMap().keySet()) {
+			String nodeId = "node"+nodeIds.size();
+			nodeIds.put(da, nodeId);
+			
+			sb.append(buildTransitionString(nodeId, da.getActivityName()));
+		}
+		
+		
+		
+		sb.append("}");
+
+		return sb.toString();
+	}
+	
+	private static String buildTransitionString(String nodeId, String label) {
+		return nodeId + " [label=\"" + label + "\",shape=rect,height=0.4,width=.4]";
+		
 	}
 }

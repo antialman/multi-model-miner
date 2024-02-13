@@ -45,15 +45,6 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 				activityRelationsMap.get(dc.getTargetActivity()).addMutualExclusion(dc.getActivationActivity());
 			}
 			initialFragments.setActivityRelationsMap(activityRelationsMap);
-			
-			
-			
-			
-			
-			
-			
-			
-			
 
 			return initialFragments;
 

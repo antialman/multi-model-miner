@@ -10,7 +10,6 @@
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
-<?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
@@ -115,11 +114,7 @@
             </Tab>
             <Tab text="Initial Fragments">
               <content>
-                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                     <children>
-                        <Label layoutX="127.0" layoutY="153.0" text="executing K leads to executing L, which thel leads to executing M " />
-                     </children>
-                  </AnchorPane>
+                  <WebView fx:id="fragmentsWebView" prefHeight="200.0" prefWidth="200.0" />
               </content>
             </Tab>
          </tabs></TabPane>

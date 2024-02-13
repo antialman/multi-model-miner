@@ -70,6 +70,9 @@ public class MainViewController {
 	private WebView preWebView;
 	@FXML
 	private WebView notcoWebView;
+	@FXML
+	private WebView fragmentsWebView;
+	
 
 	private Stage stage;
 
@@ -94,6 +97,7 @@ public class MainViewController {
 		WebViewUtils.setupWebView(resWebView);
 		WebViewUtils.setupWebView(preWebView);
 		WebViewUtils.setupWebView(notcoWebView);
+		WebViewUtils.setupWebView(fragmentsWebView);
 
 		initialPruningChoice.getItems().setAll(DeclarePruningType.values());
 		initialPruningChoice.getSelectionModel().select(DeclarePruningType.NONE);
@@ -249,7 +253,7 @@ public class MainViewController {
 		task.setOnSucceeded(event -> {
 			initialFragments = task.getValue();
 			
-			//TODO: Visualization
+			WebViewUtils.updateFragmentsWebView(initialFragments, fragmentsWebView);
 
 			
 

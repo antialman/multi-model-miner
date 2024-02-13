@@ -9,6 +9,7 @@ import data.DiscoveredConstraint;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
 import task.DiscoveryTaskResult;
+import task.InitialFragments;
 
 public class WebViewUtils {
 
@@ -55,7 +56,6 @@ public class WebViewUtils {
 			String visualizationString;
 			String script;
 
-
 			visualizationString = GraphGenerator.createDeclareVisualizationString(activities, constraints, true, true);
 			if (visualizationString != null) {
 				script = "setModel('" + visualizationString + "')";
@@ -64,5 +64,20 @@ public class WebViewUtils {
 			}
 		}
 
+	}
+
+	public static void updateFragmentsWebView(InitialFragments initialFragments, WebView fragmentsWebView) {
+		if (initialFragments != null) {
+			String visualizationString;
+			String script;
+			
+			visualizationString = GraphGenerator.createFragmentsVisualizationString(initialFragments);
+			if (visualizationString != null) {
+				script = "setModel('" + visualizationString + "')";
+				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
+				fragmentsWebView.getEngine().executeScript(script);
+			}
+		}
+		
 	}
 }
