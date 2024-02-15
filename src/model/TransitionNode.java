@@ -38,14 +38,20 @@ public class TransitionNode {
 	}
 	
 	public void addIncomingPlace(PlaceNode incomingPlace) {
-		this.incomingPlaces.add(incomingPlace);
+		incomingPlaces.add(incomingPlace);
+	}
+	public void remIncomingPlace(PlaceNode incomingPlace) {
+		incomingPlaces.remove(incomingPlace);
 	}
 	public Set<PlaceNode> getIncomingPlaces() {
 		return incomingPlaces;
 	}
 	
 	public void addOutgoingPlace(PlaceNode outgoingPlace) {
-		this.outgoingPlaces.add(outgoingPlace);
+		outgoingPlaces.add(outgoingPlace);
+	}
+	public void remOutgoingPlace(PlaceNode outgoingPlace) {
+		outgoingPlaces.remove(outgoingPlace);
 	}
 	public Set<PlaceNode> getOutgoingPlaces() {
 		return outgoingPlaces;

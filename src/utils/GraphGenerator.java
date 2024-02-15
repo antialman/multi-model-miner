@@ -2,11 +2,12 @@ package utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
-import data.ActivityRelations;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import model.PlaceNode;
@@ -255,6 +256,8 @@ public class GraphGenerator {
 		
 		int ellipsisCount = 0;
 		
+		Set<Integer> createdTransitions = new HashSet<Integer>(); //TODO: Would be better to first create all of the nodes and then the arcs between them
+		
 		for (TransitionNode mainTransitionNode : initialFragments.getFragmentMainTransitions()) {
 			sb.append(buildTransitionString(mainTransitionNode));
 			
@@ -262,10 +265,13 @@ public class GraphGenerator {
 				sb.append(buildPlaceString(outPlaceNode));
 				sb.append(" node" + mainTransitionNode.getNodeId() + " -> node" + outPlaceNode.getNodeId());
 				for (TransitionNode outTransitionNode : outPlaceNode.getOutgoingTransitions()) { //Recursion not needed here because initial fragments will not go further
-					sb.append(buildTransitionString(outTransitionNode));
+					if (!createdTransitions.contains(outTransitionNode.getNodeId())) {
+						sb.append(buildTransitionString(outTransitionNode));
+						sb.append(buildEllipsisNodeString(ellipsisCount));
+						sb.append("node" + outTransitionNode.getNodeId() + " -> ellipsis" + ellipsisCount++);
+						createdTransitions.add(outTransitionNode.getNodeId());
+					}
 					sb.append(" node" + outPlaceNode.getNodeId() + " -> node" + outTransitionNode.getNodeId());
-					sb.append(buildEllipsisNodeString(ellipsisCount));
-					sb.append("node" + outTransitionNode.getNodeId() + " -> ellipsis" + ellipsisCount++);
 				}
 			}
 			
@@ -273,11 +279,13 @@ public class GraphGenerator {
 				sb.append(buildPlaceString(inPlaceNode));
 				sb.append(" node" + inPlaceNode.getNodeId() + " -> node" + mainTransitionNode.getNodeId());
 				for (TransitionNode inTransitionNode : inPlaceNode.getIncomingTransitions()) { //Recursion not needed here because initial fragments will not go further
-					sb.append(buildTransitionString(inTransitionNode));
+					if (!createdTransitions.contains(inTransitionNode.getNodeId())) {
+						sb.append(buildTransitionString(inTransitionNode));
+						sb.append(buildEllipsisNodeString(ellipsisCount));
+						sb.append("ellipsis" + ellipsisCount++ + " -> node" + inTransitionNode.getNodeId());
+						createdTransitions.add(inTransitionNode.getNodeId());
+					}
 					sb.append(" node" + inTransitionNode.getNodeId() + " -> node" + inPlaceNode.getNodeId());
-
-					sb.append(buildEllipsisNodeString(ellipsisCount));
-					sb.append("ellipsis" + ellipsisCount++ + " -> node" + inTransitionNode.getNodeId());
 				}
 			}
 		}
@@ -291,9 +299,9 @@ public class GraphGenerator {
 	private static String buildTransitionString(TransitionNode transitionNode) {
 		
 		if (transitionNode.isVisible()) {
-			return " node" + transitionNode.getNodeId() + " [label=\"" + transitionNode.getTransitionLabel() + "\",shape=rect,height=0.4,width=.4]";
+			return " node" + transitionNode.getNodeId() + " [label=\"" + transitionNode.getTransitionLabel() + "\",shape=rect,height=0.3,width=.3]";
 		} else {
-			return " node" + transitionNode.getNodeId() + " [label=\"\"style=\"filled\",fillcolor=\"#000000\",shape=rect,height=0.4,width=.4]";
+			return " node" + transitionNode.getNodeId() + " [label=\"\"style=\"filled\",fillcolor=\"#000000\",shape=rect,height=0.3,width=.3]";
 		}
 	}
 	
@@ -302,6 +310,6 @@ public class GraphGenerator {
 	}
 	
 	private static String buildEllipsisNodeString(int ellipsisId) {
-		return " ellipsis" + ellipsisId + "[shape=none,fontsize=\"14\",label=\"...\"]";
+		return " ellipsis" + ellipsisId + "[shape=none,fontsize=\"14\",label=\"...\",height=0.3,width=.3]";
 	}
 }

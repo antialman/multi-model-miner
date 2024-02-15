@@ -105,7 +105,7 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 
 		} catch (Exception e) {
 			System.err.println("Finding constraint subsets failed: " + e.getMessage());
-			System.err.println(e);
+			e.printStackTrace();
 			throw e;
 		}
 	}

@@ -200,7 +200,7 @@ public class DiscoveryTaskDeclare extends Task<DiscoveryTaskResult> {
 
 		} catch (Exception e) {
 			System.err.println("Discovering Declare model failed: " + e.getMessage());
-			System.err.println(e);
+			e.printStackTrace();
 			throw e;
 		}
 	}

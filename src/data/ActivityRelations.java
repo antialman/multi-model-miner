@@ -27,20 +27,20 @@ public class ActivityRelations {
 		return activity;
 	}
 
-	public void addResponseOut(DiscoveredActivity activity) {
-		responseOut.add(activity);
+	public void addResponseOut(DiscoveredActivity discoveredActivity) {
+		responseOut.add(discoveredActivity);
 	}
-	public void addResponseIn(DiscoveredActivity activity) {
-		responseIn.add(activity);
+	public void addResponseIn(DiscoveredActivity discoveredActivity) {
+		responseIn.add(discoveredActivity);
 	}
-	public void addPrecedenceOut(DiscoveredActivity activity) {
-		precedenceOut.add(activity);
+	public void addPrecedenceOut(DiscoveredActivity discoveredActivity) {
+		precedenceOut.add(discoveredActivity);
 	}
-	public void addPrecedenceIn(DiscoveredActivity activity) {
-		precedenceIn.add(activity);
+	public void addPrecedenceIn(DiscoveredActivity discoveredActivity) {
+		precedenceIn.add(discoveredActivity);
 	}
 	public void addMutualExclusion(DiscoveredActivity discoveredActivity) {
-		mutualExclusion.add(activity);
+		mutualExclusion.add(discoveredActivity);
 	}
 	
 	public boolean responseOutContains(DiscoveredActivity discoveredActivity) {

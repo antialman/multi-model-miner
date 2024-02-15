@@ -18,13 +18,20 @@ public class PlaceNode {
 	}
 	
 	public void addIncomingTransition(TransitionNode incomingTransition) {
-		this.incomingTransitions.add(incomingTransition);
+		incomingTransitions.add(incomingTransition);
+	}
+	public void remIncomingTransition(TransitionNode incomingTransition) {
+		incomingTransitions.remove(incomingTransition);
 	}
 	public Set<TransitionNode> getIncomingTransitions() {
 		return incomingTransitions;
 	}
+	
 	public void addOutgoingTransition(TransitionNode outgoingTransition) {
 		outgoingTransitions.add(outgoingTransition);
+	}
+	public void remOutgoingTransition(TransitionNode outgoingTransition) {
+		outgoingTransitions.remove(outgoingTransition);
 	}
 	public Set<TransitionNode> getOutgoingTransitions() {
 		return outgoingTransitions;
