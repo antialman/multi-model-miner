@@ -39,9 +39,15 @@ public class TransitionNode {
 	
 	public void addIncomingPlace(PlaceNode incomingPlace) {
 		incomingPlaces.add(incomingPlace);
+		if (!incomingPlace.getOutgoingTransitions().contains(this)) {
+			incomingPlace.addOutgoingTransition(this);
+		}
 	}
 	public void remIncomingPlace(PlaceNode incomingPlace) {
 		incomingPlaces.remove(incomingPlace);
+		if (incomingPlace.getOutgoingTransitions().contains(this)) {
+			incomingPlace.remOutgoingTransition(this);
+		}
 	}
 	public Set<PlaceNode> getIncomingPlaces() {
 		return incomingPlaces;
@@ -49,9 +55,15 @@ public class TransitionNode {
 	
 	public void addOutgoingPlace(PlaceNode outgoingPlace) {
 		outgoingPlaces.add(outgoingPlace);
+		if (!outgoingPlace.getIncomingTransitions().contains(this)) {
+			outgoingPlace.addIncomingTransition(this);
+		}
 	}
 	public void remOutgoingPlace(PlaceNode outgoingPlace) {
 		outgoingPlaces.remove(outgoingPlace);
+		if (outgoingPlace.getIncomingTransitions().contains(this)) {
+			outgoingPlace.remIncomingTransition(this);
+		}
 	}
 	public Set<PlaceNode> getOutgoingPlaces() {
 		return outgoingPlaces;
