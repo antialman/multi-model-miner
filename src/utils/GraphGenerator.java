@@ -298,10 +298,10 @@ public class GraphGenerator {
 	
 	private static String buildTransitionString(TransitionNode transitionNode) {
 		
-		if (transitionNode.isVisible()) {
-			return " node" + transitionNode.getNodeId() + " [label=\"" + transitionNode.getTransitionLabel() + "\",shape=rect,height=0.3,width=.3]";
-		} else {
+		if (transitionNode.isSilent()) {
 			return " node" + transitionNode.getNodeId() + " [label=\"\"style=\"filled\",fillcolor=\"#000000\",shape=rect,height=0.3,width=.3]";
+		} else {
+			return " node" + transitionNode.getNodeId() + " [label=\"" + transitionNode.getTransitionLabel() + "\",shape=rect,height=0.3,width=.3]";
 		}
 	}
 	

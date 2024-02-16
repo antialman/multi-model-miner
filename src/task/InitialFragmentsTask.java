@@ -54,13 +54,13 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 			List<TransitionNode> fragmentMainTransitions = new ArrayList<TransitionNode>();
 			for (ActivityRelations activityRelations : activityRelationsMap.values()) {
 				DiscoveredActivity mainActivity = activityRelations.getActivity();
-				TransitionNode mainTransition = new TransitionNode(nextNodeId++, mainActivity, true);
+				TransitionNode mainTransition = new TransitionNode(nextNodeId++, mainActivity);
 				fragmentMainTransitions.add(mainTransition);
 				
 				//Outgoing responses from the given activity
 				for (DiscoveredActivity resOutAct : activityRelations.getResponseOut()) {
 					PlaceNode resOutPlace = new PlaceNode(nextNodeId++);
-					TransitionNode resOutTransition = new TransitionNode(nextNodeId++, resOutAct, true);
+					TransitionNode resOutTransition = new TransitionNode(nextNodeId++, resOutAct);
 					mainTransition.addOutgoingPlace(resOutPlace);
 					resOutPlace.addOutgoingTransition(resOutTransition);
 				}
@@ -68,7 +68,7 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 				//Incoming precedences to the given activity (mirror of outgoing responses)
 				for (DiscoveredActivity preInAct : activityRelations.getPrecedenceIn()) {
 					PlaceNode preInPlace = new PlaceNode(nextNodeId++);
-					TransitionNode preInTransition = new TransitionNode(nextNodeId++, preInAct, true);
+					TransitionNode preInTransition = new TransitionNode(nextNodeId++, preInAct);
 					mainTransition.addIncomingPlace(preInPlace);
 					preInPlace.addIncomingTransition(preInTransition);
 				}
@@ -84,7 +84,7 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 				for (DiscoveredActivity preOutAct : activityRelations.getPrecedenceOut()) {
 					if (!activityRelations.getResponseOut().contains(preOutAct)) {
 						PlaceNode preOutPlace = new PlaceNode(nextNodeId++);
-						TransitionNode preOutTransition = new TransitionNode(nextNodeId++, preOutAct, true);
+						TransitionNode preOutTransition = new TransitionNode(nextNodeId++, preOutAct);
 						mainTransition.addOutgoingPlace(preOutPlace);
 						preOutPlace.addOutgoingTransition(preOutTransition);
 						activityPlaceMap.put(preOutAct, preOutPlace);
@@ -119,12 +119,12 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 							outSup=outSup+outTransition.getDiscoveredActivity().getActivitySupport();
 						}
 						if (inSup != outSup) { //TODO: Should compare activity frequencies instead of support
-							TransitionNode skipTransition = new TransitionNode(nextNodeId++, null, false);
+							TransitionNode skipTransition = new TransitionNode(nextNodeId++, null);
 							skipCandidatePlace.addOutgoingTransition(skipTransition);
 						}
 					}
 					if (skipCandidatePlace.getOutgoingTransitions().size() == 1) {
-						TransitionNode skipTransition = new TransitionNode(nextNodeId++, null, false);
+						TransitionNode skipTransition = new TransitionNode(nextNodeId++, null);
 						skipCandidatePlace.addOutgoingTransition(skipTransition);
 					}
 				}
@@ -138,7 +138,7 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 				for (DiscoveredActivity resInAct : activityRelations.getResponseIn()) {
 					if (!activityRelations.getPrecedenceIn().contains(resInAct)) {
 						PlaceNode resInPlace = new PlaceNode(nextNodeId++);
-						TransitionNode resInTransition = new TransitionNode(nextNodeId++, resInAct, true);
+						TransitionNode resInTransition = new TransitionNode(nextNodeId++, resInAct);
 						mainTransition.addIncomingPlace(resInPlace);
 						resInPlace.addIncomingTransition(resInTransition);
 						activityPlaceMap.put(resInAct, resInPlace);
@@ -173,12 +173,12 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 							inSup=inSup+inTransition.getDiscoveredActivity().getActivitySupport();
 						}
 						if (outSup != inSup) { //TODO: Should compare activity frequencies instead of support
-							TransitionNode skipTransition = new TransitionNode(nextNodeId++, null, false);
+							TransitionNode skipTransition = new TransitionNode(nextNodeId++, null);
 							skipCandidatePlace.addIncomingTransition(skipTransition);
 						}
 					}
 					if (skipCandidatePlace.getIncomingTransitions().size() == 1) {
-						TransitionNode skipTransition = new TransitionNode(nextNodeId++, null, false);
+						TransitionNode skipTransition = new TransitionNode(nextNodeId++, null);
 						skipCandidatePlace.addIncomingTransition(skipTransition);
 					}
 				}

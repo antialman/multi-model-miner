@@ -8,18 +8,20 @@ import data.DiscoveredActivity;
 public class TransitionNode {
 	private int nodeId;
 	private DiscoveredActivity discoveredActivity;
-	private boolean isVisible;
+	private boolean isSilent;
 	private String transitionLabel;
 	
 	private Set<PlaceNode> incomingPlaces = new HashSet<PlaceNode>();
 	private Set<PlaceNode> outgoingPlaces = new HashSet<PlaceNode>();
 	
-	public TransitionNode(int nodeId, DiscoveredActivity discoveredActivity, boolean isVisible) {
+	public TransitionNode(int nodeId, DiscoveredActivity discoveredActivity) {
 		this.nodeId = nodeId;
 		this.discoveredActivity = discoveredActivity;
-		this.isVisible = isVisible;
-		if (isVisible) {
+		if (discoveredActivity != null) {
 			this.transitionLabel = discoveredActivity.getActivityName();
+			this.isSilent = false;
+		} else {
+			this.isSilent = true;
 		}
 	}
 	
@@ -30,8 +32,8 @@ public class TransitionNode {
 	public DiscoveredActivity getDiscoveredActivity() {
 		return discoveredActivity;
 	}
-	public boolean isVisible() {
-		return isVisible;
+	public boolean isSilent() {
+		return isSilent;
 	}
 	public String getTransitionLabel() {
 		return transitionLabel;
