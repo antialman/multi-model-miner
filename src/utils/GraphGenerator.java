@@ -300,6 +300,8 @@ public class GraphGenerator {
 		
 		if (transitionNode.isSilent()) {
 			return " node" + transitionNode.getNodeId() + " [label=\"\"style=\"filled\",fillcolor=\"#000000\",shape=rect,height=0.3,width=.3]";
+		} else if (transitionNode.isFragmentMain()) {
+			return " node" + transitionNode.getNodeId() + " [label=\"" + transitionNode.getTransitionLabel() + "\",style=\"filled\",fillcolor=\"#eeeeee\",shape=rect,height=0.3,width=.3]";
 		} else {
 			return " node" + transitionNode.getNodeId() + " [label=\"" + transitionNode.getTransitionLabel() + "\",shape=rect,height=0.3,width=.3]";
 		}

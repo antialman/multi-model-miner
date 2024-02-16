@@ -8,8 +8,9 @@ import data.DiscoveredActivity;
 public class TransitionNode {
 	private int nodeId;
 	private DiscoveredActivity discoveredActivity;
-	private boolean isSilent;
 	private String transitionLabel;
+	private boolean isSilent;
+	private boolean isFragmentMain;
 	
 	private Set<PlaceNode> incomingPlaces = new HashSet<PlaceNode>();
 	private Set<PlaceNode> outgoingPlaces = new HashSet<PlaceNode>();
@@ -23,6 +24,7 @@ public class TransitionNode {
 		} else {
 			this.isSilent = true;
 		}
+		this.isFragmentMain = false;
 	}
 	
 	
@@ -69,6 +71,13 @@ public class TransitionNode {
 	}
 	public Set<PlaceNode> getOutgoingPlaces() {
 		return outgoingPlaces;
+	}
+	
+	public void setFragmentMain(boolean isFragmentMain) {
+		this.isFragmentMain = isFragmentMain;
+	}
+	public boolean isFragmentMain() {
+		return isFragmentMain;
 	}
 
 }

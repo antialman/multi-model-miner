@@ -55,6 +55,7 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 			for (ActivityRelations activityRelations : activityRelationsMap.values()) {
 				DiscoveredActivity mainActivity = activityRelations.getActivity();
 				TransitionNode mainTransition = new TransitionNode(nextNodeId++, mainActivity);
+				mainTransition.setFragmentMain(true);
 				fragmentMainTransitions.add(mainTransition);
 				
 				//Outgoing responses from the given activity
