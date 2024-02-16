@@ -58,6 +58,7 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 				mainTransition.setFragmentMain(true);
 				fragmentMainTransitions.add(mainTransition);
 				
+				
 				//Outgoing responses from the given activity
 				for (DiscoveredActivity resOutAct : activityRelations.getResponseOut()) {
 					PlaceNode resOutPlace = new PlaceNode(nextNodeId++);
@@ -66,6 +67,7 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 					resOutPlace.addOutgoingTransition(resOutTransition);
 				}
 				
+				
 				//Incoming precedences to the given activity (mirror of outgoing responses)
 				for (DiscoveredActivity preInAct : activityRelations.getPrecedenceIn()) {
 					PlaceNode preInPlace = new PlaceNode(nextNodeId++);
@@ -73,9 +75,6 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 					mainTransition.addIncomingPlace(preInPlace);
 					preInPlace.addIncomingTransition(preInTransition);
 				}
-				
-				
-				
 				
 				
 				////Outgoing precedences from each activity
@@ -129,7 +128,6 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 						skipCandidatePlace.addOutgoingTransition(skipTransition);
 					}
 				}
-				
 				
 				
 				////Incoming responses to each activity (mirror of outgoing precedences)

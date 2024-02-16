@@ -72,6 +72,8 @@ public class MainViewController {
 	private WebView notcoWebView;
 	@FXML
 	private WebView fragmentsWebView;
+	@FXML
+	private WebView firstMergeWebView;
 	
 
 	private Stage stage;
@@ -98,6 +100,7 @@ public class MainViewController {
 		WebViewUtils.setupWebView(preWebView);
 		WebViewUtils.setupWebView(notcoWebView);
 		WebViewUtils.setupWebView(fragmentsWebView);
+		WebViewUtils.setupWebView(firstMergeWebView);
 
 		initialPruningChoice.getItems().setAll(DeclarePruningType.values());
 		initialPruningChoice.getSelectionModel().select(DeclarePruningType.NONE);

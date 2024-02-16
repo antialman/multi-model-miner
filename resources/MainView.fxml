@@ -113,8 +113,13 @@
                </content>
             </Tab>
             <Tab text="Initial Fragments">
-              <content>
+               <content>
                   <WebView fx:id="fragmentsWebView" prefHeight="200.0" prefWidth="200.0" />
+               </content>
+            </Tab>
+            <Tab text="1st Merge">
+              <content>
+                  <WebView fx:id="firstMergeWebView" prefHeight="200.0" prefWidth="200.0" />
               </content>
             </Tab>
          </tabs></TabPane>
