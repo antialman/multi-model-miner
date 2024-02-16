@@ -12,7 +12,6 @@ import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import model.PlaceNode;
 import model.TransitionNode;
-import task.InitialFragments;
 
 public class GraphGenerator {
 
@@ -246,7 +245,7 @@ public class GraphGenerator {
 	}
 
 
-	public static String createFragmentsVisualizationString(InitialFragments initialFragments) {
+	public static String createFragmentsVisualizationString(List<TransitionNode> fragmentMainTransitions) {
 		StringBuilder sb = new StringBuilder("digraph \"\" {");
 		sb.append("rankdir = \"LR\"");
 		sb.append("ranksep = \".4\"");
@@ -258,7 +257,7 @@ public class GraphGenerator {
 		
 		Set<Integer> createdTransitions = new HashSet<Integer>(); //TODO: Would be better to first create all of the nodes and then the arcs between them
 		
-		for (TransitionNode mainTransitionNode : initialFragments.getFragmentMainTransitions()) {
+		for (TransitionNode mainTransitionNode : fragmentMainTransitions) {
 			sb.append(buildTransitionString(mainTransitionNode));
 			
 			for (PlaceNode outPlaceNode : mainTransitionNode.getOutgoingPlaces()) {

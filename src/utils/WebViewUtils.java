@@ -8,8 +8,8 @@ import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
+import model.TransitionNode;
 import task.DiscoveryTaskResult;
-import task.InitialFragments;
 
 public class WebViewUtils {
 
@@ -66,12 +66,12 @@ public class WebViewUtils {
 
 	}
 
-	public static void updateFragmentsWebView(InitialFragments initialFragments, WebView fragmentsWebView) {
-		if (initialFragments != null) {
+	public static void updateFragmentsWebView(List<TransitionNode> fragmentMainTransitions, WebView fragmentsWebView) {
+		if (fragmentMainTransitions != null && !fragmentMainTransitions.isEmpty()) {
 			String visualizationString;
 			String script;
 			
-			visualizationString = GraphGenerator.createFragmentsVisualizationString(initialFragments);
+			visualizationString = GraphGenerator.createFragmentsVisualizationString(fragmentMainTransitions);
 			if (visualizationString != null) {
 				script = "setModel('" + visualizationString + "')";
 				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));

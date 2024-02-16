@@ -20,9 +20,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
+import model.TransitionNode;
 import task.DiscoveryTaskDeclare;
 import task.DiscoveryTaskResult;
-import task.InitialFragments;
 import task.InitialFragmentsTask;
 import task.ConstraintSubsets;
 import task.ConstraintSubsetsTask;
@@ -82,7 +82,7 @@ public class MainViewController {
 
 	private DiscoveryTaskResult discoveryTaskResult;
 	private ConstraintSubsets constraintSubsets;
-	private InitialFragments initialFragments;
+	private List<TransitionNode> fragmentMainTransitions;
 
 
 
@@ -254,9 +254,9 @@ public class MainViewController {
 	private void addInitialFragmentsTaskHandlers(InitialFragmentsTask task) {
 		//Handle task success
 		task.setOnSucceeded(event -> {
-			initialFragments = task.getValue();
+			fragmentMainTransitions = task.getValue();
 			
-			WebViewUtils.updateFragmentsWebView(initialFragments, fragmentsWebView);
+			WebViewUtils.updateFragmentsWebView(fragmentMainTransitions, fragmentsWebView);
 
 			
 

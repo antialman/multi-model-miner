@@ -11,7 +11,7 @@ import javafx.concurrent.Task;
 import model.PlaceNode;
 import model.TransitionNode;
 
-public class InitialFragmentsTask extends Task<InitialFragments> {
+public class InitialFragmentsTask extends Task<List<TransitionNode>> {
 
 	private List<DiscoveredActivity> discoveredActivities;
 	private ConstraintSubsets constraintSubsets;
@@ -24,12 +24,10 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 
 
 	@Override
-	protected InitialFragments call() throws Exception {
+	protected List<TransitionNode> call() throws Exception {
 		try {
 			long taskStartTime = System.currentTimeMillis();
 			System.out.println("Discovering constraint subsets started at: " + taskStartTime);
-
-			InitialFragments initialFragments = new InitialFragments();
 			
 			//Making it easier to look up which types of relations each activity has to other activities
 			Map<DiscoveredActivity, ActivityRelations> activityRelationsMap = new HashMap<DiscoveredActivity, ActivityRelations>();
@@ -46,7 +44,6 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 				activityRelationsMap.get(dc.getActivationActivity()).addMutualExclusion(dc.getTargetActivity());
 				activityRelationsMap.get(dc.getTargetActivity()).addMutualExclusion(dc.getActivationActivity());
 			}
-			initialFragments.setActivityRelationsMap(activityRelationsMap);
 			
 			
 			//Creating the initial (activity based) fragments
@@ -181,13 +178,9 @@ public class InitialFragmentsTask extends Task<InitialFragments> {
 						skipCandidatePlace.addIncomingTransition(skipTransition);
 					}
 				}
-				
-				initialFragments.setFragmentMainTransitions(fragmentMainTransitions);
 			}
 			
-			
-
-			return initialFragments;
+			return fragmentMainTransitions;
 
 		} catch (Exception e) {
 			System.err.println("Finding constraint subsets failed: " + e.getMessage());
