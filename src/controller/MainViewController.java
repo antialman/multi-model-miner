@@ -23,6 +23,7 @@ import javafx.util.StringConverter;
 import model.TransitionNode;
 import task.DiscoveryTaskDeclare;
 import task.DiscoveryTaskResult;
+import task.FirstMergeTask;
 import task.InitialFragmentsTask;
 import task.ConstraintSubsets;
 import task.ConstraintSubsetsTask;
@@ -74,7 +75,7 @@ public class MainViewController {
 	private WebView fragmentsWebView;
 	@FXML
 	private WebView firstMergeWebView;
-	
+
 
 	private Stage stage;
 
@@ -83,6 +84,7 @@ public class MainViewController {
 	private DiscoveryTaskResult discoveryTaskResult;
 	private ConstraintSubsets constraintSubsets;
 	private List<TransitionNode> fragmentMainTransitions;
+	private List<TransitionNode> firstMergeMainTransitions;
 
 
 
@@ -234,7 +236,6 @@ public class MainViewController {
 			WebViewUtils.updateSubsetsWebView(constraintSubsets.getResActivities(), constraintSubsets.getResConstraints(), resWebView);
 			WebViewUtils.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
 
-
 			//Execute initial fragments task after successful constraint filtering and pruning
 			InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryTaskResult.getActivities(), constraintSubsets);
 			addInitialFragmentsTaskHandlers(initialFragmentsTask);
@@ -255,16 +256,34 @@ public class MainViewController {
 		//Handle task success
 		task.setOnSucceeded(event -> {
 			fragmentMainTransitions = task.getValue();
-			
+
 			WebViewUtils.updateFragmentsWebView(fragmentMainTransitions, fragmentsWebView);
 
-			
-
+			//Execute the first merge task after creating the initial fragments
+			FirstMergeTask firstMergeTask = new FirstMergeTask(fragmentMainTransitions);
+			addFirstMergeTaskHandlers(firstMergeTask);
+			executorService.execute(firstMergeTask);
 		});
 
 		//Handle task failure
 		task.setOnFailed(event -> {
 			AlertUtils.showError("Finding initial fragments failed!");
+		});
+	}
+
+	private void addFirstMergeTaskHandlers(FirstMergeTask task) {
+		//Handle task success
+		task.setOnSucceeded(event -> {
+			firstMergeMainTransitions = task.getValue();
+
+			WebViewUtils.updateFragmentsWebView(firstMergeMainTransitions, firstMergeWebView);
+
+			
+		});
+
+		//Handle task failure
+		task.setOnFailed(event -> {
+			AlertUtils.showError("First merge failed!");
 		});
 	}
 
