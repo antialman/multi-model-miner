@@ -1,6 +1,7 @@
 package utils;
 
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -66,7 +67,7 @@ public class WebViewUtils {
 
 	}
 
-	public static void updateFragmentsWebView(List<TransitionNode> fragmentMainTransitions, WebView fragmentsWebView) {
+	public static void updateFragmentsWebView(Set<TransitionNode> fragmentMainTransitions, WebView fragmentsWebView) {
 		if (fragmentMainTransitions != null && !fragmentMainTransitions.isEmpty()) {
 			String visualizationString;
 			String script;

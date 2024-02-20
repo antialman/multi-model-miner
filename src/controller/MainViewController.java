@@ -2,6 +2,7 @@ package controller;
 
 import java.io.File;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -83,8 +84,8 @@ public class MainViewController {
 
 	private DiscoveryTaskResult discoveryTaskResult;
 	private ConstraintSubsets constraintSubsets;
-	private List<TransitionNode> fragmentMainTransitions;
-	private List<TransitionNode> firstMergeMainTransitions;
+	private Set<TransitionNode> fragmentMainTransitions;
+	private Set<TransitionNode> firstMergeMainTransitions;
 
 
 

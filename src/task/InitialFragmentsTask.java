@@ -1,9 +1,11 @@
 package task;
 
-import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
 import data.ActivityRelations;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
@@ -11,7 +13,7 @@ import javafx.concurrent.Task;
 import model.PlaceNode;
 import model.TransitionNode;
 
-public class InitialFragmentsTask extends Task<List<TransitionNode>> {
+public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 
 	private List<DiscoveredActivity> discoveredActivities;
 	private ConstraintSubsets constraintSubsets;
@@ -24,7 +26,7 @@ public class InitialFragmentsTask extends Task<List<TransitionNode>> {
 
 
 	@Override
-	protected List<TransitionNode> call() throws Exception {
+	protected Set<TransitionNode> call() throws Exception {
 		try {
 			long taskStartTime = System.currentTimeMillis();
 			System.out.println("Discovering constraint subsets started at: " + taskStartTime);
@@ -48,7 +50,7 @@ public class InitialFragmentsTask extends Task<List<TransitionNode>> {
 			
 			//Creating the initial (activity based) fragments
 			int nextNodeId = 0;
-			List<TransitionNode> fragmentMainTransitions = new ArrayList<TransitionNode>();
+			Set<TransitionNode> fragmentMainTransitions = new LinkedHashSet<TransitionNode>();
 			for (ActivityRelations activityRelations : activityRelationsMap.values()) {
 				DiscoveredActivity mainActivity = activityRelations.getActivity();
 				TransitionNode mainTransition = new TransitionNode(nextNodeId++, mainActivity);

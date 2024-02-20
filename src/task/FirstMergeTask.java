@@ -1,24 +1,24 @@
 package task;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javafx.concurrent.Task;
 import model.PlaceNode;
 import model.TransitionNode;
 
-public class FirstMergeTask extends Task<List<TransitionNode>> {
+public class FirstMergeTask extends Task<Set<TransitionNode>> {
 	
-	private List<TransitionNode> fragmentMainTransitions;
+	private Set<TransitionNode> fragmentMainTransitions;
 
-	public FirstMergeTask(List<TransitionNode> fragmentMainTransitions) {
+	public FirstMergeTask(Set<TransitionNode> fragmentMainTransitions) {
 		this.fragmentMainTransitions = fragmentMainTransitions;
 	}
 	
 	@Override
-	protected List<TransitionNode> call() throws Exception {
+	protected Set<TransitionNode> call() throws Exception {
 		try {
 			long taskStartTime = System.currentTimeMillis();
 			System.out.println("Discovering constraint subsets started at: " + taskStartTime);
@@ -28,7 +28,7 @@ public class FirstMergeTask extends Task<List<TransitionNode>> {
 			//Implementing only a single pass for now just to see how it would work
 			
 			
-			List<TransitionNode> firstMergeMainTransitions = new ArrayList<TransitionNode>();
+			Set<TransitionNode> firstMergeMainTransitions = new LinkedHashSet<TransitionNode>();
 			
 			int nextNodeId = 0;
 			for (TransitionNode fragmentMainTransition : fragmentMainTransitions) {
@@ -50,9 +50,6 @@ public class FirstMergeTask extends Task<List<TransitionNode>> {
 							newInPlace.addIncomingTransition(newInTransition);
 							fragmentToNewInMap.put(fragmentInTransition, newInTransition);
 						}
-						
-						//TODO: For each transition, find the corresponding fragment and add it's incoming places and transitions
-						
 					}
 				}
 				
@@ -69,13 +66,10 @@ public class FirstMergeTask extends Task<List<TransitionNode>> {
 							newOutPlace.addOutgoingTransition(newOutTransition);
 							fragmentToNewOutMap.put(fragmentOutTransition, newOutTransition);
 						}
-						
-						
-						
-						//TODO: For each transition, find the corresponding fragment and add it's outgoing places and transitions
-						
 					}
 				}
+				
+				
 			}
 			
 			

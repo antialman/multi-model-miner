@@ -245,7 +245,7 @@ public class GraphGenerator {
 	}
 
 
-	public static String createFragmentsVisualizationString(List<TransitionNode> fragmentMainTransitions) {
+	public static String createFragmentsVisualizationString(Set<TransitionNode> fragmentMainTransitions) {
 		StringBuilder sb = new StringBuilder("digraph \"\" {");
 		sb.append("rankdir = \"LR\"");
 		sb.append("ranksep = \".4\"");
