@@ -1,14 +1,14 @@
 package model;
 
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 public class PlaceNode {
 	private int nodeId;
 	
-	private Set<TransitionNode> incomingTransitions = new HashSet<TransitionNode>();
-	private Set<TransitionNode> outgoingTransitions = new HashSet<TransitionNode>();
+	private Set<TransitionNode> incomingTransitions = new LinkedHashSet<TransitionNode>();
+	private Set<TransitionNode> outgoingTransitions = new LinkedHashSet<TransitionNode>();
 	
 	public PlaceNode(int nodeId) {
 		this.nodeId = nodeId;

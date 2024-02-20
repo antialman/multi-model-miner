@@ -1,6 +1,6 @@
 package model;
 
-import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 import data.DiscoveredActivity;
@@ -12,8 +12,8 @@ public class TransitionNode {
 	private boolean isSilent;
 	private boolean isFragmentMain;
 	
-	private Set<PlaceNode> incomingPlaces = new HashSet<PlaceNode>();
-	private Set<PlaceNode> outgoingPlaces = new HashSet<PlaceNode>();
+	private Set<PlaceNode> incomingPlaces = new LinkedHashSet<PlaceNode>();
+	private Set<PlaceNode> outgoingPlaces = new LinkedHashSet<PlaceNode>();
 	
 	public TransitionNode(int nodeId, DiscoveredActivity discoveredActivity) {
 		this.nodeId = nodeId;
