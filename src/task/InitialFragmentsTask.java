@@ -1,6 +1,8 @@
 package task;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -17,6 +19,9 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 
 	private List<DiscoveredActivity> discoveredActivities;
 	private ConstraintSubsets constraintSubsets;
+	private Map<DiscoveredActivity, ActivityRelations> activityRelationsMap;
+	private ArrayList<Set<DiscoveredActivity>> notcoCliques;
+	
 
 	public InitialFragmentsTask(List<DiscoveredActivity> discoveredActivities, ConstraintSubsets constraintSubsets) {
 		super();
@@ -32,7 +37,7 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 			System.out.println("Discovering constraint subsets started at: " + taskStartTime);
 			
 			//Making it easier to look up which types of relations each activity has to other activities
-			Map<DiscoveredActivity, ActivityRelations> activityRelationsMap = new HashMap<DiscoveredActivity, ActivityRelations>();
+			activityRelationsMap = new HashMap<DiscoveredActivity, ActivityRelations>();
 			discoveredActivities.forEach(da -> {activityRelationsMap.put(da, new ActivityRelations(da));});
 			for (DiscoveredConstraint dc : constraintSubsets.getResConstraints()) {
 				activityRelationsMap.get(dc.getActivationActivity()).addResponseOut(dc.getTargetActivity());
@@ -77,107 +82,85 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 				
 				
 				////Outgoing precedences from each activity
-				//1. Place each activity that is enabled (but not required) by the mainActivity in parallel after the mainActivity
-				Map<DiscoveredActivity, PlaceNode> activityPlaceMap = new HashMap<DiscoveredActivity, PlaceNode>();
+				List<DiscoveredActivity> candidates = new ArrayList<DiscoveredActivity>();
 				Map<DiscoveredActivity, TransitionNode> activityTransitionMap = new HashMap<DiscoveredActivity, TransitionNode>();
+		        
+				//1. Create places and transitions for each activity that cannot be in XOR with others, prepare for processing potential XORs
 				for (DiscoveredActivity preOutAct : activityRelations.getPrecedenceOut()) {
-					if (!activityRelations.getResponseOut().contains(preOutAct)) {
+					if (activityRelations.getResponseOut().contains(preOutAct)) { //If there is also an outgoing response to the same activity, then that activity is already processed
+						continue;
+					} else if (activityRelationsMap.get(preOutAct).getMutualExclusion().isEmpty()) { //If there are no mutual exclusions and no outgoing response to the same activity, then that activity must be optional
 						PlaceNode preOutPlace = new PlaceNode(nextNodeId++);
 						TransitionNode preOutTransition = new TransitionNode(nextNodeId++, preOutAct);
 						mainTransition.addOutgoingPlace(preOutPlace);
 						preOutPlace.addOutgoingTransition(preOutTransition);
-						activityPlaceMap.put(preOutAct, preOutPlace);
-						activityTransitionMap.put(preOutAct, preOutTransition);
-					}
-				}
-				//2. Create mutual exclusion arcs based on not coexistence constraints
-				for (DiscoveredActivity preOutAct : activityPlaceMap.keySet()) {
-					for (DiscoveredActivity notCoActivity : activityRelationsMap.get(preOutAct).getMutualExclusion()) {
-						if (activityTransitionMap.containsKey(notCoActivity)) {
-							activityPlaceMap.get(preOutAct).addOutgoingTransition(activityTransitionMap.get(notCoActivity));
-						}
-					}
-				}
-				//3. Remove equivalent places (simplifies XOR-splits)
-				for (PlaceNode remPlaceCandidate : activityPlaceMap.values()) {
-					for (PlaceNode compareToPlace : activityPlaceMap.values()) {
-						if (remPlaceCandidate != compareToPlace && remPlaceCandidate.getOutgoingTransitions().equals(compareToPlace.getOutgoingTransitions())) {
-							remPlaceCandidate.clearAllTransitions();
-						}
-					}
-				}
-				//4. Add silent transitions
-				for (PlaceNode skipCandidatePlace : activityPlaceMap.values()) {
-					if (skipCandidatePlace.getOutgoingTransitions().size() > 1) {
-						float inSup = 0;
-						float outSup = 0;
-						for (TransitionNode inTransition : skipCandidatePlace.getIncomingTransitions()) {
-							inSup=inSup+inTransition.getDiscoveredActivity().getActivitySupport();
-						}
-						for (TransitionNode outTransition : skipCandidatePlace.getOutgoingTransitions()) {
-							outSup=outSup+outTransition.getDiscoveredActivity().getActivitySupport();
-						}
-						if (inSup != outSup) { //TODO: Should compare activity frequencies instead of support
-							TransitionNode skipTransition = new TransitionNode(nextNodeId++, null);
-							skipCandidatePlace.addOutgoingTransition(skipTransition);
-						}
-					}
-					if (skipCandidatePlace.getOutgoingTransitions().size() == 1) {
 						TransitionNode skipTransition = new TransitionNode(nextNodeId++, null);
-						skipCandidatePlace.addOutgoingTransition(skipTransition);
+						preOutPlace.addOutgoingTransition(skipTransition);
+					} else {
+						candidates.add(preOutAct); //Add the activity to a list for finding notcoCliques
+						TransitionNode preOutTransition = new TransitionNode(nextNodeId++, preOutAct);
+						activityTransitionMap.put(preOutAct, preOutTransition); //Outgoing transitions from notco clique places
 					}
 				}
 				
+				//2. Find all maximal notco cliques
+				notcoCliques = new ArrayList<Set<DiscoveredActivity>>();
+				findCliques(new ArrayList<DiscoveredActivity>(), candidates, new ArrayList<DiscoveredActivity>()); //Fills the notcoCliques list
 				
+				//3. Create a place for each notco clique and connect it to the corresponding transitions
+				for (Set<DiscoveredActivity> notcoClique : notcoCliques) {
+					PlaceNode cliquePlace = new PlaceNode(nextNodeId++);
+					mainTransition.addOutgoingPlace(cliquePlace); //One outgoing place per each notco clique
+					float cliqueSupport = 0;
+					for (DiscoveredActivity notcoActivity : notcoClique) {
+						cliquePlace.addOutgoingTransition(activityTransitionMap.get(notcoActivity)); //Firing any activity of a notco click consumes the token of that clique (disabling other activities of that clique)
+						cliqueSupport = cliqueSupport + notcoActivity.getActivitySupport(); //For detecting if executing an activity from this clique is required 
+					}
+					if (mainActivity.getActivitySupport() > cliqueSupport) { //TODO: This check can probably break if there is looping behaviour (e.g., B is always preceded by A, but A can also occur after B)
+						TransitionNode skipTransition = new TransitionNode(nextNodeId++, null);
+						cliquePlace.addOutgoingTransition(skipTransition);
+					}
+				}
+				
+
 				////Incoming responses to each activity (mirror of outgoing precedences)
-				//1. Place each activity that enables (but is not required) by the mainActivity in parallel before the mainActivity
-				activityPlaceMap = new HashMap<DiscoveredActivity, PlaceNode>();
+				candidates = new ArrayList<DiscoveredActivity>();
 				activityTransitionMap = new HashMap<DiscoveredActivity, TransitionNode>();
+		        
+				//1. Create places and transitions for each activity that cannot be in XOR with others, prepare for processing potential XORs
 				for (DiscoveredActivity resInAct : activityRelations.getResponseIn()) {
-					if (!activityRelations.getPrecedenceIn().contains(resInAct)) {
+					if (activityRelations.getPrecedenceIn().contains(resInAct)) { //If there is also an incoming precedence to the same activity, then that activity is already processed
+						continue;
+					} else if (activityRelationsMap.get(resInAct).getMutualExclusion().isEmpty()) { //If there are no mutual exclusions and no incoming precedence to the same activity, then that activity must be optional
 						PlaceNode resInPlace = new PlaceNode(nextNodeId++);
 						TransitionNode resInTransition = new TransitionNode(nextNodeId++, resInAct);
 						mainTransition.addIncomingPlace(resInPlace);
 						resInPlace.addIncomingTransition(resInTransition);
-						activityPlaceMap.put(resInAct, resInPlace);
-						activityTransitionMap.put(resInAct, resInTransition);
-					}
-				}
-				//2. Create mutual exclusion arcs based on not coexistence constraints
-				for (DiscoveredActivity resInAct : activityPlaceMap.keySet()) {
-					for (DiscoveredActivity notCoActivity : activityRelationsMap.get(resInAct).getMutualExclusion()) {
-						if (activityTransitionMap.containsKey(notCoActivity)) {
-							activityPlaceMap.get(resInAct).addIncomingTransition(activityTransitionMap.get(notCoActivity));
-						}
-					}
-				}
-				//3. Remove equivalent places (simplifies XOR-splits)
-				for (PlaceNode remPlaceCandidate : activityPlaceMap.values()) {
-					for (PlaceNode compareToPlace : activityPlaceMap.values()) {
-						if (remPlaceCandidate != compareToPlace && remPlaceCandidate.getIncomingTransitions().equals(compareToPlace.getIncomingTransitions())) {
-							remPlaceCandidate.clearAllTransitions();
-						}
-					}
-				}
-				//4. Add silent transitions
-				for (PlaceNode skipCandidatePlace : activityPlaceMap.values()) {
-					if (skipCandidatePlace.getIncomingTransitions().size() > 1) {
-						float outSup = 0;
-						float inSup = 0;
-						for (TransitionNode outTransition : skipCandidatePlace.getOutgoingTransitions()) {
-							outSup=outSup+outTransition.getDiscoveredActivity().getActivitySupport();
-						}
-						for (TransitionNode inTransition : skipCandidatePlace.getIncomingTransitions()) {
-							inSup=inSup+inTransition.getDiscoveredActivity().getActivitySupport();
-						}
-						if (outSup != inSup) { //TODO: Should compare activity frequencies instead of support
-							TransitionNode skipTransition = new TransitionNode(nextNodeId++, null);
-							skipCandidatePlace.addIncomingTransition(skipTransition);
-						}
-					}
-					if (skipCandidatePlace.getIncomingTransitions().size() == 1) {
 						TransitionNode skipTransition = new TransitionNode(nextNodeId++, null);
-						skipCandidatePlace.addIncomingTransition(skipTransition);
+						resInPlace.addIncomingTransition(skipTransition);
+					} else {
+						candidates.add(resInAct); //Add the activity to a list for finding notcoCliques
+						TransitionNode resInTransition = new TransitionNode(nextNodeId++, resInAct);
+						activityTransitionMap.put(resInAct, resInTransition); //Incoming transitions from notco clique places
+					}
+				}
+				
+				//2. Find all maximal notco cliques
+				notcoCliques = new ArrayList<Set<DiscoveredActivity>>();
+				findCliques(new ArrayList<DiscoveredActivity>(), candidates, new ArrayList<DiscoveredActivity>()); //Fills the notcoCliques list
+				
+				//3. Create a place for each notco clique and connect it to the corresponding transitions
+				for (Set<DiscoveredActivity> notcoClique : notcoCliques) {
+					PlaceNode cliquePlace = new PlaceNode(nextNodeId++);
+					mainTransition.addIncomingPlace(cliquePlace); //One incoming place per each notco clique
+					float cliqueSupport = 0;
+					for (DiscoveredActivity notcoActivity : notcoClique) {
+						cliquePlace.addIncomingTransition(activityTransitionMap.get(notcoActivity)); //Firing any activity of a notco click produces the token of that clique (only one activity per clique should be fired)
+						cliqueSupport = cliqueSupport + notcoActivity.getActivitySupport(); //For detecting if executing an activity from this clique is required 
+					}
+					if (mainActivity.getActivitySupport() > cliqueSupport) { //TODO: This check can probably break if there is looping behaviour (e.g., B is always preceded by A, but A can also occur after B)
+						TransitionNode skipTransition = new TransitionNode(nextNodeId++, null);
+						cliquePlace.addIncomingTransition(skipTransition);
 					}
 				}
 			}
@@ -191,5 +174,68 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 		}
 	}
 
+	
+	public List<Set<TransitionNode>> findCliques(List<DiscoveredActivity> potentialClique, List<DiscoveredActivity> candidates, List<DiscoveredActivity> alreadyFound) {
+		//Based on the following Bron–Kerbosch algorithm implementation: https://github.com/liziliao/Bron-Kerbosch/blob/master/Bron-Kerbosch.java
+		
+		List<DiscoveredActivity> candidatesArray = new ArrayList<DiscoveredActivity>(candidates);
+		if (!end(candidates, alreadyFound)) {
+			for (DiscoveredActivity candidate : candidatesArray) {
+				List<DiscoveredActivity> newCandidates  = new ArrayList<DiscoveredActivity>();
+				List<DiscoveredActivity> newAlreadyFound  = new ArrayList<DiscoveredActivity>();
+				
+				potentialClique.add(candidate);
+				candidates.remove(candidate);
+				
+				for (DiscoveredActivity newCandidate : candidates) {
+					if (isNotcoNeighbor(candidate, newCandidate)) {
+						newCandidates.add(newCandidate);
+					}
+				}
+				
+				for (DiscoveredActivity newFound : alreadyFound) {
+					if (isNotcoNeighbor(candidate, newFound)) {
+						newAlreadyFound.add(newFound);
+					}
+				}
+				
+				if (newCandidates.isEmpty() && newAlreadyFound.isEmpty()) {
+					notcoCliques.add(new HashSet<DiscoveredActivity>(potentialClique));
+				} else {
+					findCliques(potentialClique, newCandidates, newAlreadyFound);
+				}
+				
+				alreadyFound.add(candidate);
+				potentialClique.remove(candidate);
+			}
+		}
+		
+		
+		
+		return null; 
+		
+	}
+	
+	private boolean end(List<DiscoveredActivity> candidates, List<DiscoveredActivity> alreadyFound) {
+		boolean end = false;
+		int edgecounter;
+		
+		for (DiscoveredActivity found : alreadyFound) {
+			edgecounter = 0;
+			for (DiscoveredActivity candidate : candidates) {
+				if (isNotcoNeighbor(found, candidate)) {
+					edgecounter++;
+				}
+			}
+			if (edgecounter == candidates.size()) {
+				end = true;
+			}
+		}
+		return end;
+	}
+	
+	private boolean isNotcoNeighbor(DiscoveredActivity activityA, DiscoveredActivity activityB) {
+		return activityRelationsMap.get(activityA).getMutualExclusion().contains(activityB);
+	}
 
 }
