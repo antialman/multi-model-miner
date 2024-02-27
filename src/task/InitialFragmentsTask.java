@@ -81,6 +81,9 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 				}
 				
 				
+				//TODO: Probably need to include coexistence constraints and do a similar clique-based calculation to also find skippable AND splits (e.g., either both A and B are executed in parallel or neither is executed)
+				
+				
 				////Outgoing precedences from each activity
 				List<DiscoveredActivity> candidates = new ArrayList<DiscoveredActivity>();
 				Map<DiscoveredActivity, TransitionNode> activityTransitionMap = new HashMap<DiscoveredActivity, TransitionNode>();
