@@ -7,6 +7,10 @@ import java.util.Set;
 public class PlaceNode {
 	private int nodeId;
 	
+	private boolean isInitial;
+	private boolean isFinal;
+	
+	
 	private Set<TransitionNode> incomingTransitions = new LinkedHashSet<TransitionNode>();
 	private Set<TransitionNode> outgoingTransitions = new LinkedHashSet<TransitionNode>();
 	
@@ -16,6 +20,19 @@ public class PlaceNode {
 	
 	public int getNodeId() {
 		return nodeId;
+	}
+	
+	public void setInitial(boolean isInitial) {
+		this.isInitial = isInitial;
+	}
+	public boolean isInitial() {
+		return isInitial;
+	}
+	public void setFinal(boolean isFinal) {
+		this.isFinal = isFinal;
+	}
+	public boolean isFinal() {
+		return isFinal;
 	}
 	
 	public void addIncomingTransition(TransitionNode incomingTransition) {
@@ -63,6 +80,12 @@ public class PlaceNode {
 			outIterator.remove();
 			t.remIncomingPlace(this);
 		}
+	}
+
+	@Override
+	public String toString() {
+		return "PlaceNode [nodeId=" + nodeId + ", incomingTransitions=" + incomingTransitions + ", outgoingTransitions="
+				+ outgoingTransitions + "]";
 	}
 	
 }

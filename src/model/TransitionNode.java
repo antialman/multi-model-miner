@@ -80,4 +80,11 @@ public class TransitionNode {
 		return isFragmentMain;
 	}
 
+
+	@Override
+	public String toString() {
+		return "TransitionNode [nodeId=" + nodeId + ", transitionLabel=" + transitionLabel + ", isSilent=" + isSilent
+				+ ", isFragmentMain=" + isFragmentMain + "]";
+	}
+
 }

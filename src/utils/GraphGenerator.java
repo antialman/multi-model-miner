@@ -14,7 +14,6 @@ import model.PlaceNode;
 import model.TransitionNode;
 
 public class GraphGenerator {
-
 	// private constructor to avoid unnecessary instantiation of the class
 	private GraphGenerator() {
 	}
@@ -202,7 +201,7 @@ public class GraphGenerator {
 		String fc = "#e6e600";
 		return "fillcolor=\""+color+";"+portion+":#808080\" gradientangle=90 fontcolor=\""+fc+"\"";
 	}
-	
+
 	private static String getHexValue(long value) {
 		long b1 = value / 16;
 		long b2 = value % 16;
@@ -245,6 +244,8 @@ public class GraphGenerator {
 	}
 
 
+
+
 	public static String createFragmentsVisualizationString(Set<TransitionNode> fragmentMainTransitions) {
 		StringBuilder sb = new StringBuilder("digraph \"\" {");
 		sb.append("rankdir = \"LR\"");
@@ -252,51 +253,60 @@ public class GraphGenerator {
 		sb.append("nodesep = \".3\"");
 		sb.append("node [fontsize=\"8\", fontname=\"Helvetica\"]");
 		sb.append("edge [fontsize=\"8\", fontname=\"Helvetica\" arrowsize=\".8\"]");
-		
-		int ellipsisCount = 0;
-		
-		Set<Integer> createdTransitions = new HashSet<Integer>(); //TODO: Would be better to first create all of the nodes and then the arcs between them
-		
+
 		for (TransitionNode mainTransitionNode : fragmentMainTransitions) {
-			sb.append(buildTransitionString(mainTransitionNode));
-			
-			for (PlaceNode outPlaceNode : mainTransitionNode.getOutgoingPlaces()) {
-				sb.append(buildPlaceString(outPlaceNode));
-				sb.append(" node" + mainTransitionNode.getNodeId() + " -> node" + outPlaceNode.getNodeId());
-				for (TransitionNode outTransitionNode : outPlaceNode.getOutgoingTransitions()) { //Recursion not needed here because initial fragments will not go further
-					if (!createdTransitions.contains(outTransitionNode.getNodeId())) {
-						sb.append(buildTransitionString(outTransitionNode));
-						sb.append(buildEllipsisNodeString(ellipsisCount));
-						sb.append("node" + outTransitionNode.getNodeId() + " -> ellipsis" + ellipsisCount++);
-						createdTransitions.add(outTransitionNode.getNodeId());
-					}
-					sb.append(" node" + outPlaceNode.getNodeId() + " -> node" + outTransitionNode.getNodeId());
-				}
-			}
-			
-			for (PlaceNode inPlaceNode : mainTransitionNode.getIncomingPlaces()) {
-				sb.append(buildPlaceString(inPlaceNode));
-				sb.append(" node" + inPlaceNode.getNodeId() + " -> node" + mainTransitionNode.getNodeId());
-				for (TransitionNode inTransitionNode : inPlaceNode.getIncomingTransitions()) { //Recursion not needed here because initial fragments will not go further
-					if (!createdTransitions.contains(inTransitionNode.getNodeId())) {
-						sb.append(buildTransitionString(inTransitionNode));
-						sb.append(buildEllipsisNodeString(ellipsisCount));
-						sb.append("ellipsis" + ellipsisCount++ + " -> node" + inTransitionNode.getNodeId());
-						createdTransitions.add(inTransitionNode.getNodeId());
-					}
-					sb.append(" node" + inTransitionNode.getNodeId() + " -> node" + inPlaceNode.getNodeId());
-				}
-			}
+			Set<Integer> createdNodes = new HashSet<Integer>();
+			processTransition(mainTransitionNode, createdNodes, sb);
 		}
-		
-		
+
 		sb.append("}");
 
 		return sb.toString();
 	}
 	
+	private static void processTransition(TransitionNode transitionNode, Set<Integer> createdNodes, StringBuilder sb) {
+		if (!createdNodes.contains(transitionNode.getNodeId())) {
+			sb.append(buildTransitionString(transitionNode));
+			createdNodes.add(transitionNode.getNodeId());
+			
+			if (transitionNode.getIncomingPlaces().isEmpty()) {
+				sb.append(buildEllipsisNodeString(transitionNode.getNodeId()+"el_in"));
+				sb.append(" node" + transitionNode.getNodeId()+"el_in" + " -> node" + transitionNode.getNodeId());
+			}
+			if (transitionNode.getOutgoingPlaces().isEmpty()) {
+				sb.append(buildEllipsisNodeString(transitionNode.getNodeId()+"el_out"));
+				sb.append(" node" + transitionNode.getNodeId() + " -> node" + transitionNode.getNodeId()+"el_out");
+			}
+			
+			for (PlaceNode placeNode : transitionNode.getIncomingPlaces()) {
+				processPlace(placeNode, createdNodes, sb);
+				sb.append(" node" + placeNode.getNodeId() + " -> node" + transitionNode.getNodeId());
+			}
+			for (PlaceNode placeNode : transitionNode.getOutgoingPlaces()) {
+				processPlace(placeNode, createdNodes, sb);
+				sb.append(" node" + transitionNode.getNodeId() + " -> node" + placeNode.getNodeId());
+			}
+		}
+	}
+	
+	private static void processPlace(PlaceNode placeNode, Set<Integer> createdNodes, StringBuilder sb) {
+		if (!createdNodes.contains(placeNode.getNodeId())) {
+			sb.append(buildPlaceString(placeNode));
+			createdNodes.add(placeNode.getNodeId());
+
+			for (TransitionNode transitionNode : placeNode.getIncomingTransitions()) {
+				processTransition(transitionNode, createdNodes, sb);
+			}
+			for (TransitionNode transitionNode : placeNode.getOutgoingTransitions()) {
+				processTransition(transitionNode, createdNodes, sb);
+			}
+		}
+	}
+	
+	
+
 	private static String buildTransitionString(TransitionNode transitionNode) {
-		
+
 		if (transitionNode.isSilent()) {
 			return " node" + transitionNode.getNodeId() + " [label=\"\"style=\"filled\",fillcolor=\"#000000\",shape=rect,height=0.3,width=.3]";
 		} else if (transitionNode.isFragmentMain()) {
@@ -305,12 +315,20 @@ public class GraphGenerator {
 			return " node" + transitionNode.getNodeId() + " [label=\"" + transitionNode.getTransitionLabel() + "\",shape=rect,height=0.3,width=.3]";
 		}
 	}
-	
+
 	private static String buildPlaceString(PlaceNode placeNode) {
-		return " node" + placeNode.getNodeId() + "[shape=circle,fixedsize=true,label=\"\", height=.3,width=.3]";
+		String placeString = null;
+		if (placeNode.isInitial()) {
+			placeString =  " node" + placeNode.getNodeId() + "[label=\"I\"";
+		} else if (placeNode.isFinal()) {
+			placeString =  " node" + placeNode.getNodeId() + "[label=\"F\"";
+		} else {
+			placeString =  " node" + placeNode.getNodeId() + "[label=\"\"";
+		}
+		return placeString + "shape=circle,fixedsize=true,height=.3,width=.3]";
 	}
-	
-	private static String buildEllipsisNodeString(int ellipsisId) {
-		return " ellipsis" + ellipsisId + "[shape=none,fontsize=\"14\",label=\"...\",height=0.3,width=.3]";
+
+	private static String buildEllipsisNodeString(String ellipsisId) {
+		return " node" + ellipsisId + "[shape=none,fontsize=\"14\",label=\"...\",height=0.3,width=.3]";
 	}
 }
