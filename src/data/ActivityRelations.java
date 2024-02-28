@@ -7,6 +7,8 @@ public class ActivityRelations {
 
 	private DiscoveredActivity activity;
 	
+	private Set<DiscoveredActivity> successionOut; //Technically not needed, added for completeness
+	private Set<DiscoveredActivity> successionIn; //Technically not needed, added for completeness
 	private Set<DiscoveredActivity> responseOut;
 	private Set<DiscoveredActivity> responseIn;
 	private Set<DiscoveredActivity> precedenceOut;
@@ -16,6 +18,8 @@ public class ActivityRelations {
 	public ActivityRelations(DiscoveredActivity discoveredActivity) {
 		this.activity = discoveredActivity;
 		
+		successionOut = new HashSet<DiscoveredActivity>();
+		successionIn = new HashSet<DiscoveredActivity>();
 		responseOut = new HashSet<DiscoveredActivity>();
 		responseIn = new HashSet<DiscoveredActivity>();
 		precedenceOut = new HashSet<DiscoveredActivity>();
@@ -26,7 +30,13 @@ public class ActivityRelations {
 	public DiscoveredActivity getActivity() {
 		return activity;
 	}
-
+	
+	public void addSuccessionOut(DiscoveredActivity discoveredActivity) {
+		successionOut.add(discoveredActivity);
+	}
+	public void addSuccessionIn(DiscoveredActivity discoveredActivity) {
+		successionIn.add(discoveredActivity);
+	}
 	public void addResponseOut(DiscoveredActivity discoveredActivity) {
 		responseOut.add(discoveredActivity);
 	}
@@ -43,6 +53,12 @@ public class ActivityRelations {
 		mutualExclusion.add(discoveredActivity);
 	}
 	
+	public boolean successionOutContains(DiscoveredActivity discoveredActivity) {
+		return successionOut.contains(discoveredActivity);
+	}
+	public boolean successionInContains(DiscoveredActivity discoveredActivity) {
+		return successionIn.contains(discoveredActivity);
+	}
 	public boolean responseOutContains(DiscoveredActivity discoveredActivity) {
 		return responseOut.contains(discoveredActivity);
 	}
@@ -59,6 +75,12 @@ public class ActivityRelations {
 		return mutualExclusion.contains(discoveredActivity);
 	}
 	
+	public Set<DiscoveredActivity> getSuccessionOut() {
+		return successionOut;
+	}
+	public Set<DiscoveredActivity> getSuccessionIn() {
+		return successionIn;
+	}
 	public Set<DiscoveredActivity> getResponseOut() {
 		return responseOut;
 	}

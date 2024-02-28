@@ -34,13 +34,17 @@ public class InitialFragmentsTask extends Task<InitialFragmentsResult> {
 		try {
 			long taskStartTime = System.currentTimeMillis();
 			System.out.println("Discovering constraint subsets started at: " + taskStartTime);
-			
+
 			InitialFragmentsResult initialFragmentsResult = new InitialFragmentsResult();
-			
+
 
 			//Making it easier to look up which types of relations each activity has to other activities
 			activityRelationsMap = new HashMap<DiscoveredActivity, ActivityRelations>();
 			discoveredActivities.forEach(da -> {activityRelationsMap.put(da, new ActivityRelations(da));});
+			for (DiscoveredConstraint dc : constraintSubsets.getSucConstraints()) {
+				activityRelationsMap.get(dc.getActivationActivity()).addSuccessionOut(dc.getTargetActivity());
+				activityRelationsMap.get(dc.getTargetActivity()).addSuccessionIn(dc.getActivationActivity());
+			}
 			for (DiscoveredConstraint dc : constraintSubsets.getResConstraints()) {
 				activityRelationsMap.get(dc.getActivationActivity()).addResponseOut(dc.getTargetActivity());
 				activityRelationsMap.get(dc.getTargetActivity()).addResponseIn(dc.getActivationActivity());
@@ -71,7 +75,7 @@ public class InitialFragmentsTask extends Task<InitialFragmentsResult> {
 					//No outgoing response nor precedence means no activities are required nor enabled by this activity
 					ModelUtils.addFinalPlace(mainTransition, nextNodeId++);
 				}
-
+				
 
 				//Outgoing responses from the given activity
 				for (DiscoveredActivity resOutAct : activityRelations.getResponseOut()) {
@@ -85,12 +89,16 @@ public class InitialFragmentsTask extends Task<InitialFragmentsResult> {
 				}
 
 
-				//Incoming precedences to the given activity (mirror of outgoing responses)
+				//Incoming precedences to the given activity
 				for (DiscoveredActivity preInAct : activityRelations.getPrecedenceIn()) {
 					PlaceNode preInPlace = new PlaceNode(nextNodeId++);
 					TransitionNode preInTransition = new TransitionNode(nextNodeId++, preInAct);
 					mainTransition.addIncomingPlace(preInPlace);
 					preInPlace.addIncomingTransition(preInTransition);
+					if (!activityRelationsMap.get(preInAct).responseOutContains(mainActivity)) {
+						TransitionNode skipTransition = new TransitionNode(nextNodeId++, null);
+						preInPlace.addOutgoingTransition(skipTransition);
+					}
 					if (activityRelationsMap.get(preInAct).getPrecedenceIn().isEmpty() && activityRelationsMap.get(preInAct).getResponseIn().isEmpty()) {
 						ModelUtils.addInitialPlace(preInTransition, nextNodeId++);
 					}
@@ -207,7 +215,7 @@ public class InitialFragmentsTask extends Task<InitialFragmentsResult> {
 					}
 				}
 			}
-			
+
 			initialFragmentsResult.setNodeCount(nextNodeId);
 
 			return initialFragmentsResult;
