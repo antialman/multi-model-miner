@@ -23,8 +23,9 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import model.TransitionNode;
 import task.DiscoveryTaskDeclare;
-import task.DiscoveryTaskResult;
+import task.DiscoveryResult;
 import task.FirstMergeTask;
+import task.InitialFragmentsResult;
 import task.InitialFragmentsTask;
 import task.ConstraintSubsets;
 import task.ConstraintSubsetsTask;
@@ -82,9 +83,9 @@ public class MainViewController {
 
 	private File logFile;
 
-	private DiscoveryTaskResult discoveryTaskResult;
+	private DiscoveryResult discoveryResult;
 	private ConstraintSubsets constraintSubsets;
-	private Set<TransitionNode> fragmentMainTransitions;
+	private InitialFragmentsResult initialFragmentsResult;
 	private Set<TransitionNode> firstMergeMainTransitions;
 
 
@@ -140,7 +141,7 @@ public class MainViewController {
 
 		mainHeader.setDisable(true);
 		resultTabPane.setDisable(true);
-		Task<DiscoveryTaskResult> task = createDiscoveryTask();
+		Task<DiscoveryResult> task = createDiscoveryTask();
 		addDiscoveryTaskHandlers(task);
 		executorService.execute(task);
 	}
@@ -172,7 +173,7 @@ public class MainViewController {
 
 
 
-	private Task<DiscoveryTaskResult> createDiscoveryTask() {
+	private Task<DiscoveryResult> createDiscoveryTask() {
 		List<ConstraintTemplate> templates = List.of(ConstraintTemplate.Precedence, ConstraintTemplate.Response, ConstraintTemplate.Succession, ConstraintTemplate.Not_CoExistence, ConstraintTemplate.Existence, ConstraintTemplate.Absence2);
 
 		DiscoveryTaskDeclare discoveryTaskDeclare = new DiscoveryTaskDeclare();
@@ -188,18 +189,18 @@ public class MainViewController {
 		return discoveryTaskDeclare;
 	}
 
-	private void addDiscoveryTaskHandlers(Task<DiscoveryTaskResult> task) {
+	private void addDiscoveryTaskHandlers(Task<DiscoveryResult> task) {
 		//Handle task success
 		task.setOnSucceeded(event -> {
-			discoveryTaskResult = task.getValue();
+			discoveryResult = task.getValue();
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
-			WebViewUtils.updateDeclareVisualization(discoveryTaskResult, declareWebView);
+			WebViewUtils.updateDeclareVisualization(discoveryResult, declareWebView);
 			updateConstraintLabels();
 			AlertUtils.showSuccess("Declare model discovered! Finding constraint subsets...");
 
 			//Execute constraint filtering and pruning task after successful discovery
-			ConstraintSubsetsTask constraintSubsetsTask = new ConstraintSubsetsTask(discoveryTaskResult, pruneSubsetsCheckBox.isSelected());
+			ConstraintSubsetsTask constraintSubsetsTask = new ConstraintSubsetsTask(discoveryResult, pruneSubsetsCheckBox.isSelected());
 			addConstraintSubsetsTaskHandlers(constraintSubsetsTask);
 			executorService.execute(constraintSubsetsTask);
 
@@ -238,7 +239,7 @@ public class MainViewController {
 			WebViewUtils.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
 
 			//Execute initial fragments task after successful constraint filtering and pruning
-			InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryTaskResult.getActivities(), constraintSubsets);
+			InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryResult.getActivities(), constraintSubsets);
 			addInitialFragmentsTaskHandlers(initialFragmentsTask);
 			executorService.execute(initialFragmentsTask);
 
@@ -256,12 +257,12 @@ public class MainViewController {
 	private void addInitialFragmentsTaskHandlers(InitialFragmentsTask task) {
 		//Handle task success
 		task.setOnSucceeded(event -> {
-			fragmentMainTransitions = task.getValue();
+			initialFragmentsResult = task.getValue();
 
-			WebViewUtils.updateFragmentsWebView(fragmentMainTransitions, fragmentsWebView);
+			WebViewUtils.updateFragmentsWebView(initialFragmentsResult.getFragmentMainTransitions(), fragmentsWebView);
 
 			//Execute the first merge task after creating the initial fragments
-			FirstMergeTask firstMergeTask = new FirstMergeTask(fragmentMainTransitions);
+			FirstMergeTask firstMergeTask = new FirstMergeTask(initialFragmentsResult);
 			addFirstMergeTaskHandlers(firstMergeTask);
 			executorService.execute(firstMergeTask);
 		});
@@ -290,7 +291,7 @@ public class MainViewController {
 
 	private void updateConstraintLabels() {
 		constraintLabelListView.getItems().clear();
-		for (DiscoveredConstraint constraint : discoveryTaskResult.getConstraints()) {
+		for (DiscoveredConstraint constraint : discoveryResult.getConstraints()) {
 			constraintLabelListView.getItems().add(constraint.toString());
 		}
 

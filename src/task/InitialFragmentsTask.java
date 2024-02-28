@@ -3,19 +3,18 @@ package task;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
 import data.ActivityRelations;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
 import model.PlaceNode;
 import model.TransitionNode;
+import utils.ModelUtils;
 
-public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
+public class InitialFragmentsTask extends Task<InitialFragmentsResult> {
 
 	private List<DiscoveredActivity> discoveredActivities;
 	private ConstraintSubsets constraintSubsets;
@@ -31,10 +30,13 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 
 
 	@Override
-	protected Set<TransitionNode> call() throws Exception {
+	protected InitialFragmentsResult call() throws Exception {
 		try {
 			long taskStartTime = System.currentTimeMillis();
 			System.out.println("Discovering constraint subsets started at: " + taskStartTime);
+			
+			InitialFragmentsResult initialFragmentsResult = new InitialFragmentsResult();
+			
 
 			//Making it easier to look up which types of relations each activity has to other activities
 			activityRelationsMap = new HashMap<DiscoveredActivity, ActivityRelations>();
@@ -55,20 +57,19 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 
 			//Creating the initial (activity based) fragments
 			int nextNodeId = 0;
-			Set<TransitionNode> fragmentMainTransitions = new LinkedHashSet<TransitionNode>();
 			for (ActivityRelations activityRelations : activityRelationsMap.values()) {
 				DiscoveredActivity mainActivity = activityRelations.getActivity();
 				TransitionNode mainTransition = new TransitionNode(nextNodeId++, mainActivity);
 				mainTransition.setFragmentMain(true);
-				fragmentMainTransitions.add(mainTransition);
+				initialFragmentsResult.addFragmentMainTransition(mainTransition);
 
 
 				if (activityRelations.getResponseIn().isEmpty() && activityRelations.getPrecedenceIn().isEmpty()) {
 					//No incoming response nor precedence means no activities require nor enable this activity
-					addInitialPlace(mainTransition, nextNodeId++);
+					ModelUtils.addInitialPlace(mainTransition, nextNodeId++);
 				} else if (activityRelations.getResponseOut().isEmpty() && activityRelations.getPrecedenceOut().isEmpty()) {
 					//No outgoing response nor precedence means no activities are required nor enabled by this activity
-					addFinalPlace(mainTransition, nextNodeId++);
+					ModelUtils.addFinalPlace(mainTransition, nextNodeId++);
 				}
 
 
@@ -79,7 +80,7 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 					mainTransition.addOutgoingPlace(resOutPlace);
 					resOutPlace.addOutgoingTransition(resOutTransition);
 					if (activityRelationsMap.get(resOutAct).getPrecedenceOut().isEmpty() && activityRelationsMap.get(resOutAct).getResponseOut().isEmpty()) {
-						addFinalPlace(resOutTransition, nextNodeId++);
+						ModelUtils.addFinalPlace(resOutTransition, nextNodeId++);
 					}
 				}
 
@@ -91,7 +92,7 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 					mainTransition.addIncomingPlace(preInPlace);
 					preInPlace.addIncomingTransition(preInTransition);
 					if (activityRelationsMap.get(preInAct).getPrecedenceIn().isEmpty() && activityRelationsMap.get(preInAct).getResponseIn().isEmpty()) {
-						addInitialPlace(preInTransition, nextNodeId++);
+						ModelUtils.addInitialPlace(preInTransition, nextNodeId++);
 					}
 				}
 
@@ -116,8 +117,8 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 						preOutPlace.addOutgoingTransition(skipTransition);
 						if (activityRelationsMap.get(preOutAct).getPrecedenceOut().isEmpty() && activityRelationsMap.get(preOutAct).getResponseOut().isEmpty()) {
 							//No outgoing constraints means no further activities are enabled by this activity 
-							addFinalPlace(preOutTransition, nextNodeId++);
-							addFinalPlace(skipTransition, nextNodeId++);
+							ModelUtils.addFinalPlace(preOutTransition, nextNodeId++);
+							ModelUtils.addFinalPlace(skipTransition, nextNodeId++);
 						}
 					} else {
 						candidates.add(preOutAct); //Add the activity to a list for finding notcoCliques
@@ -129,7 +130,7 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 				for (TransitionNode preOutTransition : activityTransitionMap.values()) {
 					if (activityRelationsMap.get(preOutTransition.getDiscoveredActivity()).getPrecedenceOut().isEmpty() && activityRelationsMap.get(preOutTransition.getDiscoveredActivity()).getResponseOut().isEmpty()) {
 						//No outgoing constraints means no further activities are enabled by this activity 
-						addFinalPlace(preOutTransition, nextNodeId++);
+						ModelUtils.addFinalPlace(preOutTransition, nextNodeId++);
 					}
 				}
 
@@ -170,8 +171,8 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 						resInPlace.addIncomingTransition(skipTransition);
 						if (activityRelationsMap.get(resInAct).getPrecedenceIn().isEmpty() && activityRelationsMap.get(resInAct).getResponseIn().isEmpty()) {
 							//No incoming constraints means no activities enable this activity 
-							addInitialPlace(resInTransition, nextNodeId++);
-							addInitialPlace(skipTransition, nextNodeId++);
+							ModelUtils.addInitialPlace(resInTransition, nextNodeId++);
+							ModelUtils.addInitialPlace(skipTransition, nextNodeId++);
 						}
 					} else {
 						candidates.add(resInAct); //Add the activity to a list for finding notcoCliques
@@ -183,7 +184,7 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 				for (TransitionNode resInTransition : activityTransitionMap.values()) {
 					if (activityRelationsMap.get(resInTransition.getDiscoveredActivity()).getPrecedenceIn().isEmpty() && activityRelationsMap.get(resInTransition.getDiscoveredActivity()).getResponseIn().isEmpty()) {
 						//No outgoing constraints means no further activities are enabled by this activity 
-						addInitialPlace(resInTransition, nextNodeId++);
+						ModelUtils.addInitialPlace(resInTransition, nextNodeId++);
 					}
 				}
 
@@ -205,12 +206,11 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 						cliquePlace.addIncomingTransition(skipTransition);
 					}
 				}
-
-
-
 			}
+			
+			initialFragmentsResult.setNodeCount(nextNodeId);
 
-			return fragmentMainTransitions;
+			return initialFragmentsResult;
 
 		} catch (Exception e) {
 			System.err.println("Finding constraint subsets failed: " + e.getMessage());
@@ -281,18 +281,6 @@ public class InitialFragmentsTask extends Task<Set<TransitionNode>> {
 
 	private boolean isNotcoNeighbor(DiscoveredActivity activityA, DiscoveredActivity activityB) {
 		return activityRelationsMap.get(activityA).getMutualExclusion().contains(activityB);
-	}
-
-	private void addInitialPlace(TransitionNode transitionNode, int nextNodeId) {
-		PlaceNode initialPlace = new PlaceNode(nextNodeId);
-		initialPlace.setInitial(true);
-		transitionNode.addIncomingPlace(initialPlace);
-	}
-
-	private void addFinalPlace(TransitionNode transitionNode, int nextNodeId) {
-		PlaceNode finalPlace = new PlaceNode(nextNodeId);
-		finalPlace.setFinal(true);
-		transitionNode.addOutgoingPlace(finalPlace);
 	}
 
 }

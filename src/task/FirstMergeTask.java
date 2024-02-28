@@ -10,14 +10,16 @@ import data.DiscoveredActivity;
 import javafx.concurrent.Task;
 import model.PlaceNode;
 import model.TransitionNode;
+import utils.ModelUtils;
 
 public class FirstMergeTask extends Task<Set<TransitionNode>> {
 	
-	private Set<TransitionNode> fragmentMainTransitions;
+	private InitialFragmentsResult initialFragmentsResult;
 
-	public FirstMergeTask(Set<TransitionNode> fragmentMainTransitions) {
-		this.fragmentMainTransitions = fragmentMainTransitions;
+	public FirstMergeTask(InitialFragmentsResult initialFragmentsResult) {
+		this.initialFragmentsResult = initialFragmentsResult;
 	}
+	
 	
 	@Override
 	protected Set<TransitionNode> call() throws Exception {
@@ -28,51 +30,9 @@ public class FirstMergeTask extends Task<Set<TransitionNode>> {
 			//It should be ok to modify the input fragments directly, but creating new ones for now just to be safe and in case I need the input fragments
 			//Merge should probably be either recursive or loop until there are no changes in the fragments, but this will do for now
 			Set<TransitionNode> firstMergeMainTransitions = new LinkedHashSet<TransitionNode>();
-			
-			int nextNodeId = 0;
-			for (TransitionNode fragmentMainTransition : fragmentMainTransitions) {
-				Map<TransitionNode, TransitionNode> fragmentToNewInMap = new HashMap<TransitionNode, TransitionNode>();
-				Map<TransitionNode, TransitionNode> fragmentToNewOutMap = new HashMap<TransitionNode, TransitionNode>();
-				TransitionNode newMainTransition = new TransitionNode(nextNodeId++, fragmentMainTransition.getDiscoveredActivity());
-				newMainTransition.setFragmentMain(true);
-				firstMergeMainTransitions.add(newMainTransition);
-				
-				//Adding incoming places and transitions as-is
-				for (PlaceNode fragmentInPlace : fragmentMainTransition.getIncomingPlaces()) {
-					PlaceNode newInPlace = new PlaceNode(nextNodeId++);
-					newInPlace.setInitial(fragmentInPlace.isInitial());
-					newInPlace.setFinal(fragmentInPlace.isFinal());
-					newMainTransition.addIncomingPlace(newInPlace);
-					for (TransitionNode fragmentInTransition : fragmentInPlace.getIncomingTransitions()) {
-						if (fragmentToNewInMap.containsKey(fragmentInTransition)) {
-							newInPlace.addIncomingTransition(fragmentToNewInMap.get(fragmentInTransition));
-						} else {
-							TransitionNode newInTransition = new TransitionNode(nextNodeId++, fragmentInTransition.getDiscoveredActivity());
-							newInPlace.addIncomingTransition(newInTransition);
-							fragmentToNewInMap.put(fragmentInTransition, newInTransition);
-						}
-					}
-				}
-				
-				
-				//Adding outgoing places and transitions as-is
-				for (PlaceNode fragmentOutPlace : fragmentMainTransition.getOutgoingPlaces()) {
-					PlaceNode newOutPlace = new PlaceNode(nextNodeId++);
-					newOutPlace.setInitial(fragmentOutPlace.isInitial());
-					newOutPlace.setFinal(fragmentOutPlace.isFinal());
-					newMainTransition.addOutgoingPlace(newOutPlace);
-					for (TransitionNode fragmentOutTransition : fragmentOutPlace.getOutgoingTransitions()) {
-						if (fragmentToNewOutMap.containsKey(fragmentOutTransition)) {
-							newOutPlace.addOutgoingTransition(fragmentToNewOutMap.get(fragmentOutTransition));
-						} else {
-							TransitionNode newOutTransition = new TransitionNode(nextNodeId++, fragmentOutTransition.getDiscoveredActivity());
-							newOutPlace.addOutgoingTransition(newOutTransition);
-							fragmentToNewOutMap.put(fragmentOutTransition, newOutTransition);
-						}
-					}
-				}
+			for (TransitionNode fragmentMainTransition : initialFragmentsResult.getFragmentMainTransitions()) {
+				firstMergeMainTransitions.add(ModelUtils.cloneFragment(fragmentMainTransition));
 			}
-			
 			
 			//Map for looking up fragments based on their main activity
 			Map<DiscoveredActivity, TransitionNode> mainActToFragment = new HashMap<DiscoveredActivity, TransitionNode>();
@@ -80,6 +40,7 @@ public class FirstMergeTask extends Task<Set<TransitionNode>> {
 				mainActToFragment.put(mainTransition.getDiscoveredActivity(), mainTransition);
 			}
 			
+			int nextNodeId = initialFragmentsResult.getNodeCount();
 			
 			//Extending each copy of the initial fragments, only one "extension pass" for now, just to see how it should work
 			for (TransitionNode mainTransition : firstMergeMainTransitions) {
@@ -100,7 +61,7 @@ public class FirstMergeTask extends Task<Set<TransitionNode>> {
 								TransitionNode newMergeInT = new TransitionNode(nextNodeId++, mergeInT.getDiscoveredActivity());
 								newMergeInP.addIncomingTransition(newMergeInT);
 								if (mergeInT.getIncomingPlaces().size() == 1 && mergeInT.getIncomingPlaces().iterator().next().isInitial()) {
-									addInitialPlace(newMergeInT, nextNodeId++);
+									ModelUtils.addInitialPlace(newMergeInT, nextNodeId++);
 								}
 							}
 						}
@@ -123,7 +84,7 @@ public class FirstMergeTask extends Task<Set<TransitionNode>> {
 								TransitionNode newMergeOutT = new TransitionNode(nextNodeId++, mergeOutT.getDiscoveredActivity());
 								newMergeOutP.addOutgoingTransition(newMergeOutT);
 								if (mergeOutT.getOutgoingPlaces().size() == 1 && mergeOutT.getOutgoingPlaces().iterator().next().isFinal()) {
-									addFinalPlace(newMergeOutT, nextNodeId++);
+									ModelUtils.addFinalPlace(newMergeOutT, nextNodeId++);
 								}
 							}
 						}
@@ -140,17 +101,5 @@ public class FirstMergeTask extends Task<Set<TransitionNode>> {
 			e.printStackTrace();
 			throw e;
 		}
-	}
-	
-	private void addInitialPlace(TransitionNode transitionNode, int nextNodeId) {
-		PlaceNode initialPlace = new PlaceNode(nextNodeId);
-		initialPlace.setInitial(true);
-		transitionNode.addIncomingPlace(initialPlace);
-	}
-
-	private void addFinalPlace(TransitionNode transitionNode, int nextNodeId) {
-		PlaceNode finalPlace = new PlaceNode(nextNodeId);
-		finalPlace.setFinal(true);
-		transitionNode.addOutgoingPlace(finalPlace);
 	}
 }

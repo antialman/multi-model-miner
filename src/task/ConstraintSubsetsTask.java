@@ -14,10 +14,10 @@ import utils.TransitiveClosureUtils;
 
 public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 
-	private DiscoveryTaskResult discoveryTaskResult;
+	private DiscoveryResult discoveryTaskResult;
 	private boolean pruneSubsets;
 
-	public ConstraintSubsetsTask(DiscoveryTaskResult discoveryTaskResult, boolean pruneSubsets) {
+	public ConstraintSubsetsTask(DiscoveryResult discoveryTaskResult, boolean pruneSubsets) {
 		super();
 		this.discoveryTaskResult = discoveryTaskResult;
 		this.pruneSubsets = pruneSubsets;

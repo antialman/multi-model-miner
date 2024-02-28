@@ -1,22 +1,21 @@
 package model;
 
-import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
 import data.DiscoveredActivity;
 
-public class TransitionNode {
-	private int nodeId;
+public class TransitionNode extends Node {
 	private DiscoveredActivity discoveredActivity;
 	private String transitionLabel;
 	private boolean isSilent;
 	private boolean isFragmentMain;
 	
-	private Set<PlaceNode> incomingPlaces = new LinkedHashSet<PlaceNode>();
-	private Set<PlaceNode> outgoingPlaces = new LinkedHashSet<PlaceNode>();
+	private Set<PlaceNode> incomingPlaces = new TreeSet<PlaceNode>();
+	private Set<PlaceNode> outgoingPlaces = new TreeSet<PlaceNode>();
 	
 	public TransitionNode(int nodeId, DiscoveredActivity discoveredActivity) {
-		this.nodeId = nodeId;
+		super(nodeId);
 		this.discoveredActivity = discoveredActivity;
 		if (discoveredActivity != null) {
 			this.transitionLabel = discoveredActivity.getActivityName();
@@ -27,10 +26,6 @@ public class TransitionNode {
 		this.isFragmentMain = false;
 	}
 	
-	
-	public int getNodeId() {
-		return nodeId;
-	}
 	public DiscoveredActivity getDiscoveredActivity() {
 		return discoveredActivity;
 	}

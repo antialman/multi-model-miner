@@ -33,7 +33,7 @@ import utils.ConstraintTemplate;
 import utils.ConstraintUtils;
 import utils.DeclarePruningType;
 
-public class DiscoveryTaskDeclare extends Task<DiscoveryTaskResult> {
+public class DiscoveryTaskDeclare extends Task<DiscoveryResult> {
 
 	private File logFile;
 	private int minSupport;
@@ -75,7 +75,7 @@ public class DiscoveryTaskDeclare extends Task<DiscoveryTaskResult> {
 	}
 
 	@Override
-	protected DiscoveryTaskResult call() throws Exception {
+	protected DiscoveryResult call() throws Exception {
 		try {
 			long taskStartTime = System.currentTimeMillis();
 			System.out.println("Discovering Declare model started at: " + taskStartTime);
@@ -188,14 +188,14 @@ public class DiscoveryTaskDeclare extends Task<DiscoveryTaskResult> {
 
 
 			// Result object of the process discovery task
-			DiscoveryTaskResult discoveryTaskResult = new DiscoveryTaskResult();
-			discoveryTaskResult.setActivities(discoveredActivities);
-			discoveryTaskResult.setConstraints(discoveredConstraints);
+			DiscoveryResult discoveryResult = new DiscoveryResult();
+			discoveryResult.setActivities(discoveredActivities);
+			discoveryResult.setConstraints(discoveredConstraints);
 
 
 			System.out.println("Discovering Declare model finished at: " + taskStartTime + " - total time: " + (System.currentTimeMillis() - taskStartTime));
 
-			return discoveryTaskResult;
+			return discoveryResult;
 
 
 		} catch (Exception e) {

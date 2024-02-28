@@ -1,25 +1,20 @@
 package model;
 
 import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.Set;
+import java.util.TreeSet;
 
-public class PlaceNode {
-	private int nodeId;
+public class PlaceNode extends Node {
 	
 	private boolean isInitial;
 	private boolean isFinal;
 	
-	
-	private Set<TransitionNode> incomingTransitions = new LinkedHashSet<TransitionNode>();
-	private Set<TransitionNode> outgoingTransitions = new LinkedHashSet<TransitionNode>();
+	//Using TreeSet only to make testing easier
+	private Set<TransitionNode> incomingTransitions = new TreeSet<TransitionNode>();
+	private Set<TransitionNode> outgoingTransitions = new TreeSet<TransitionNode>();
 	
 	public PlaceNode(int nodeId) {
-		this.nodeId = nodeId;
-	}
-	
-	public int getNodeId() {
-		return nodeId;
+		super(nodeId);
 	}
 	
 	public void setInitial(boolean isInitial) {

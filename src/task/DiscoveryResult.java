@@ -5,12 +5,12 @@ import java.util.List;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 
-public class DiscoveryTaskResult {
+public class DiscoveryResult {
 	
 	private List<DiscoveredActivity> activities;
 	private List<DiscoveredConstraint> constraints;
 
-	public DiscoveryTaskResult() {
+	public DiscoveryResult() {
 	}
 
 	public List<DiscoveredActivity> getActivities() {
