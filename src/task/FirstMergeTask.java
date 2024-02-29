@@ -2,6 +2,7 @@ package task;
 
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
@@ -41,7 +42,7 @@ public class FirstMergeTask extends Task<Set<TransitionNode>> {
 			//Extending each copy of the initial fragments, only one "extension pass" for now, just to see how it should work
 			for (TransitionNode mergeFragment : mergeFragments) {
 
-				//Extension by incoming transitions
+				//Initial extension by incoming transitions
 				Set<TransitionNode> mergeInTransitions = new HashSet<TransitionNode>();
 				mergeFragment.getIncomingPlaces().forEach(inP -> {inP.getIncomingTransitions().forEach(inT -> {mergeInTransitions.add(inT);});});
 				for (TransitionNode mergeInTransition : mergeInTransitions) {
@@ -64,7 +65,7 @@ public class FirstMergeTask extends Task<Set<TransitionNode>> {
 					}
 				}
 
-				//Extension by outgoing transitions
+				//Initial extension by outgoing transitions
 				Set<TransitionNode> mergeOutTransitions = new HashSet<TransitionNode>();
 				mergeFragment.getOutgoingPlaces().forEach(outP -> {outP.getOutgoingTransitions().forEach(outT -> {mergeOutTransitions.add(outT);});});
 				for (TransitionNode mergeOutTransition : mergeOutTransitions) {
@@ -87,6 +88,76 @@ public class FirstMergeTask extends Task<Set<TransitionNode>> {
 					}
 				}
 			}
+			
+			
+			//Processing duplicate activities created by merge
+			for (TransitionNode mergeFragment : mergeFragments) {
+				Map<DiscoveredActivity, Set<TransitionNode>> actTransitionsMap = new HashMap<DiscoveredActivity, Set<TransitionNode>>();
+				Set<Integer> visited = new HashSet<Integer>();
+				addToActTransitionsMap(mergeFragment, actTransitionsMap, visited);
+				Map<DiscoveredActivity, TransitionNode> mergeTransitions = new HashMap<DiscoveredActivity, TransitionNode>();
+				
+				//Creating merge transitions to replace all transitions that were duplicated during the merge
+				for (DiscoveredActivity discoveredActivity : actTransitionsMap.keySet()) {
+					if (actTransitionsMap.get(discoveredActivity).size()>1) {
+						mergeTransitions.put(discoveredActivity, new TransitionNode(nextNodeId++, discoveredActivity));
+					}
+				}
+				
+				//Replacing all duplicated transitions with a single merge transition
+				for (DiscoveredActivity mergeActivity : mergeTransitions.keySet()) {
+					TransitionNode initialFragment = initialFragmentsMap.get(mergeActivity);
+					
+					for (PlaceNode initialOutPlace : initialFragment.getOutgoingPlaces()) {
+						PlaceNode mergeP = new PlaceNode(nextNodeId++);
+						mergeTransitions.get(mergeActivity).addOutgoingPlace(mergeP);
+						for (TransitionNode initialOutTransition : initialOutPlace.getOutgoingTransitions()) {
+							if (!initialOutTransition.isSilent()) {	
+								DiscoveredActivity initialOutActivity = initialOutTransition.getDiscoveredActivity();
+								if (mergeTransitions.containsKey(initialOutActivity)) {
+									mergeP.addOutgoingTransition(mergeTransitions.get(initialOutActivity));
+								} else if (actTransitionsMap.containsKey(initialOutTransition.getDiscoveredActivity())) {
+									//If the set corresponding to mergeActivity in actTransitionsMap has more than 1 element, then it is covered by the previous if block
+									mergeP.addOutgoingTransition(actTransitionsMap.get(initialOutActivity).iterator().next());
+								}
+							}
+						}
+						if (mergeP.getOutgoingTransitions().isEmpty()) {
+							mergeTransitions.get(mergeActivity).remOutgoingPlace(mergeP);
+						}
+					}
+					
+					for (PlaceNode initialInPlace : initialFragment.getIncomingPlaces()) {
+						PlaceNode mergeP = new PlaceNode(nextNodeId++);
+						mergeTransitions.get(mergeActivity).addIncomingPlace(mergeP);
+						for (TransitionNode initialInTransition : initialInPlace.getIncomingTransitions()) {
+							if (!initialInTransition.isSilent()) {
+								DiscoveredActivity initialInActivity = initialInTransition.getDiscoveredActivity();
+								if (mergeTransitions.containsKey(initialInActivity)) {
+									mergeP.addIncomingTransition(mergeTransitions.get(initialInActivity));
+								} else if (actTransitionsMap.containsKey(initialInActivity)) {
+									//If the set corresponding to mergeActivity in actTransitionsMap has more than 1 element, then it is covered by the previous if block
+									mergeP.addIncomingTransition(actTransitionsMap.get(initialInActivity).iterator().next());
+								}
+							}
+						}
+						if (mergeP.getIncomingTransitions().isEmpty()) {
+							mergeTransitions.get(mergeActivity).remIncomingPlace(mergeP);
+						}
+					}
+					
+					for (TransitionNode duplicateTransition : actTransitionsMap.get(mergeActivity)) {
+						Set<PlaceNode> dupInPlaces = new HashSet<PlaceNode>();
+						Set<PlaceNode> dupOutPlaces = new HashSet<PlaceNode>();
+						duplicateTransition.getIncomingPlaces().forEach(dupInP -> {dupInPlaces.add(dupInP);});
+						duplicateTransition.getOutgoingPlaces().forEach(dupOutP -> {dupOutPlaces.add(dupOutP);});
+						
+						dupInPlaces.forEach(dupInP -> {dupInP.clearAllTransitions();});
+						dupOutPlaces.forEach(dupOutP -> {dupOutP.clearAllTransitions();});
+					}
+					
+				}
+			}
 
 
 			return mergeFragments;
@@ -96,5 +167,25 @@ public class FirstMergeTask extends Task<Set<TransitionNode>> {
 			e.printStackTrace();
 			throw e;
 		}
+	}
+	
+	private void addToActTransitionsMap(TransitionNode mergeFragment, Map<DiscoveredActivity, Set<TransitionNode>> actTransitionsMap, Set<Integer> visited) {
+		if (!actTransitionsMap.containsKey(mergeFragment.getDiscoveredActivity())) {
+			actTransitionsMap.put(mergeFragment.getDiscoveredActivity(), new HashSet<TransitionNode>());
+		}
+		actTransitionsMap.get(mergeFragment.getDiscoveredActivity()).add(mergeFragment);
+		visited.add(mergeFragment.getNodeId());
+		
+		mergeFragment.getIncomingPlaces().forEach(inP -> {inP.getIncomingTransitions().forEach(inT -> {
+			if (!visited.contains(inT.getNodeId()) && !inT.isSilent()) {
+				addToActTransitionsMap(inT, actTransitionsMap, visited);
+			}
+		});});
+		
+		mergeFragment.getOutgoingPlaces().forEach(outP -> {outP.getOutgoingTransitions().forEach(outT -> {
+			if (!visited.contains(outT.getNodeId()) && !outT.isSilent()) {
+				addToActTransitionsMap(outT, actTransitionsMap, visited);
+			}
+		});});
 	}
 }

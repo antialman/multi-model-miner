@@ -15,6 +15,8 @@ public class PlaceNode extends Node {
 	
 	public PlaceNode(int nodeId) {
 		super(nodeId);
+		this.isInitial = false;
+		this.isFinal = false;
 	}
 	
 	public void setInitial(boolean isInitial) {

@@ -1,5 +1,6 @@
 package model;
 
+import java.util.Iterator;
 import java.util.Set;
 import java.util.TreeSet;
 
@@ -36,6 +37,13 @@ public class TransitionNode extends Node {
 		return transitionLabel;
 	}
 	
+	public void setFragmentMain(boolean isFragmentMain) {
+		this.isFragmentMain = isFragmentMain;
+	}
+	public boolean isFragmentMain() {
+		return isFragmentMain;
+	}
+	
 	public void addIncomingPlace(PlaceNode incomingPlace) {
 		incomingPlaces.add(incomingPlace);
 		if (!incomingPlace.getOutgoingTransitions().contains(this)) {
@@ -68,11 +76,20 @@ public class TransitionNode extends Node {
 		return outgoingPlaces;
 	}
 	
-	public void setFragmentMain(boolean isFragmentMain) {
-		this.isFragmentMain = isFragmentMain;
-	}
-	public boolean isFragmentMain() {
-		return isFragmentMain;
+	
+	public void clearAllPlaces() {
+		Iterator<PlaceNode> inIterator = incomingPlaces.iterator();
+		while (inIterator.hasNext()) {
+			PlaceNode p = inIterator.next();
+			inIterator.remove();
+			p.remOutgoingTransition(this);
+		}
+		Iterator<PlaceNode> outIterator = outgoingPlaces.iterator();
+		while (outIterator.hasNext()) {
+			PlaceNode p = outIterator.next();
+			outIterator.remove();
+			p.remIncomingTransition(this);
+		}
 	}
 
 
