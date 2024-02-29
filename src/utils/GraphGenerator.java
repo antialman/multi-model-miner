@@ -323,7 +323,7 @@ public class GraphGenerator {
 		} else if (placeNode.isFinal()) {
 			placeString =  " node" + placeNode.getNodeId() + "[label=\"F\"";
 		} else {
-			placeString =  " node" + placeNode.getNodeId() + "[label=\"\"";
+			placeString =  " node" + placeNode.getNodeId() + "[label=\"" + placeNode.getNodeId() + "\",fontcolor=\"#777777\"";
 		}
 		return placeString + "shape=circle,fixedsize=true,height=.3,width=.3]";
 	}
