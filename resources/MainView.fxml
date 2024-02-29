@@ -117,10 +117,15 @@
                   <WebView fx:id="fragmentsWebView" prefHeight="200.0" prefWidth="200.0" />
                </content>
             </Tab>
-            <Tab text="1st Merge">
+            <Tab text="Merge Step1">
               <content>
-                  <WebView fx:id="firstMergeWebView" prefHeight="200.0" prefWidth="200.0" />
+                  <WebView fx:id="mergeStep1WebView" prefHeight="200.0" prefWidth="200.0" />
               </content>
+            </Tab>
+            <Tab text="Merge Step 2">
+               <content>
+                  <WebView fx:id="mergeStep2WebView" prefHeight="200.0" prefWidth="200.0" />
+               </content>
             </Tab>
          </tabs></TabPane>
    </children>

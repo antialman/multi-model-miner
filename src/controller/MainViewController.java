@@ -24,9 +24,11 @@ import javafx.util.StringConverter;
 import model.TransitionNode;
 import task.DiscoveryTaskDeclare;
 import task.DiscoveryResult;
-import task.FirstMergeTask;
+import task.MergeStep1Task;
+import task.MergeStep2Task;
 import task.InitialFragmentsResult;
 import task.InitialFragmentsTask;
+import task.MergeStep1Result;
 import task.ConstraintSubsets;
 import task.ConstraintSubsetsTask;
 import utils.WebViewUtils;
@@ -76,7 +78,9 @@ public class MainViewController {
 	@FXML
 	private WebView fragmentsWebView;
 	@FXML
-	private WebView firstMergeWebView;
+	private WebView mergeStep1WebView;
+	@FXML
+	private WebView mergeStep2WebView;
 
 
 	private Stage stage;
@@ -86,7 +90,8 @@ public class MainViewController {
 	private DiscoveryResult discoveryResult;
 	private ConstraintSubsets constraintSubsets;
 	private InitialFragmentsResult initialFragmentsResult;
-	private Set<TransitionNode> firstMergeMainTransitions;
+	private MergeStep1Result mergeStep1Result;
+	private Set<TransitionNode> mergeStep2Result;
 
 
 
@@ -104,7 +109,8 @@ public class MainViewController {
 		WebViewUtils.setupWebView(preWebView);
 		WebViewUtils.setupWebView(notcoWebView);
 		WebViewUtils.setupWebView(fragmentsWebView);
-		WebViewUtils.setupWebView(firstMergeWebView);
+		WebViewUtils.setupWebView(mergeStep1WebView);
+		WebViewUtils.setupWebView(mergeStep2WebView);
 
 		initialPruningChoice.getItems().setAll(DeclarePruningType.values());
 		initialPruningChoice.getSelectionModel().select(DeclarePruningType.NONE);
@@ -261,10 +267,10 @@ public class MainViewController {
 
 			WebViewUtils.updateFragmentsWebView(initialFragmentsResult.getFragmentMainTransitions(), fragmentsWebView);
 
-			//Execute the first merge task after creating the initial fragments
-			FirstMergeTask firstMergeTask = new FirstMergeTask(initialFragmentsResult);
-			addFirstMergeTaskHandlers(firstMergeTask);
-			executorService.execute(firstMergeTask);
+			//Execute step 1 of merging fragments
+			MergeStep1Task mergeStep1Task = new MergeStep1Task(initialFragmentsResult);
+			addMergeStep1TaskHandlers(mergeStep1Task);
+			executorService.execute(mergeStep1Task);
 		});
 
 		//Handle task failure
@@ -273,19 +279,38 @@ public class MainViewController {
 		});
 	}
 
-	private void addFirstMergeTaskHandlers(FirstMergeTask task) {
+	private void addMergeStep1TaskHandlers(MergeStep1Task task) {
 		//Handle task success
 		task.setOnSucceeded(event -> {
-			firstMergeMainTransitions = task.getValue();
+			mergeStep1Result = task.getValue();
 
-			WebViewUtils.updateFragmentsWebView(firstMergeMainTransitions, firstMergeWebView);
+			WebViewUtils.updateFragmentsWebView(mergeStep1Result.getStep1MainTransitions(), mergeStep1WebView);
+
+			//Execute step 2 of merging fragments
+			MergeStep2Task mergeStep2Task = new MergeStep2Task(initialFragmentsResult, mergeStep1Result);
+			addMergeStep2TaskHandlers(mergeStep2Task);
+			executorService.execute(mergeStep2Task);
+		});
+
+		//Handle task failure
+		task.setOnFailed(event -> {
+			AlertUtils.showError("Step 1 of merge failed");
+		});
+	}
+
+	private void addMergeStep2TaskHandlers(MergeStep2Task task) {
+		//Handle task success
+		task.setOnSucceeded(event -> {
+			mergeStep2Result = task.getValue();
+
+			WebViewUtils.updateFragmentsWebView(mergeStep2Result, mergeStep2WebView);
 
 			
 		});
 
 		//Handle task failure
 		task.setOnFailed(event -> {
-			AlertUtils.showError("First merge failed!");
+			AlertUtils.showError("Step 1 of merge failed");
 		});
 	}
 
