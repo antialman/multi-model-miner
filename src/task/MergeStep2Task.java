@@ -56,6 +56,8 @@ public class MergeStep2Task extends Task<Set<TransitionNode>> {
 					}
 				}
 				
+				Set<PlaceNode> newPlaces = new HashSet<PlaceNode>();
+				
 				//Replacing all duplicated transitions with a single merge transition
 				for (DiscoveredActivity mergeActivity : mergeTransitions.keySet()) {
 					TransitionNode initialFragment = initialFragmentsMap.get(mergeActivity);
@@ -76,6 +78,8 @@ public class MergeStep2Task extends Task<Set<TransitionNode>> {
 						}
 						if (mergeP.getOutgoingTransitions().isEmpty()) {
 							mergeTransitions.get(mergeActivity).remOutgoingPlace(mergeP);
+						} else {
+							newPlaces.add(mergeP);
 						}
 					}
 					
@@ -95,6 +99,8 @@ public class MergeStep2Task extends Task<Set<TransitionNode>> {
 						}
 						if (mergeP.getIncomingTransitions().isEmpty()) {
 							mergeTransitions.get(mergeActivity).remIncomingPlace(mergeP);
+						} else {
+							newPlaces.add(mergeP);
 						}
 					}
 					
@@ -108,6 +114,31 @@ public class MergeStep2Task extends Task<Set<TransitionNode>> {
 						dupOutPlaces.forEach(dupOutP -> {dupOutP.clearAllTransitions();});
 					}
 					
+					
+					Set<PlaceNode> uniquePlaces = new HashSet<PlaceNode>();
+					for (PlaceNode newPlace : newPlaces) {
+						Set<TransitionNode> inTransitions = new HashSet<TransitionNode>();
+						Set<TransitionNode> outTransitions = new HashSet<TransitionNode>();
+						newPlace.getIncomingTransitions().forEach(inT -> {inTransitions.add(inT);});
+						newPlace.getOutgoingTransitions().forEach(outT -> {outTransitions.add(outT);});
+						
+						boolean isUnique=true;
+						for (PlaceNode uniquePlace : uniquePlaces) {
+							Set<TransitionNode> inTransitions2 = new HashSet<TransitionNode>();
+							Set<TransitionNode> outTransitions2 = new HashSet<TransitionNode>();
+							uniquePlace.getIncomingTransitions().forEach(inT -> {inTransitions2.add(inT);});
+							uniquePlace.getOutgoingTransitions().forEach(outT -> {outTransitions2.add(outT);});
+							
+							if (inTransitions.equals(inTransitions2) && outTransitions.equals(outTransitions2)) {
+								isUnique=false;
+							}
+						}
+						if (isUnique) {
+							uniquePlaces.add(newPlace);
+						} else {
+							newPlace.clearAllTransitions();
+						}
+					}
 				}
 			}
 			
