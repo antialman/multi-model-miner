@@ -73,6 +73,10 @@ public class MergeStep2Task extends Task<Set<TransitionNode>> {
 								} else if (actTransitionsMap.containsKey(initialOutTransition.getDiscoveredActivity())) {
 									//If the set corresponding to mergeActivity in actTransitionsMap has more than 1 element, then it is covered by the previous if block
 									mergeP.addOutgoingTransition(actTransitionsMap.get(initialOutActivity).iterator().next());
+								} else {
+									//Place has an outgoing transition that can't be represented without adding additional transitions (more complex XOR relations)
+									mergeP.clearAllTransitions();
+									break;
 								}
 							}
 						}
@@ -94,6 +98,10 @@ public class MergeStep2Task extends Task<Set<TransitionNode>> {
 								} else if (actTransitionsMap.containsKey(initialInActivity)) {
 									//If the set corresponding to mergeActivity in actTransitionsMap has more than 1 element, then it is covered by the previous if block
 									mergeP.addIncomingTransition(actTransitionsMap.get(initialInActivity).iterator().next());
+								} else {
+									//Place has an incoming transition that can't be represented without adding additional transitions (more complex XOR relations)
+									mergeP.clearAllTransitions();
+									break;
 								}
 							}
 						}
