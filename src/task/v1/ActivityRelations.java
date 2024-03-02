@@ -1,9 +1,11 @@
-package data;
+package task.v1;
 
 import java.util.HashSet;
 import java.util.Set;
 
-public class ActivityRelationsV1 {
+import data.DiscoveredActivity;
+
+public class ActivityRelations {
 
 	private DiscoveredActivity activity;
 	
@@ -15,7 +17,7 @@ public class ActivityRelationsV1 {
 	private Set<DiscoveredActivity> precedenceIn;
 	private Set<DiscoveredActivity> mutualExclusion;
 	
-	public ActivityRelationsV1(DiscoveredActivity discoveredActivity) {
+	public ActivityRelations(DiscoveredActivity discoveredActivity) {
 		this.activity = discoveredActivity;
 		
 		successionOut = new HashSet<DiscoveredActivity>();
