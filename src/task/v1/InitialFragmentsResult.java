@@ -1,4 +1,4 @@
-package task;
+package task.v1;
 
 import java.util.Set;
 import java.util.TreeSet;

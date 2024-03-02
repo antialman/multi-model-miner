@@ -23,21 +23,21 @@ import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import model.TransitionNode;
 import task.DiscoveryTaskDeclare;
+import task.v1.ConstraintSubsets;
+import task.v1.ConstraintSubsetsTask;
+import task.v1.InitialFragmentsResult;
+import task.v1.InitialFragmentsTask;
+import task.v1.MergeStep1Result;
+import task.v1.MergeStep1Task;
+import task.v1.MergeStep2Task;
 import task.DiscoveryResult;
-import task.MergeStep1Task;
-import task.MergeStep2Task;
-import task.InitialFragmentsResult;
-import task.InitialFragmentsTask;
-import task.MergeStep1Result;
-import task.ConstraintSubsets;
-import task.ConstraintSubsetsTask;
-import utils.WebViewUtils;
+import utils.WebViewUtilsV1;
 import utils.AlertUtils;
 import utils.ConstraintTemplate;
 import utils.DeclarePruningType;
 import utils.FileUtils;
 
-public class MainViewController {
+public class MainViewControllerV1 {
 
 	private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
@@ -103,14 +103,14 @@ public class MainViewController {
 	private void initialize() {
 		resultTabPane.setDisable(true);
 		redescoverButton.setDisable(true);
-		WebViewUtils.setupWebView(declareWebView);
-		WebViewUtils.setupWebView(sucWebView);
-		WebViewUtils.setupWebView(resWebView);
-		WebViewUtils.setupWebView(preWebView);
-		WebViewUtils.setupWebView(notcoWebView);
-		WebViewUtils.setupWebView(fragmentsWebView);
-		WebViewUtils.setupWebView(mergeStep1WebView);
-		WebViewUtils.setupWebView(mergeStep2WebView);
+		WebViewUtilsV1.setupWebView(declareWebView);
+		WebViewUtilsV1.setupWebView(sucWebView);
+		WebViewUtilsV1.setupWebView(resWebView);
+		WebViewUtilsV1.setupWebView(preWebView);
+		WebViewUtilsV1.setupWebView(notcoWebView);
+		WebViewUtilsV1.setupWebView(fragmentsWebView);
+		WebViewUtilsV1.setupWebView(mergeStep1WebView);
+		WebViewUtilsV1.setupWebView(mergeStep2WebView);
 
 		initialPruningChoice.getItems().setAll(DeclarePruningType.values());
 		initialPruningChoice.getSelectionModel().select(DeclarePruningType.NONE);
@@ -201,7 +201,7 @@ public class MainViewController {
 			discoveryResult = task.getValue();
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
-			WebViewUtils.updateDeclareVisualization(discoveryResult, declareWebView);
+			WebViewUtilsV1.updateDeclareVisualization(discoveryResult, declareWebView);
 			updateConstraintLabels();
 			AlertUtils.showSuccess("Declare model discovered! Finding constraint subsets...");
 
@@ -239,10 +239,10 @@ public class MainViewController {
 				noCardActivitiesListview.getItems().add(noCardActivity.getActivityName());
 			}
 
-			WebViewUtils.updateSubsetsWebView(constraintSubsets.getSucActivities(), constraintSubsets.getSucConstraints(), sucWebView);
-			WebViewUtils.updateSubsetsWebView(constraintSubsets.getPreActivities(), constraintSubsets.getPreConstraints(), preWebView);
-			WebViewUtils.updateSubsetsWebView(constraintSubsets.getResActivities(), constraintSubsets.getResConstraints(), resWebView);
-			WebViewUtils.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
+			WebViewUtilsV1.updateSubsetsWebView(constraintSubsets.getSucActivities(), constraintSubsets.getSucConstraints(), sucWebView);
+			WebViewUtilsV1.updateSubsetsWebView(constraintSubsets.getPreActivities(), constraintSubsets.getPreConstraints(), preWebView);
+			WebViewUtilsV1.updateSubsetsWebView(constraintSubsets.getResActivities(), constraintSubsets.getResConstraints(), resWebView);
+			WebViewUtilsV1.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
 
 			//Execute initial fragments task after successful constraint filtering and pruning
 			InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryResult.getActivities(), constraintSubsets);
@@ -265,7 +265,7 @@ public class MainViewController {
 		task.setOnSucceeded(event -> {
 			initialFragmentsResult = task.getValue();
 
-			WebViewUtils.updateFragmentsWebView(initialFragmentsResult.getFragmentMainTransitions(), fragmentsWebView);
+			WebViewUtilsV1.updateFragmentsWebView(initialFragmentsResult.getFragmentMainTransitions(), fragmentsWebView);
 
 			//Execute step 1 of merging fragments
 			MergeStep1Task mergeStep1Task = new MergeStep1Task(initialFragmentsResult);
@@ -284,7 +284,7 @@ public class MainViewController {
 		task.setOnSucceeded(event -> {
 			mergeStep1Result = task.getValue();
 
-			WebViewUtils.updateFragmentsWebView(mergeStep1Result.getStep1MainTransitions(), mergeStep1WebView);
+			WebViewUtilsV1.updateFragmentsWebView(mergeStep1Result.getStep1MainTransitions(), mergeStep1WebView);
 
 			//Execute step 2 of merging fragments
 			MergeStep2Task mergeStep2Task = new MergeStep2Task(initialFragmentsResult, mergeStep1Result);
@@ -303,7 +303,7 @@ public class MainViewController {
 		task.setOnSucceeded(event -> {
 			mergeStep2Result = task.getValue();
 
-			WebViewUtils.updateFragmentsWebView(mergeStep2Result, mergeStep2WebView);
+			WebViewUtilsV1.updateFragmentsWebView(mergeStep2Result, mergeStep2WebView);
 
 			
 		});

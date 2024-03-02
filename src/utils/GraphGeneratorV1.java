@@ -13,9 +13,9 @@ import data.DiscoveredConstraint;
 import model.PlaceNode;
 import model.TransitionNode;
 
-public class GraphGenerator {
+public class GraphGeneratorV1 {
 	// private constructor to avoid unnecessary instantiation of the class
-	private GraphGenerator() {
+	private GraphGeneratorV1() {
 	}
 
 

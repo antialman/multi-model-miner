@@ -1,4 +1,4 @@
-package task;
+package task.v1;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -9,6 +9,7 @@ import java.util.stream.Collectors;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
+import task.DiscoveryResult;
 import utils.ConstraintTemplate;
 import utils.TransitiveClosureUtils;
 

@@ -12,14 +12,14 @@ import javafx.scene.web.WebView;
 import model.TransitionNode;
 import task.DiscoveryResult;
 
-public class WebViewUtils {
+public class WebViewUtilsV2 {
 
 	//Private constructor to avoid unnecessary instantiation of the class
-	private WebViewUtils() {
+	private WebViewUtilsV2() {
 	}
 
 	public static void setupWebView(WebView webView) {
-		webView.getEngine().load((WebViewUtils.class.getClassLoader().getResource("test.html")).toString());
+		webView.getEngine().load((WebViewUtilsV2.class.getClassLoader().getResource("test.html")).toString());
 		webView.setContextMenuEnabled(false); //Setting it in FXML causes an IllegalArgumentException
 
 		webView.addEventFilter(ScrollEvent.SCROLL, e -> {
@@ -43,7 +43,7 @@ public class WebViewUtils {
 			String visualizationString;
 			String script;
 
-			visualizationString = GraphGenerator.createDeclareVisualizationString(discoveryTaskResult.getActivities(), discoveryTaskResult.getConstraints(), true, false);
+			visualizationString = GraphGeneratorV2.createDeclareVisualizationString(discoveryTaskResult.getActivities(), discoveryTaskResult.getConstraints(), true, false);
 			if (visualizationString != null) {
 				script = "setModel('" + visualizationString + "')";
 				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
@@ -57,7 +57,7 @@ public class WebViewUtils {
 			String visualizationString;
 			String script;
 
-			visualizationString = GraphGenerator.createDeclareVisualizationString(activities, constraints, true, true);
+			visualizationString = GraphGeneratorV2.createDeclareVisualizationString(activities, constraints, true, true);
 			if (visualizationString != null) {
 				script = "setModel('" + visualizationString + "')";
 				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
@@ -72,7 +72,7 @@ public class WebViewUtils {
 			String visualizationString;
 			String script;
 			
-			visualizationString = GraphGenerator.createFragmentsVisualizationString(fragmentMainTransitions);
+			visualizationString = GraphGeneratorV2.createFragmentsVisualizationString(fragmentMainTransitions);
 			if (visualizationString != null) {
 				script = "setModel('" + visualizationString + "')";
 				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
