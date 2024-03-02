@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import data.ActivityRelations;
+import data.ActivityRelationsV1;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
@@ -18,7 +18,7 @@ public class InitialFragmentsTask extends Task<InitialFragmentsResult> {
 
 	private List<DiscoveredActivity> discoveredActivities;
 	private ConstraintSubsets constraintSubsets;
-	private Map<DiscoveredActivity, ActivityRelations> activityRelationsMap;
+	private Map<DiscoveredActivity, ActivityRelationsV1> activityRelationsMap;
 	private ArrayList<Set<DiscoveredActivity>> notcoCliques;
 
 
@@ -39,8 +39,8 @@ public class InitialFragmentsTask extends Task<InitialFragmentsResult> {
 
 
 			//Making it easier to look up which types of relations each activity has to other activities
-			activityRelationsMap = new HashMap<DiscoveredActivity, ActivityRelations>();
-			discoveredActivities.forEach(da -> {activityRelationsMap.put(da, new ActivityRelations(da));});
+			activityRelationsMap = new HashMap<DiscoveredActivity, ActivityRelationsV1>();
+			discoveredActivities.forEach(da -> {activityRelationsMap.put(da, new ActivityRelationsV1(da));});
 			for (DiscoveredConstraint dc : constraintSubsets.getSucConstraints()) {
 				activityRelationsMap.get(dc.getActivationActivity()).addSuccessionOut(dc.getTargetActivity());
 				activityRelationsMap.get(dc.getTargetActivity()).addSuccessionIn(dc.getActivationActivity());
@@ -61,7 +61,7 @@ public class InitialFragmentsTask extends Task<InitialFragmentsResult> {
 
 			//Creating the initial (activity based) fragments
 			int nextNodeId = 0;
-			for (ActivityRelations activityRelations : activityRelationsMap.values()) {
+			for (ActivityRelationsV1 activityRelations : activityRelationsMap.values()) {
 				DiscoveredActivity mainActivity = activityRelations.getActivity();
 				TransitionNode mainTransition = new TransitionNode(nextNodeId++, mainActivity);
 				mainTransition.setFragmentMain(true);

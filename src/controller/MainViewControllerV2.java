@@ -2,7 +2,6 @@ package controller;
 
 import java.io.File;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -18,15 +17,9 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import model.TransitionNode;
 import task.DiscoveryTaskDeclare;
-import task.v1.ConstraintSubsets;
-import task.v1.ConstraintSubsetsTask;
-import task.v1.InitialFragmentsResult;
-import task.v1.InitialFragmentsTask;
-import task.v1.MergeStep1Result;
-import task.v1.MergeStep1Task;
-import task.v1.MergeStep2Task;
+import task.v2.ConstraintSubsets;
+import task.v2.ConstraintSubsetsTask;
 import task.DiscoveryResult;
 import utils.WebViewUtilsV2;
 import utils.AlertUtils;
@@ -80,10 +73,6 @@ public class MainViewControllerV2 {
 
 	private DiscoveryResult discoveryResult;
 	private ConstraintSubsets constraintSubsets;
-	private InitialFragmentsResult initialFragmentsResult;
-	private MergeStep1Result mergeStep1Result;
-	private Set<TransitionNode> mergeStep2Result;
-
 
 
 	public void setStage(Stage stage) {
@@ -220,9 +209,9 @@ public class MainViewControllerV2 {
 			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
 
 			//Execute initial fragments task after successful constraint filtering and pruning
-			InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryResult.getActivities(), constraintSubsets);
-			addInitialFragmentsTaskHandlers(initialFragmentsTask);
-			executorService.execute(initialFragmentsTask);
+			//InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryResult.getActivities(), constraintSubsets);
+			//addInitialFragmentsTaskHandlers(initialFragmentsTask);
+			//executorService.execute(initialFragmentsTask);
 
 
 		});
@@ -235,59 +224,7 @@ public class MainViewControllerV2 {
 
 
 
-	private void addInitialFragmentsTaskHandlers(InitialFragmentsTask task) {
-		//Handle task success
-		task.setOnSucceeded(event -> {
-			initialFragmentsResult = task.getValue();
-
-			WebViewUtilsV2.updateFragmentsWebView(initialFragmentsResult.getFragmentMainTransitions(), fragmentsWebView);
-
-			//Execute step 1 of merging fragments
-			MergeStep1Task mergeStep1Task = new MergeStep1Task(initialFragmentsResult);
-			addMergeStep1TaskHandlers(mergeStep1Task);
-			executorService.execute(mergeStep1Task);
-		});
-
-		//Handle task failure
-		task.setOnFailed(event -> {
-			AlertUtils.showError("Finding initial fragments failed!");
-		});
-	}
-
-	private void addMergeStep1TaskHandlers(MergeStep1Task task) {
-		//Handle task success
-		task.setOnSucceeded(event -> {
-			mergeStep1Result = task.getValue();
-
-			WebViewUtilsV2.updateFragmentsWebView(mergeStep1Result.getStep1MainTransitions(), mergeStep1WebView);
-
-			//Execute step 2 of merging fragments
-//			MergeStep2Task mergeStep2Task = new MergeStep2Task(initialFragmentsResult, mergeStep1Result);
-//			addMergeStep2TaskHandlers(mergeStep2Task);
-//			executorService.execute(mergeStep2Task);
-		});
-
-		//Handle task failure
-		task.setOnFailed(event -> {
-			AlertUtils.showError("Step 1 of merge failed");
-		});
-	}
-
-	private void addMergeStep2TaskHandlers(MergeStep2Task task) {
-		//Handle task success
-		task.setOnSucceeded(event -> {
-			mergeStep2Result = task.getValue();
-
-			WebViewUtilsV2.updateFragmentsWebView(mergeStep2Result, mergeStep2WebView);
-
-			
-		});
-
-		//Handle task failure
-		task.setOnFailed(event -> {
-			AlertUtils.showError("Step 1 of merge failed");
-		});
-	}
+	
 
 	private void updateConstraintLabels() {
 		constraintLabelListView.getItems().clear();

@@ -3,7 +3,7 @@ package data;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ActivityRelations {
+public class ActivityRelationsV1 {
 
 	private DiscoveredActivity activity;
 	
@@ -15,7 +15,7 @@ public class ActivityRelations {
 	private Set<DiscoveredActivity> precedenceIn;
 	private Set<DiscoveredActivity> mutualExclusion;
 	
-	public ActivityRelations(DiscoveredActivity discoveredActivity) {
+	public ActivityRelationsV1(DiscoveredActivity discoveredActivity) {
 		this.activity = discoveredActivity;
 		
 		successionOut = new HashSet<DiscoveredActivity>();
