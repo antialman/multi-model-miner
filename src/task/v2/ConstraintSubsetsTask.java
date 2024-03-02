@@ -16,12 +16,10 @@ import utils.TransitiveClosureUtils;
 public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 
 	private DiscoveryResult discoveryTaskResult;
-	private boolean pruneSubsets;
 
-	public ConstraintSubsetsTask(DiscoveryResult discoveryTaskResult, boolean pruneSubsets) {
+	public ConstraintSubsetsTask(DiscoveryResult discoveryTaskResult) {
 		super();
 		this.discoveryTaskResult = discoveryTaskResult;
-		this.pruneSubsets = pruneSubsets;
 	}
 
 
@@ -56,14 +54,12 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 			List<DiscoveredConstraint> resConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Response).collect(Collectors.toList());
 			List<DiscoveredConstraint> preConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Precedence).collect(Collectors.toList());
 			List<DiscoveredConstraint> notcoConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Not_CoExistence).collect(Collectors.toList());
-			
-			//Pruning the constraint subsets
-			if (pruneSubsets) {
-				sucConstraints = TransitiveClosureUtils.getTransitiveClosureSuccessionConstraints(sucConstraints);
-				resConstraints = TransitiveClosureUtils.getTransitiveClosureResponseConstraints(resConstraints);
-				preConstraints = TransitiveClosureUtils.getTransitiveClosurePrecedenceConstraints(preConstraints);
-				//notcoConstraints = TransitiveClosureUtils.getTransitiveClosureNotCoexistenceConstraints(notcoConstraints); //Not Co-Existence is not transitive, so pruning wouldn't make any difference here
-			}
+
+			//Pruning constraint subsets
+			sucConstraints = TransitiveClosureUtils.getTransitiveClosureSuccessionConstraints(sucConstraints);
+			resConstraints = TransitiveClosureUtils.getTransitiveClosureResponseConstraints(resConstraints);
+			preConstraints = TransitiveClosureUtils.getTransitiveClosurePrecedenceConstraints(preConstraints);
+			//notcoConstraints = TransitiveClosureUtils.getTransitiveClosureNotCoexistenceConstraints(notcoConstraints); //Not Co-Existence is not transitive, so pruning wouldn't make any difference here
 
 			//Activity lists for the subsets (used by the current visualization script)
 			Set<DiscoveredActivity> sucActivities = new HashSet<DiscoveredActivity>();
@@ -73,11 +69,11 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 			sucConstraints.forEach(c -> {
 				sucActivities.add(c.getActivationActivity());
 				sucActivities.add(c.getTargetActivity());}
-			);
+					);
 			resConstraints.forEach(c -> {
 				resActivities.add(c.getActivationActivity());
 				resActivities.add(c.getTargetActivity());}
-			);
+					);
 			preConstraints.forEach(c -> {
 				preActivities.add(c.getActivationActivity());
 				preActivities.add(c.getTargetActivity());}
@@ -85,14 +81,14 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 			notcoConstraints.forEach(c -> {
 				notcoActivities.add(c.getActivationActivity());
 				notcoActivities.add(c.getTargetActivity());}
-			);
-			
+					);
+
 			//Result object
 			ConstraintSubsets constraintSubsets = new ConstraintSubsets();
 			constraintSubsets.setReqActivities(reqActivities);
 			constraintSubsets.setNoRepActivities(noRepActivities);
 			constraintSubsets.setNoCardActivities(noCardActivities);
-			
+
 			constraintSubsets.setSucActivities(new ArrayList<>(sucActivities));
 			constraintSubsets.setPreActivities(new ArrayList<>(preActivities));
 			constraintSubsets.setResActivities(new ArrayList<>(resActivities));
@@ -101,7 +97,7 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 			constraintSubsets.setPreConstraints(preConstraints);
 			constraintSubsets.setResConstraints(resConstraints);
 			constraintSubsets.setNotcoConstraints(notcoConstraints);
-			
+
 			return constraintSubsets;
 
 		} catch (Exception e) {

@@ -170,7 +170,7 @@ public class MainViewControllerV2 {
 			AlertUtils.showSuccess("Declare model discovered! Finding constraint subsets...");
 
 			//Execute constraint filtering and pruning task after successful discovery
-			ConstraintSubsetsTask constraintSubsetsTask = new ConstraintSubsetsTask(discoveryResult, true);
+			ConstraintSubsetsTask constraintSubsetsTask = new ConstraintSubsetsTask(discoveryResult);
 			addConstraintSubsetsTaskHandlers(constraintSubsetsTask);
 			executorService.execute(constraintSubsetsTask);
 
