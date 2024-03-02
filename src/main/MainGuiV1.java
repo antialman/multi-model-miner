@@ -1,7 +1,6 @@
 package main;
 
 import controller.MainViewControllerV1;
-import controller.MainViewControllerV2;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;
@@ -14,7 +13,6 @@ import javafx.stage.WindowEvent;
 public class MainGuiV1 extends Application {
 
 	private static Scene scene;
-	private int version = 2;
 	
 	public static void main(String[] args) {
 		launch(args);
@@ -23,7 +21,7 @@ public class MainGuiV1 extends Application {
 	
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		String fxmlPath = "MainViewV2.fxml";
+		String fxmlPath = "MainViewV1.fxml";
 		FXMLLoader fxmlLoader = new FXMLLoader(MainGuiV1.class.getClassLoader().getResource(fxmlPath));
 		Parent parent = fxmlLoader.load();
 		
