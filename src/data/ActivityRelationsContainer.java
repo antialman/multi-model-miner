@@ -1,6 +1,7 @@
 package data;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -24,6 +25,10 @@ public class ActivityRelationsContainer {
 	private Map<DiscoveredActivity, DiscoveredConstraint> notSuccAllInMap = new HashMap<DiscoveredActivity, DiscoveredConstraint>();
 	private Map<DiscoveredActivity, DiscoveredConstraint> notSuccAllOutMap = new HashMap<DiscoveredActivity, DiscoveredConstraint>();
 	
+	//Pruned incoming and outgoing activities for easier lookup (populated by other add methods)
+	private Set<DiscoveredActivity> prunedInActivities = new HashSet<DiscoveredActivity>();
+	private Set<DiscoveredActivity> prunedOutActivities = new HashSet<DiscoveredActivity>();
+	
 
 	public ActivityRelationsContainer(DiscoveredActivity discoveredActivity) {
 		this.activity = discoveredActivity;
@@ -36,21 +41,27 @@ public class ActivityRelationsContainer {
 	//Adding constraint relations to the container
 	public void addSuccPrunedIn(DiscoveredActivity discoveredActivity, DiscoveredConstraint discoveredConstraint) {
 		succPrunedInMap.put(discoveredActivity, discoveredConstraint);
+		prunedInActivities.add(discoveredActivity);
 	}
 	public void addSuccPrunedOut(DiscoveredActivity discoveredActivity, DiscoveredConstraint discoveredConstraint) {
 		succPrunedOutMap.put(discoveredActivity, discoveredConstraint);
+		prunedOutActivities.add(discoveredActivity);
 	}
 	public void addPrecPrunedIn(DiscoveredActivity discoveredActivity, DiscoveredConstraint discoveredConstraint) {
 		precPrunedInMap.put(discoveredActivity, discoveredConstraint);
+		prunedInActivities.add(discoveredActivity);
 	}
 	public void addPrecPrunedOut(DiscoveredActivity discoveredActivity, DiscoveredConstraint discoveredConstraint) {
 		precPrunedOutMap.put(discoveredActivity, discoveredConstraint);
+		prunedOutActivities.add(discoveredActivity);
 	}
 	public void addRespPrunedIn(DiscoveredActivity discoveredActivity, DiscoveredConstraint discoveredConstraint) {
 		respPrunedInMap.put(discoveredActivity, discoveredConstraint);
+		prunedInActivities.add(discoveredActivity);
 	}
 	public void addRespPrunedOut(DiscoveredActivity discoveredActivity, DiscoveredConstraint discoveredConstraint) {
 		respPrunedOutMap.put(discoveredActivity, discoveredConstraint);
+		prunedOutActivities.add(discoveredActivity);
 	}
 	public void addCoex(DiscoveredActivity discoveredActivity, DiscoveredConstraint discoveredConstraint) {
 		coexAllMap.put(discoveredActivity, discoveredConstraint);
@@ -126,11 +137,22 @@ public class ActivityRelationsContainer {
 		return notCoexAllMap.get(discoveredActivity);
 	}
 	
+	
+	//Getting pruned incoming and outgoing activities
+	public Set<DiscoveredActivity> getPrunedInActivities() {
+		return prunedInActivities;
+	}
+	public Set<DiscoveredActivity> getOutPrunedActivities() {
+		return prunedOutActivities;
+	}
+	
 	@Override
 	public String toString() {
-		return "Relations of " + activity.getActivityName() + " - succPrunedInMap: " + succPrunedInMap.size() + ", succPrunedOutMap: " + succPrunedOutMap.size() + 
-				", precPrunedInMap: " + precPrunedInMap.size() + ", precPrunedOutMap: " + precPrunedOutMap.size() + ", respPrunedInMap: " + respPrunedInMap.size() +
-				", respPrunedOutMap: " + respPrunedOutMap.size() + ", coexAllMap: " + coexAllMap.size() + ", notCoexAllMap: " + notCoexAllMap.size() + 
+		return "Relations of " + activity.getActivityName() + " - prunedInActivities: " + prunedInActivities .size() + ", prunedOutActivities: " + prunedOutActivities .size() + 
+				", succPrunedInMap: " + succPrunedInMap.size() + ", succPrunedOutMap: " + succPrunedOutMap.size() + 
+				", precPrunedInMap: " + precPrunedInMap.size() + ", precPrunedOutMap: " + precPrunedOutMap.size() +
+				", respPrunedInMap: " + respPrunedInMap.size() + ", respPrunedOutMap: " + respPrunedOutMap.size() + 
+				", coexAllMap: " + coexAllMap.size() + ", notCoexAllMap: " + notCoexAllMap.size() + 
 				", notSuccAllInMap: " + notSuccAllInMap.size() + ", notSuccAllOutMap: " + notSuccAllOutMap.size();
 	}
 	
