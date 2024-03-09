@@ -6,6 +6,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
+import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -55,11 +56,11 @@ public class MainViewControllerV2 {
 	@FXML
 	private ListView<String> noCardActivitiesListview;
 	@FXML
-	private WebView sucWebView;
+	private WebView succWebView;
 	@FXML
-	private WebView resWebView;
+	private WebView respWebView;
 	@FXML
-	private WebView preWebView;
+	private WebView precWebView;
 	@FXML
 	private WebView notcoWebView;
 
@@ -81,11 +82,11 @@ public class MainViewControllerV2 {
 		resultTabPane.setDisable(true);
 		redescoverButton.setDisable(true);
 		addStartEndCheckBox.setSelected(true);
-		
+
 		WebViewUtilsV2.setupWebView(declareWebView);
-		WebViewUtilsV2.setupWebView(sucWebView);
-		WebViewUtilsV2.setupWebView(resWebView);
-		WebViewUtilsV2.setupWebView(preWebView);
+		WebViewUtilsV2.setupWebView(succWebView);
+		WebViewUtilsV2.setupWebView(respWebView);
+		WebViewUtilsV2.setupWebView(precWebView);
 		WebViewUtilsV2.setupWebView(notcoWebView);
 	}
 
@@ -196,33 +197,35 @@ public class MainViewControllerV2 {
 			reqActivitiesListView.getItems().clear();
 			noRepActivitiesListview.getItems().clear();
 			noCardActivitiesListview.getItems().clear();
-			
-			
+
+
 			List<DiscoveredConstraint> patternConstraints = declarePostprocessingResult.getPrunedConstraints().stream().filter(c -> (
 					c.getTemplate() == ConstraintTemplate.Succession || 
 					c.getTemplate() == ConstraintTemplate.Precedence || 
 					c.getTemplate() == ConstraintTemplate.Response || 
-					c.getTemplate() == ConstraintTemplate.Not_CoExistence) 
+					c.getTemplate() == ConstraintTemplate.Not_CoExistence ||
+					c.getTemplate() == ConstraintTemplate.Existence ||
+					c.getTemplate() == ConstraintTemplate.Absence2) 
 					).collect(Collectors.toList());
-			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getActivities(), patternConstraints, declareWebView, false);
+			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getAllActivities(), patternConstraints, declareWebView, false);
 
 			AlertUtils.showSuccess("Declare model discovered and post-processing done! Starting Petri net construction.");
-			
-			
-//			for (DiscoveredActivity reqActivity : dataStore.getReqActivities()) {
-//				reqActivitiesListView.getItems().add(reqActivity.getActivityName());
-//			}
-//			for (DiscoveredActivity noRepActivity : dataStore.getNoRepActivities()) {
-//				noRepActivitiesListview.getItems().add(noRepActivity.getActivityName());
-//			}
-//			for (DiscoveredActivity noCardActivity : dataStore.getNoCardActivities()) {
-//				noCardActivitiesListview.getItems().add(noCardActivity.getActivityName());
-//			}
 
-//			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getSucActivities(), constraintSubsets.getSucConstraints(), sucWebView);
-//			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getPreActivities(), constraintSubsets.getPreConstraints(), preWebView);
-//			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getResActivities(), constraintSubsets.getResConstraints(), resWebView);
-//			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
+
+			for (DiscoveredActivity reqActivity : declarePostprocessingResult.getReqActivities()) {
+				reqActivitiesListView.getItems().add(reqActivity.getActivityName());
+			}
+			for (DiscoveredActivity noRepActivity : declarePostprocessingResult.getNoRepActivities()) {
+				noRepActivitiesListview.getItems().add(noRepActivity.getActivityName());
+			}
+			for (DiscoveredActivity noCardActivity : declarePostprocessingResult.getNoCardActivities()) {
+				noCardActivitiesListview.getItems().add(noCardActivity.getActivityName());
+			}
+
+			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getSuccActivities(), declarePostprocessingResult.getSuccPrunedConstraints(), succWebView, true);
+			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getPrecActivities(), declarePostprocessingResult.getPrecPrunedConstraints(), precWebView, true);
+			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getRespActivities(), declarePostprocessingResult.getRespPrunedConstraints(), respWebView, true);
+			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getNotcoActivities(), declarePostprocessingResult.getNotcoAllConstraints(), notcoWebView, true);
 
 			//Execute initial fragments task after successful constraint filtering and pruning
 			//InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryResult.getActivities(), constraintSubsets);
@@ -240,7 +243,7 @@ public class MainViewControllerV2 {
 
 
 
-	
+
 
 	private void updateConstraintLabels() {
 		constraintLabelListView.getItems().clear();

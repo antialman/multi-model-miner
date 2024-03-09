@@ -66,7 +66,7 @@
                                  </children>
                               </HBox>
                               <Label maxHeight="55.0" minHeight="55.0" prefHeight="55.0" text="Potentially optional activities with fixed execution order" wrapText="true" />
-                              <WebView fx:id="sucWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+                              <WebView fx:id="succWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
@@ -78,7 +78,7 @@
                                  </children>
                               </HBox>
                               <Label maxHeight="55.0" minHeight="55.0" prefHeight="55.0" text="Mandatory followers of potentially optional activities" wrapText="true" />
-                              <WebView fx:id="resWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+                              <WebView fx:id="respWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
@@ -90,7 +90,7 @@
                                  </children>
                               </HBox>
                               <Label maxHeight="55.0" minHeight="55.0" prefHeight="55.0" text="Prerequisite activities of each potentially optional activity" wrapText="true" />
-                              <WebView fx:id="preWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+                              <WebView fx:id="precWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>
                         </VBox>
                         <VBox prefHeight="200.0" prefWidth="100.0">
