@@ -22,7 +22,7 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import model.TransitionNode;
-import task.DiscoveryTaskDeclare;
+import task.DeclareDiscoveryTask;
 import task.v1.ConstraintSubsets;
 import task.v1.ConstraintSubsetsTask;
 import task.v1.InitialFragmentsResult;
@@ -30,7 +30,7 @@ import task.v1.InitialFragmentsTask;
 import task.v1.MergeStep1Result;
 import task.v1.MergeStep1Task;
 import task.v1.MergeStep2Task;
-import task.DiscoveryResult;
+import task.DeclareDiscoveryResult;
 import utils.WebViewUtilsV1;
 import utils.AlertUtils;
 import utils.ConstraintTemplate;
@@ -87,7 +87,7 @@ public class MainViewControllerV1 {
 
 	private File logFile;
 
-	private DiscoveryResult discoveryResult;
+	private DeclareDiscoveryResult declareDiscoveryResult;
 	private ConstraintSubsets constraintSubsets;
 	private InitialFragmentsResult initialFragmentsResult;
 	private MergeStep1Result mergeStep1Result;
@@ -147,8 +147,8 @@ public class MainViewControllerV1 {
 
 		mainHeader.setDisable(true);
 		resultTabPane.setDisable(true);
-		Task<DiscoveryResult> task = createDiscoveryTask();
-		addDiscoveryTaskHandlers(task);
+		Task<DeclareDiscoveryResult> task = createDeclareDiscoveryTask();
+		addDeclareDiscoveryTaskHandlers(task);
 		executorService.execute(task);
 	}
 
@@ -179,41 +179,41 @@ public class MainViewControllerV1 {
 
 
 
-	private Task<DiscoveryResult> createDiscoveryTask() {
+	private Task<DeclareDiscoveryResult> createDeclareDiscoveryTask() {
 		List<ConstraintTemplate> templates = List.of(ConstraintTemplate.Precedence, ConstraintTemplate.Response, ConstraintTemplate.Succession, ConstraintTemplate.Not_CoExistence, ConstraintTemplate.Existence, ConstraintTemplate.Absence2);
 
-		DiscoveryTaskDeclare discoveryTaskDeclare = new DiscoveryTaskDeclare();
-		discoveryTaskDeclare.setLogFile(logFile);
-		discoveryTaskDeclare.setVacuityDetection(false);
-		discoveryTaskDeclare.setConsiderLifecycle(false);
-		discoveryTaskDeclare.setPruningType(initialPruningChoice.getSelectionModel().getSelectedItem());
-		discoveryTaskDeclare.setSelectedTemplates(templates);
-		discoveryTaskDeclare.setMinSupport(100);
+		DeclareDiscoveryTask declareDiscoveryTask = new DeclareDiscoveryTask();
+		declareDiscoveryTask.setLogFile(logFile);
+		declareDiscoveryTask.setVacuityDetection(false);
+		declareDiscoveryTask.setConsiderLifecycle(false);
+		declareDiscoveryTask.setPruningType(initialPruningChoice.getSelectionModel().getSelectedItem());
+		declareDiscoveryTask.setSelectedTemplates(templates);
+		declareDiscoveryTask.setMinSupport(100);
 
-		discoveryTaskDeclare.setArtifStartEnd(addStartEndCheckBox.isSelected());
+		declareDiscoveryTask.setArtifStartEnd(addStartEndCheckBox.isSelected());
 
-		return discoveryTaskDeclare;
+		return declareDiscoveryTask;
 	}
 
-	private void addDiscoveryTaskHandlers(Task<DiscoveryResult> task) {
+	private void addDeclareDiscoveryTaskHandlers(Task<DeclareDiscoveryResult> declareDiscoveryTask) {
 		//Handle task success
-		task.setOnSucceeded(event -> {
-			discoveryResult = task.getValue();
+		declareDiscoveryTask.setOnSucceeded(event -> {
+			declareDiscoveryResult = declareDiscoveryTask.getValue();
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
-			WebViewUtilsV1.updateDeclareVisualization(discoveryResult, declareWebView);
+			WebViewUtilsV1.updateDeclareVisualization(declareDiscoveryResult, declareWebView);
 			updateConstraintLabels();
 			AlertUtils.showSuccess("Declare model discovered! Finding constraint subsets...");
 
 			//Execute constraint filtering and pruning task after successful discovery
-			ConstraintSubsetsTask constraintSubsetsTask = new ConstraintSubsetsTask(discoveryResult, pruneSubsetsCheckBox.isSelected());
+			ConstraintSubsetsTask constraintSubsetsTask = new ConstraintSubsetsTask(declareDiscoveryResult, pruneSubsetsCheckBox.isSelected());
 			addConstraintSubsetsTaskHandlers(constraintSubsetsTask);
 			executorService.execute(constraintSubsetsTask);
 
 		});
 
 		//Handle task failure
-		task.setOnFailed(event -> {
+		declareDiscoveryTask.setOnFailed(event -> {
 			mainHeader.setDisable(false);
 			AlertUtils.showError("Running Declare Miner failed!");
 		});
@@ -245,7 +245,7 @@ public class MainViewControllerV1 {
 			WebViewUtilsV1.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
 
 			//Execute initial fragments task after successful constraint filtering and pruning
-			InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryResult.getActivities(), constraintSubsets);
+			InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(declareDiscoveryResult.getActivities(), constraintSubsets);
 			addInitialFragmentsTaskHandlers(initialFragmentsTask);
 			executorService.execute(initialFragmentsTask);
 
@@ -316,7 +316,7 @@ public class MainViewControllerV1 {
 
 	private void updateConstraintLabels() {
 		constraintLabelListView.getItems().clear();
-		for (DiscoveredConstraint constraint : discoveryResult.getConstraints()) {
+		for (DiscoveredConstraint constraint : declareDiscoveryResult.getConstraints()) {
 			constraintLabelListView.getItems().add(constraint.toString());
 		}
 

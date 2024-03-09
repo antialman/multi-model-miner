@@ -9,16 +9,16 @@ import java.util.stream.Collectors;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
-import task.DiscoveryResult;
+import task.DeclareDiscoveryResult;
 import utils.ConstraintTemplate;
 import utils.TransitiveClosureUtils;
 
 public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 
-	private DiscoveryResult discoveryTaskResult;
+	private DeclareDiscoveryResult discoveryTaskResult;
 	private boolean pruneSubsets;
 
-	public ConstraintSubsetsTask(DiscoveryResult discoveryTaskResult, boolean pruneSubsets) {
+	public ConstraintSubsetsTask(DeclareDiscoveryResult discoveryTaskResult, boolean pruneSubsets) {
 		super();
 		this.discoveryTaskResult = discoveryTaskResult;
 		this.pruneSubsets = pruneSubsets;

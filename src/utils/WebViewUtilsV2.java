@@ -10,7 +10,7 @@ import data.DiscoveredConstraint;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
 import model.TransitionNode;
-import task.DiscoveryResult;
+import task.DeclareDiscoveryResult;
 
 public class WebViewUtilsV2 {
 
@@ -38,7 +38,7 @@ public class WebViewUtilsV2 {
 	}
 
 
-	public static void updateDeclareVisualization(DiscoveryResult discoveryTaskResult, WebView declareWebView) {
+	public static void updateDeclareVisualization(DeclareDiscoveryResult discoveryTaskResult, WebView declareWebView) {
 		if (discoveryTaskResult != null) {
 			String visualizationString;
 			String script;

@@ -17,8 +17,8 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
-import task.DiscoveryTaskDeclare;
-import task.DiscoveryResult;
+import task.DeclareDiscoveryTask;
+import task.DeclareDiscoveryResult;
 import utils.WebViewUtilsV2;
 import utils.AlertUtils;
 import utils.ConstraintTemplate;
@@ -65,7 +65,7 @@ public class MainViewControllerV2 {
 
 	private File logFile;
 
-	private DiscoveryResult discoveryResult;
+	private DeclareDiscoveryResult declareDiscoveryResult;
 
 
 	public void setStage(Stage stage) {
@@ -103,8 +103,8 @@ public class MainViewControllerV2 {
 
 		mainHeader.setDisable(true);
 		resultTabPane.setDisable(true);
-		Task<DiscoveryResult> task = createDiscoveryTask();
-		addDiscoveryTaskHandlers(task);
+		Task<DeclareDiscoveryResult> task = createDeclareDiscoveryTask();
+		addDeclareDiscoveryTaskHandlers(task);
 		executorService.execute(task);
 	}
 
@@ -135,7 +135,7 @@ public class MainViewControllerV2 {
 
 
 
-	private Task<DiscoveryResult> createDiscoveryTask() {
+	private Task<DeclareDiscoveryResult> createDeclareDiscoveryTask() {
 		List<ConstraintTemplate> templates = List.of(
 				ConstraintTemplate.Precedence,
 				ConstraintTemplate.Response,
@@ -147,28 +147,28 @@ public class MainViewControllerV2 {
 				ConstraintTemplate.Absence2
 				);
 
-		DiscoveryTaskDeclare discoveryTaskDeclare = new DiscoveryTaskDeclare();
-		discoveryTaskDeclare.setLogFile(logFile);
-		discoveryTaskDeclare.setVacuityDetection(false);
-		discoveryTaskDeclare.setConsiderLifecycle(false);
-		discoveryTaskDeclare.setPruningType(DeclarePruningType.NONE);
-		discoveryTaskDeclare.setSelectedTemplates(templates);
-		discoveryTaskDeclare.setMinSupport(100);
+		DeclareDiscoveryTask declareDiscoveryTaskDeclare = new DeclareDiscoveryTask();
+		declareDiscoveryTaskDeclare.setLogFile(logFile);
+		declareDiscoveryTaskDeclare.setVacuityDetection(false);
+		declareDiscoveryTaskDeclare.setConsiderLifecycle(false);
+		declareDiscoveryTaskDeclare.setPruningType(DeclarePruningType.NONE);
+		declareDiscoveryTaskDeclare.setSelectedTemplates(templates);
+		declareDiscoveryTaskDeclare.setMinSupport(100);
 
-		discoveryTaskDeclare.setArtifStartEnd(addStartEndCheckBox.isSelected());
+		declareDiscoveryTaskDeclare.setArtifStartEnd(addStartEndCheckBox.isSelected());
 
-		return discoveryTaskDeclare;
+		return declareDiscoveryTaskDeclare;
 	}
 
-	private void addDiscoveryTaskHandlers(Task<DiscoveryResult> task) {
+	private void addDeclareDiscoveryTaskHandlers(Task<DeclareDiscoveryResult> delcareDiscoveryTask) {
 		//Handle task success
-		task.setOnSucceeded(event -> {
-			discoveryResult = task.getValue();
+		delcareDiscoveryTask.setOnSucceeded(event -> {
+			declareDiscoveryResult = delcareDiscoveryTask.getValue();
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
-			WebViewUtilsV2.updateDeclareVisualization(discoveryResult, declareWebView);
+			WebViewUtilsV2.updateDeclareVisualization(declareDiscoveryResult, declareWebView);
 			updateConstraintLabels();
-			AlertUtils.showSuccess("Declare model discovered! Finding constraint subsets...");
+			AlertUtils.showSuccess("Declare model discovered! Starting post-processing.");
 
 			//Execute constraint filtering and pruning task after successful discovery
 //			DataStorePrepTask dataStorePrepTask = new DataStorePrepTask(discoveryResult);
@@ -178,7 +178,7 @@ public class MainViewControllerV2 {
 		});
 
 		//Handle task failure
-		task.setOnFailed(event -> {
+		delcareDiscoveryTask.setOnFailed(event -> {
 			mainHeader.setDisable(false);
 			AlertUtils.showError("Running Declare Miner failed!");
 		});
@@ -229,7 +229,7 @@ public class MainViewControllerV2 {
 
 	private void updateConstraintLabels() {
 		constraintLabelListView.getItems().clear();
-		for (DiscoveredConstraint constraint : discoveryResult.getConstraints()) {
+		for (DiscoveredConstraint constraint : declareDiscoveryResult.getConstraints()) {
 			constraintLabelListView.getItems().add(constraint.toString());
 		}
 
