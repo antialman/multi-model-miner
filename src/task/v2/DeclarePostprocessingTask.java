@@ -1,11 +1,14 @@
 package task.v2;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import data.ActivityRelationsContainer;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
@@ -31,16 +34,9 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 			declarePostprocessingResult.setAllActivities(declareDiscoveryResult.getActivities());
 			declarePostprocessingResult.setAllConstraints(declareDiscoveryResult.getConstraints());
 			
-			
-			
-			
-			
-			
-			
-			
+			//Pruning
 			List<DiscoveredConstraint> prunedConstraints = TransitiveClosureUtils.getPrunedConstraints(declareDiscoveryResult.getConstraints());
 			declarePostprocessingResult.setPrunedConstraints(prunedConstraints);
-
 			
 			//Cardinalities (done after pruning as pruning does not remove unary constraints)
 			List<DiscoveredActivity> reqActivities = new ArrayList<DiscoveredActivity>();
@@ -101,10 +97,36 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 			declarePostprocessingResult.setNotcoActivities(new ArrayList<>(notcoActivities));
 			
 			
-			
-			
-			
-			
+			//Creating activityToRelationsMap (main input for building Petri nets) 
+			Map<DiscoveredActivity, ActivityRelationsContainer> activityToRelationsMap = new HashMap<DiscoveredActivity, ActivityRelationsContainer>(declareDiscoveryResult.getActivities().size());
+			declareDiscoveryResult.getActivities().forEach(da -> {activityToRelationsMap.put(da, new ActivityRelationsContainer(da));});
+			//Pruned relations
+			for (DiscoveredConstraint dc : succPrunedConstraints) {
+				activityToRelationsMap.get(dc.getTargetActivity()).addSuccPrunedIn(dc.getActivationActivity(), dc);
+				activityToRelationsMap.get(dc.getActivationActivity()).addSuccPrunedOut(dc.getTargetActivity(), dc);
+			}
+			for (DiscoveredConstraint dc : precPrunedConstraints) {
+				activityToRelationsMap.get(dc.getActivationActivity()).addPrecPrunedIn(dc.getTargetActivity(), dc);
+				activityToRelationsMap.get(dc.getTargetActivity()).addPrecPrunedOut(dc.getActivationActivity(), dc);
+			}
+			for (DiscoveredConstraint dc : respPrunedConstraints) {
+				activityToRelationsMap.get(dc.getTargetActivity()).addRespPrunedIn(dc.getActivationActivity(), dc);
+				activityToRelationsMap.get(dc.getActivationActivity()).addRespPrunedOut(dc.getTargetActivity(), dc);
+			}
+			//Non-pruned relations
+			for (DiscoveredConstraint dc : declareDiscoveryResult.getConstraints()) {
+				if (dc.getTemplate() == ConstraintTemplate.CoExistence) {
+					activityToRelationsMap.get(dc.getActivationActivity()).addCoex(dc.getTargetActivity(), dc);
+					activityToRelationsMap.get(dc.getTargetActivity()).addCoex(dc.getActivationActivity(), dc);
+				} else if (dc.getTemplate() == ConstraintTemplate.Not_CoExistence) {
+					activityToRelationsMap.get(dc.getActivationActivity()).addNotCoex(dc.getTargetActivity(), dc);
+					activityToRelationsMap.get(dc.getTargetActivity()).addNotCoex(dc.getActivationActivity(), dc);
+				} else if (dc.getTemplate() == ConstraintTemplate.Not_Succession) {
+					activityToRelationsMap.get(dc.getTargetActivity()).addNotSuccAllIn(dc.getActivationActivity(), dc);
+					activityToRelationsMap.get(dc.getActivationActivity()).addNotSuccAllOut(dc.getTargetActivity(), dc);
+				}
+			}
+			declarePostprocessingResult.setActivityToRelationsMap(activityToRelationsMap);
 			
 			
 			

@@ -126,6 +126,12 @@ public class ActivityRelationsContainer {
 		return notCoexAllMap.get(discoveredActivity);
 	}
 	
-	
+	@Override
+	public String toString() {
+		return "Relations of " + activity.getActivityName() + " - succPrunedInMap: " + succPrunedInMap.size() + ", succPrunedOutMap: " + succPrunedOutMap.size() + 
+				", precPrunedInMap: " + precPrunedInMap.size() + ", precPrunedOutMap: " + precPrunedOutMap.size() + ", respPrunedInMap: " + respPrunedInMap.size() +
+				", respPrunedOutMap: " + respPrunedOutMap.size() + ", coexAllMap: " + coexAllMap.size() + ", notCoexAllMap: " + notCoexAllMap.size() + 
+				", notSuccAllInMap: " + notSuccAllInMap.size() + ", notSuccAllOutMap: " + notSuccAllOutMap.size();
+	}
 	
 }

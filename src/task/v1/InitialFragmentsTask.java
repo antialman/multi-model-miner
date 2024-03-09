@@ -39,7 +39,7 @@ public class InitialFragmentsTask extends Task<InitialFragmentsResult> {
 
 
 			//Making it easier to look up which types of relations each activity has to other activities
-			activityRelationsMap = new HashMap<DiscoveredActivity, ActivityRelations>();
+			activityRelationsMap = new HashMap<DiscoveredActivity, ActivityRelations>(discoveredActivities.size());
 			discoveredActivities.forEach(da -> {activityRelationsMap.put(da, new ActivityRelations(da));});
 			for (DiscoveredConstraint dc : constraintSubsets.getSucConstraints()) {
 				activityRelationsMap.get(dc.getActivationActivity()).addSuccessionOut(dc.getTargetActivity());

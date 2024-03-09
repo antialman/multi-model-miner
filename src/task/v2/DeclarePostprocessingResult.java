@@ -30,11 +30,18 @@ public class DeclarePostprocessingResult {
 	private List<DiscoveredConstraint> notcoAllConstraints;
 	
 	//Data structure for building the Petri nets
-	private Map<DiscoveredActivity, ActivityRelationsContainer> activityToRelations = new HashMap<DiscoveredActivity, ActivityRelationsContainer>();
+	private Map<DiscoveredActivity, ActivityRelationsContainer> activityToRelationsMap = new HashMap<DiscoveredActivity, ActivityRelationsContainer>();
 
 	
 	
 	public DeclarePostprocessingResult() {
+	}
+	
+	public Map<DiscoveredActivity, ActivityRelationsContainer> getActivityToRelationsMap() {
+		return activityToRelationsMap;
+	}
+	public void setActivityToRelationsMap(Map<DiscoveredActivity, ActivityRelationsContainer> activityToRelationsMap) {
+		this.activityToRelationsMap = activityToRelationsMap;
 	}
 
 	
