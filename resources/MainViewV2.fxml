@@ -27,7 +27,7 @@
       <Separator prefWidth="200.0" />
       <TabPane fx:id="resultTabPane" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
          <tabs>
-            <Tab text="Declare Model">
+            <Tab text="Pruned Declare Model">
                <content>
                   <SplitPane dividerPositions="0.9" orientation="VERTICAL">
                      <items>
