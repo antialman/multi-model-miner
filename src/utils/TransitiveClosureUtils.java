@@ -23,7 +23,7 @@ public class TransitiveClosureUtils {
 	
 	
 	
-	public static List<DiscoveredConstraint> getTransitiveClosureSuccessionConstraints(List<DiscoveredConstraint> sucConstraints) {
+	public static void pruneSuccessionConstraints(List<DiscoveredConstraint> sucConstraints) {
 		
 		//For reusing Declare miner code as-is
 		HashMap<Integer, List<String>> constraintParametersMap = new HashMap<Integer, List<String>>();
@@ -195,15 +195,12 @@ public class TransitiveClosureUtils {
 				sucConstraints.remove(i);
 			}
 		}
-		
-		
-		return sucConstraints;
 	}
 	
 	
 	
 	
-	public static List<DiscoveredConstraint> getTransitiveClosureResponseConstraints(List<DiscoveredConstraint> resConstraints) {
+	public static void pruneResponseConstraints(List<DiscoveredConstraint> resConstraints) {
 
 		//For reusing Declare miner code as-is
 		HashMap<Integer, List<String>> constraintParametersMap = new HashMap<Integer, List<String>>();
@@ -384,16 +381,12 @@ public class TransitiveClosureUtils {
 				resConstraints.remove(i);
 			}
 		}
-		
-		
-		return resConstraints;
-
 	}
 	
 	
 	
 	
-	public static List<DiscoveredConstraint> getTransitiveClosurePrecedenceConstraints(List<DiscoveredConstraint> preConstraints) {
+	public static void prunePrecedenceConstraints(List<DiscoveredConstraint> preConstraints) {
 
 		//For reusing Declare miner code as-is
 		HashMap<Integer, List<String>> constraintParametersMap = new HashMap<Integer, List<String>>();
@@ -574,7 +567,6 @@ public class TransitiveClosureUtils {
 				preConstraints.remove(i);
 			}
 		}
-		return preConstraints;
 	}
 	
 	

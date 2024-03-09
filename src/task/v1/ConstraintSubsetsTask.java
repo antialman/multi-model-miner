@@ -59,13 +59,13 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 			
 			//Pruning the constraint subsets
 			if (pruneSubsets) {
-				sucConstraints = TransitiveClosureUtils.getTransitiveClosureSuccessionConstraints(sucConstraints);
-				resConstraints = TransitiveClosureUtils.getTransitiveClosureResponseConstraints(resConstraints);
-				preConstraints = TransitiveClosureUtils.getTransitiveClosurePrecedenceConstraints(preConstraints);
+				TransitiveClosureUtils.pruneSuccessionConstraints(sucConstraints);
+				TransitiveClosureUtils.pruneResponseConstraints(resConstraints);
+				TransitiveClosureUtils.prunePrecedenceConstraints(preConstraints);
 				//notcoConstraints = TransitiveClosureUtils.getTransitiveClosureNotCoexistenceConstraints(notcoConstraints); //Not Co-Existence is not transitive, so pruning wouldn't make any difference here
 			}
 
-			//Activity lists for the subsets (used by the current visualization script)
+			//Activity lists for the subsets (needed for the Declare model visualization code)
 			Set<DiscoveredActivity> sucActivities = new HashSet<DiscoveredActivity>();
 			Set<DiscoveredActivity> preActivities = new HashSet<DiscoveredActivity>();
 			Set<DiscoveredActivity> resActivities = new HashSet<DiscoveredActivity>();

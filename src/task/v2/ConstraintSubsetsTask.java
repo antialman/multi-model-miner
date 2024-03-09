@@ -29,6 +29,9 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 			long taskStartTime = System.currentTimeMillis();
 			System.out.println("Discovering constraint subsets started at: " + taskStartTime);
 
+			ConstraintSubsets constraintSubsets = new ConstraintSubsets();
+
+
 			//Cardinalities
 			List<DiscoveredActivity> reqActivities = new ArrayList<DiscoveredActivity>();
 			List<DiscoveredActivity> noRepActivities = new ArrayList<DiscoveredActivity>();
@@ -48,20 +51,33 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 				}
 			}
 
+			constraintSubsets.setReqActivities(reqActivities);
+			constraintSubsets.setNoRepActivities(noRepActivities);
+			constraintSubsets.setNoCardActivities(noCardActivities);
+
+
 
 			//Filtering constraint subsets
 			List<DiscoveredConstraint> sucConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Succession).collect(Collectors.toList());
 			List<DiscoveredConstraint> resConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Response).collect(Collectors.toList());
 			List<DiscoveredConstraint> preConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Precedence).collect(Collectors.toList());
 			List<DiscoveredConstraint> notcoConstraints = discoveryTaskResult.getConstraints().stream().filter(c -> c.getTemplate() == ConstraintTemplate.Not_CoExistence).collect(Collectors.toList());
+			constraintSubsets.setAllSucConstraints(new ArrayList<DiscoveredConstraint>(sucConstraints)); //Creating new lists because existing lists will be modified by pruning
+			constraintSubsets.setAllResConstraints(new ArrayList<DiscoveredConstraint>(resConstraints));
+			constraintSubsets.setAllPreConstraints(new ArrayList<DiscoveredConstraint>(preConstraints));
+			constraintSubsets.setAllNotcoConstraints(new ArrayList<DiscoveredConstraint>(notcoConstraints));
 
-			//Pruning constraint subsets
-			sucConstraints = TransitiveClosureUtils.getTransitiveClosureSuccessionConstraints(sucConstraints);
-			resConstraints = TransitiveClosureUtils.getTransitiveClosureResponseConstraints(resConstraints);
-			preConstraints = TransitiveClosureUtils.getTransitiveClosurePrecedenceConstraints(preConstraints);
+
+
+			//Pruning the constraint subsets
+			TransitiveClosureUtils.pruneSuccessionConstraints(sucConstraints);
+			TransitiveClosureUtils.pruneResponseConstraints(resConstraints);
+			TransitiveClosureUtils.prunePrecedenceConstraints(preConstraints);
 			//notcoConstraints = TransitiveClosureUtils.getTransitiveClosureNotCoexistenceConstraints(notcoConstraints); //Not Co-Existence is not transitive, so pruning wouldn't make any difference here
 
-			//Activity lists for the subsets (used by the current visualization script)
+
+
+			//Lists for pruned constraint subsets and corresponding activities (latter used for visualising the corresponding Declare models) 
 			Set<DiscoveredActivity> sucActivities = new HashSet<DiscoveredActivity>();
 			Set<DiscoveredActivity> preActivities = new HashSet<DiscoveredActivity>();
 			Set<DiscoveredActivity> resActivities = new HashSet<DiscoveredActivity>();
@@ -82,21 +98,14 @@ public class ConstraintSubsetsTask extends Task<ConstraintSubsets> {
 				notcoActivities.add(c.getActivationActivity());
 				notcoActivities.add(c.getTargetActivity());}
 					);
-
-			//Result object
-			ConstraintSubsets constraintSubsets = new ConstraintSubsets();
-			constraintSubsets.setReqActivities(reqActivities);
-			constraintSubsets.setNoRepActivities(noRepActivities);
-			constraintSubsets.setNoCardActivities(noCardActivities);
-
-			constraintSubsets.setSucActivities(new ArrayList<>(sucActivities));
-			constraintSubsets.setPreActivities(new ArrayList<>(preActivities));
-			constraintSubsets.setResActivities(new ArrayList<>(resActivities));
-			constraintSubsets.setNotcoActivities(new ArrayList<>(notcoActivities));
-			constraintSubsets.setSucConstraints(sucConstraints);
-			constraintSubsets.setPreConstraints(preConstraints);
-			constraintSubsets.setResConstraints(resConstraints);
-			constraintSubsets.setNotcoConstraints(notcoConstraints);
+			constraintSubsets.setPrunedSucActivities(new ArrayList<>(sucActivities));
+			constraintSubsets.setPrunedPreActivities(new ArrayList<>(preActivities));
+			constraintSubsets.setPrunedResActivities(new ArrayList<>(resActivities));
+			constraintSubsets.setPrunedNotcoActivities(new ArrayList<>(notcoActivities));
+			constraintSubsets.setPrunedSucConstraints(sucConstraints);
+			constraintSubsets.setPrunedPreConstraints(preConstraints);
+			constraintSubsets.setPrunedResConstraints(resConstraints);
+			constraintSubsets.setPrunedNotcoConstraints(notcoConstraints);
 
 			return constraintSubsets;
 

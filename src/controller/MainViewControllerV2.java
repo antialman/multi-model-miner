@@ -18,8 +18,6 @@ import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import task.DiscoveryTaskDeclare;
-import task.v2.ConstraintSubsets;
-import task.v2.ConstraintSubsetsTask;
 import task.DiscoveryResult;
 import utils.WebViewUtilsV2;
 import utils.AlertUtils;
@@ -72,7 +70,6 @@ public class MainViewControllerV2 {
 	private File logFile;
 
 	private DiscoveryResult discoveryResult;
-	private ConstraintSubsets constraintSubsets;
 
 
 	public void setStage(Stage stage) {
@@ -170,9 +167,9 @@ public class MainViewControllerV2 {
 			AlertUtils.showSuccess("Declare model discovered! Finding constraint subsets...");
 
 			//Execute constraint filtering and pruning task after successful discovery
-			ConstraintSubsetsTask constraintSubsetsTask = new ConstraintSubsetsTask(discoveryResult);
-			addConstraintSubsetsTaskHandlers(constraintSubsetsTask);
-			executorService.execute(constraintSubsetsTask);
+//			DataStorePrepTask dataStorePrepTask = new DataStorePrepTask(discoveryResult);
+//			addDataStorePrepTaskHandlers(dataStorePrepTask);
+//			executorService.execute(dataStorePrepTask);
 
 		});
 
@@ -185,42 +182,42 @@ public class MainViewControllerV2 {
 	}
 
 
-	private void addConstraintSubsetsTaskHandlers(Task<ConstraintSubsets> task) {
-		//Handle task success
-		task.setOnSucceeded(event -> {
-			constraintSubsets = task.getValue();
-			reqActivitiesListView.getItems().clear();
-			noRepActivitiesListview.getItems().clear();
-			noCardActivitiesListview.getItems().clear();
-
-			for (DiscoveredActivity reqActivity : constraintSubsets.getReqActivities()) {
-				reqActivitiesListView.getItems().add(reqActivity.getActivityName());
-			}
-			for (DiscoveredActivity noRepActivity : constraintSubsets.getNoRepActivities()) {
-				noRepActivitiesListview.getItems().add(noRepActivity.getActivityName());
-			}
-			for (DiscoveredActivity noCardActivity : constraintSubsets.getNoCardActivities()) {
-				noCardActivitiesListview.getItems().add(noCardActivity.getActivityName());
-			}
-
-			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getSucActivities(), constraintSubsets.getSucConstraints(), sucWebView);
-			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getPreActivities(), constraintSubsets.getPreConstraints(), preWebView);
-			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getResActivities(), constraintSubsets.getResConstraints(), resWebView);
-			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
-
-			//Execute initial fragments task after successful constraint filtering and pruning
-			//InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryResult.getActivities(), constraintSubsets);
-			//addInitialFragmentsTaskHandlers(initialFragmentsTask);
-			//executorService.execute(initialFragmentsTask);
-
-
-		});
-
-		//Handle task failure
-		task.setOnFailed(event -> {
-			AlertUtils.showError("Finding constraint subsets failed");
-		});
-	}
+//	private void addDataStorePrepTaskHandlers(Task<DataStore> task) {
+//		//Handle task success
+//		task.setOnSucceeded(event -> {
+//			dataStore = task.getValue();
+//			reqActivitiesListView.getItems().clear();
+//			noRepActivitiesListview.getItems().clear();
+//			noCardActivitiesListview.getItems().clear();
+//
+//			for (DiscoveredActivity reqActivity : dataStore.getReqActivities()) {
+//				reqActivitiesListView.getItems().add(reqActivity.getActivityName());
+//			}
+//			for (DiscoveredActivity noRepActivity : dataStore.getNoRepActivities()) {
+//				noRepActivitiesListview.getItems().add(noRepActivity.getActivityName());
+//			}
+//			for (DiscoveredActivity noCardActivity : dataStore.getNoCardActivities()) {
+//				noCardActivitiesListview.getItems().add(noCardActivity.getActivityName());
+//			}
+//
+//			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getSucActivities(), constraintSubsets.getSucConstraints(), sucWebView);
+//			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getPreActivities(), constraintSubsets.getPreConstraints(), preWebView);
+//			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getResActivities(), constraintSubsets.getResConstraints(), resWebView);
+//			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
+//
+//			//Execute initial fragments task after successful constraint filtering and pruning
+//			//InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryResult.getActivities(), constraintSubsets);
+//			//addInitialFragmentsTaskHandlers(initialFragmentsTask);
+//			//executorService.execute(initialFragmentsTask);
+//
+//
+//		});
+//
+//		//Handle task failure
+//		task.setOnFailed(event -> {
+//			AlertUtils.showError("Finding constraint subsets failed");
+//		});
+//	}
 
 
 

@@ -6,94 +6,133 @@ import data.DiscoveredConstraint;
 
 public class ConstraintSubsets {
 	
+	//Activity cardinalities
 	private List<DiscoveredActivity> reqActivities;
 	private List<DiscoveredActivity> noRepActivities;
 	private List<DiscoveredActivity> noCardActivities;
 	
-	private List<DiscoveredActivity> sucActivities;
-	private List<DiscoveredActivity> preActivities;
-	private List<DiscoveredActivity> resActivities;
-	private List<DiscoveredActivity> notcoActivities;
+	//Activity lists based on pruned constraint subsets (used for visualising pruned constraint subsets)
+	private List<DiscoveredActivity> prunedSucActivities;
+	private List<DiscoveredActivity> prunedPreActivities;
+	private List<DiscoveredActivity> prunedResActivities;
+	private List<DiscoveredActivity> prunedNotcoActivities;
 	
-	private List<DiscoveredConstraint> sucConstraints;
-	private List<DiscoveredConstraint> preConstraints;
-	private List<DiscoveredConstraint> resConstraints;
-	private List<DiscoveredConstraint> notcoConstraints;
+	//Constraint subsets pruned based on constraint type
+	private List<DiscoveredConstraint> prunedSucConstraints;
+	private List<DiscoveredConstraint> prunedPreConstraints;
+	private List<DiscoveredConstraint> prunedResConstraints;
+	private List<DiscoveredConstraint> prunedNotcoConstraints;
+	
+	//Constraint subsets containing all discovered constraints
+	private List<DiscoveredConstraint> allSucConstraints;
+	private List<DiscoveredConstraint> allPreConstraints;
+	private List<DiscoveredConstraint> allResConstraints;
+	private List<DiscoveredConstraint> allNotcoConstraints;
+	
 	
 	public ConstraintSubsets() {
 	}
 	
-	public void setReqActivities(List<DiscoveredActivity> reqActivities) {
-		this.reqActivities = reqActivities;
-	}
 	
+	//Getters and setters for cardinality lists
 	public List<DiscoveredActivity> getReqActivities() {
 		return reqActivities;
 	}
-	
-	public void setNoRepActivities(List<DiscoveredActivity> noRepActivities) {
-		this.noRepActivities = noRepActivities;
-	}
-	
 	public List<DiscoveredActivity> getNoRepActivities() {
 		return noRepActivities;
-	}
-	
-	public void setNoCardActivities(List<DiscoveredActivity> noCardActivities) {
-		this.noCardActivities = noCardActivities;
 	}
 	public List<DiscoveredActivity> getNoCardActivities() {
 		return noCardActivities;
 	}
-	
-	public void setSucActivities(List<DiscoveredActivity> sucActivities) {
-		this.sucActivities = sucActivities;
+	public void setReqActivities(List<DiscoveredActivity> reqActivities) {
+		this.reqActivities = reqActivities;
 	}
-	public List<DiscoveredActivity> getSucActivities() {
-		return sucActivities;
+	public void setNoRepActivities(List<DiscoveredActivity> noRepActivities) {
+		this.noRepActivities = noRepActivities;
 	}
-	public void setPreActivities(List<DiscoveredActivity> preActivities) {
-		this.preActivities = preActivities;
-	}
-	public List<DiscoveredActivity> getPreActivities() {
-		return preActivities;
-	}
-	public void setResActivities(List<DiscoveredActivity> resActivities) {
-		this.resActivities = resActivities;
-	}
-	public List<DiscoveredActivity> getResActivities() {
-		return resActivities;
-	}
-	public void setNotcoActivities(List<DiscoveredActivity> notcoActivities) {
-		this.notcoActivities = notcoActivities;
-	}
-	public List<DiscoveredActivity> getNotcoActivities() {
-		return notcoActivities;
+	public void setNoCardActivities(List<DiscoveredActivity> noCardActivities) {
+		this.noCardActivities = noCardActivities;
 	}
 	
-	public void setSucConstraints(List<DiscoveredConstraint> sucConstraints) {
-		this.sucConstraints = sucConstraints;
+	
+	//Getters and setters for activity lists based on pruned constraint subsets
+	public List<DiscoveredActivity> getPrunedSucActivities() {
+		return prunedSucActivities;
 	}
-	public List<DiscoveredConstraint> getSucConstraints() {
-		return sucConstraints;
+	public List<DiscoveredActivity> getPrunedPreActivities() {
+		return prunedPreActivities;
 	}
-	public void setPreConstraints(List<DiscoveredConstraint> preConstraints) {
-		this.preConstraints = preConstraints;
+	public List<DiscoveredActivity> getPrunedResActivities() {
+		return prunedResActivities;
 	}
-	public List<DiscoveredConstraint> getPreConstraints() {
-		return preConstraints;
+	public List<DiscoveredActivity> getPrunedNotcoActivities() {
+		return prunedNotcoActivities;
 	}
-	public void setResConstraints(List<DiscoveredConstraint> resConstraints) {
-		this.resConstraints = resConstraints;
+	public void setPrunedSucActivities(List<DiscoveredActivity> prunedSucActivities) {
+		this.prunedSucActivities = prunedSucActivities;
 	}
-	public List<DiscoveredConstraint> getResConstraints() {
-		return resConstraints;
+	public void setPrunedPreActivities(List<DiscoveredActivity> prunedPreActivities) {
+		this.prunedPreActivities = prunedPreActivities;
 	}
-	public void setNotcoConstraints(List<DiscoveredConstraint> notcoConstraints) {
-		this.notcoConstraints = notcoConstraints;
+	public void setPrunedResActivities(List<DiscoveredActivity> prunedResActivities) {
+		this.prunedResActivities = prunedResActivities;
 	}
-	public List<DiscoveredConstraint> getNotcoConstraints() {
-		return notcoConstraints;
+	public void setPrunedNotcoActivities(List<DiscoveredActivity> prunedNotcoActivities) {
+		this.prunedNotcoActivities = prunedNotcoActivities;
+	}
+	
+	
+	//Getters and setters for constraint subsets pruned based on constraint type
+	public List<DiscoveredConstraint> getPrunedSucConstraints() {
+		return prunedSucConstraints;
+	}
+	public List<DiscoveredConstraint> getPrunedPreConstraints() {
+		return prunedPreConstraints;
+	}
+	public List<DiscoveredConstraint> getPrunedResConstraints() {
+		return prunedResConstraints;
+	}
+	public List<DiscoveredConstraint> getPrunedNotcoConstraints() {
+		return prunedNotcoConstraints;
+	}
+	public void setPrunedSucConstraints(List<DiscoveredConstraint> prunedSucConstraints) {
+		this.prunedSucConstraints = prunedSucConstraints;
+	}
+	public void setPrunedPreConstraints(List<DiscoveredConstraint> prunedPreConstraints) {
+		this.prunedPreConstraints = prunedPreConstraints;
+	}
+	public void setPrunedResConstraints(List<DiscoveredConstraint> prunedResConstraints) {
+		this.prunedResConstraints = prunedResConstraints;
+	}
+	public void setPrunedNotcoConstraints(List<DiscoveredConstraint> prunedNotcoConstraints) {
+		this.prunedNotcoConstraints = prunedNotcoConstraints;
+	}
+	
+	
+	//Getters and setters for constraint subsets containing all discovered constraints
+	public List<DiscoveredConstraint> getAllSucConstraints() {
+		return allSucConstraints;
+	}
+	public List<DiscoveredConstraint> getAllPreConstraints() {
+		return allPreConstraints;
+	}
+	public List<DiscoveredConstraint> getAllResConstraints() {
+		return allResConstraints;
+	}
+	public List<DiscoveredConstraint> getAllNotcoConstraints() {
+		return allNotcoConstraints;
+	}
+	public void setAllSucConstraints(List<DiscoveredConstraint> allSucConstraints) {
+		this.allSucConstraints = allSucConstraints;
+	}
+	public void setAllPreConstraints(List<DiscoveredConstraint> allPreConstraints) {
+		this.allPreConstraints = allPreConstraints;
+	}
+	public void setAllResConstraints(List<DiscoveredConstraint> allResConstraints) {
+		this.allResConstraints = allResConstraints;
+	}
+	public void setAllNotcoConstraints(List<DiscoveredConstraint> allNotcoConstraints) {
+		this.allNotcoConstraints = allNotcoConstraints;
 	}
 
 }
