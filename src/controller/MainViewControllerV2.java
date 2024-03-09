@@ -4,6 +4,7 @@ import java.io.File;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
@@ -18,6 +19,8 @@ import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import task.DeclareDiscoveryTask;
+import task.v2.DeclarePostprocessingResult;
+import task.v2.DeclarePostprocessingTask;
 import task.DeclareDiscoveryResult;
 import utils.WebViewUtilsV2;
 import utils.AlertUtils;
@@ -66,6 +69,7 @@ public class MainViewControllerV2 {
 	private File logFile;
 
 	private DeclareDiscoveryResult declareDiscoveryResult;
+	private DeclarePostprocessingResult declarePostprocessingResult;
 
 
 	public void setStage(Stage stage) {
@@ -166,14 +170,13 @@ public class MainViewControllerV2 {
 			declareDiscoveryResult = delcareDiscoveryTask.getValue();
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
-			WebViewUtilsV2.updateDeclareVisualization(declareDiscoveryResult, declareWebView);
 			updateConstraintLabels();
-			AlertUtils.showSuccess("Declare model discovered! Starting post-processing.");
 
-			//Execute constraint filtering and pruning task after successful discovery
-//			DataStorePrepTask dataStorePrepTask = new DataStorePrepTask(discoveryResult);
-//			addDataStorePrepTaskHandlers(dataStorePrepTask);
-//			executorService.execute(dataStorePrepTask);
+			//Execute Declare post-processing task
+			DeclarePostprocessingTask declarePostprocessingTask = new DeclarePostprocessingTask();
+			declarePostprocessingTask.setDeclareDiscoveryResult(declareDiscoveryResult);
+			addDeclarePostprocessingTaskHandlers(declarePostprocessingTask);
+			executorService.execute(declarePostprocessingTask);
 
 		});
 
@@ -186,14 +189,26 @@ public class MainViewControllerV2 {
 	}
 
 
-//	private void addDataStorePrepTaskHandlers(Task<DataStore> task) {
-//		//Handle task success
-//		task.setOnSucceeded(event -> {
-//			dataStore = task.getValue();
-//			reqActivitiesListView.getItems().clear();
-//			noRepActivitiesListview.getItems().clear();
-//			noCardActivitiesListview.getItems().clear();
-//
+	private void addDeclarePostprocessingTaskHandlers(Task<DeclarePostprocessingResult> task) {
+		//Handle task success
+		task.setOnSucceeded(event -> {
+			declarePostprocessingResult = task.getValue();
+			reqActivitiesListView.getItems().clear();
+			noRepActivitiesListview.getItems().clear();
+			noCardActivitiesListview.getItems().clear();
+			
+			
+			List<DiscoveredConstraint> patternConstraints = declarePostprocessingResult.getPrunedConstraints().stream().filter(c -> (
+					c.getTemplate() == ConstraintTemplate.Succession || 
+					c.getTemplate() == ConstraintTemplate.Precedence || 
+					c.getTemplate() == ConstraintTemplate.Response || 
+					c.getTemplate() == ConstraintTemplate.Not_CoExistence) 
+					).collect(Collectors.toList());
+			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getActivities(), patternConstraints, declareWebView, false);
+
+			AlertUtils.showSuccess("Declare model discovered and post-processing done! Starting Petri net construction.");
+			
+			
 //			for (DiscoveredActivity reqActivity : dataStore.getReqActivities()) {
 //				reqActivitiesListView.getItems().add(reqActivity.getActivityName());
 //			}
@@ -203,25 +218,25 @@ public class MainViewControllerV2 {
 //			for (DiscoveredActivity noCardActivity : dataStore.getNoCardActivities()) {
 //				noCardActivitiesListview.getItems().add(noCardActivity.getActivityName());
 //			}
-//
+
 //			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getSucActivities(), constraintSubsets.getSucConstraints(), sucWebView);
 //			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getPreActivities(), constraintSubsets.getPreConstraints(), preWebView);
 //			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getResActivities(), constraintSubsets.getResConstraints(), resWebView);
 //			WebViewUtilsV2.updateSubsetsWebView(constraintSubsets.getNotcoActivities(), constraintSubsets.getNotcoConstraints(), notcoWebView);
-//
-//			//Execute initial fragments task after successful constraint filtering and pruning
-//			//InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryResult.getActivities(), constraintSubsets);
-//			//addInitialFragmentsTaskHandlers(initialFragmentsTask);
-//			//executorService.execute(initialFragmentsTask);
-//
-//
-//		});
-//
-//		//Handle task failure
-//		task.setOnFailed(event -> {
-//			AlertUtils.showError("Finding constraint subsets failed");
-//		});
-//	}
+
+			//Execute initial fragments task after successful constraint filtering and pruning
+			//InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryResult.getActivities(), constraintSubsets);
+			//addInitialFragmentsTaskHandlers(initialFragmentsTask);
+			//executorService.execute(initialFragmentsTask);
+
+
+		});
+
+		//Handle task failure
+		task.setOnFailed(event -> {
+			AlertUtils.showError("Finding constraint subsets failed");
+		});
+	}
 
 
 

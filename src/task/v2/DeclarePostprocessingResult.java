@@ -8,16 +8,16 @@ import data.ActivityRelationsContainer;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 
-public class DeclarePostProcessingResult {
+public class DeclarePostprocessingResult {
 	
 	private List<DiscoveredActivity> activities; //Pruning keeps all activities
-	private List<DiscoveredConstraint> allConstraints; //Unmodified constraints returned by DeclareDiscoveryTask
-	private List<DiscoveredConstraint> prunedConstraints; //Fully pruned list of constraints
+	private List<DiscoveredConstraint> allConstraints; //As returned by DeclareDiscoveryTask
+	private List<DiscoveredConstraint> prunedConstraints; //As returned by DeclareDiscoveryTask
 	
 	//Main data structure for building the Petri nets
 	private Map<DiscoveredActivity, ActivityRelationsContainer> activityToRelations = new HashMap<DiscoveredActivity, ActivityRelationsContainer>();
 
-	public DeclarePostProcessingResult() {
+	public DeclarePostprocessingResult() {
 	}
 
 	public List<DiscoveredActivity> getActivities() {

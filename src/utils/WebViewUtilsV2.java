@@ -37,27 +37,12 @@ public class WebViewUtilsV2 {
 
 	}
 
-
-	public static void updateDeclareVisualization(DeclareDiscoveryResult discoveryTaskResult, WebView declareWebView) {
-		if (discoveryTaskResult != null) {
-			String visualizationString;
-			String script;
-
-			visualizationString = GraphGeneratorV2.createDeclareVisualizationString(discoveryTaskResult.getActivities(), discoveryTaskResult.getConstraints(), true, false);
-			if (visualizationString != null) {
-				script = "setModel('" + visualizationString + "')";
-				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
-				declareWebView.getEngine().executeScript(script);
-			}
-		}
-	}
-
-	public static void updateSubsetsWebView(List<DiscoveredActivity> activities, List<DiscoveredConstraint> constraints, WebView webView) {
+	public static void updateSubsetsWebView(List<DiscoveredActivity> activities, List<DiscoveredConstraint> constraints, WebView webView, boolean alternativeLayout) {
 		if (constraints != null) {
 			String visualizationString;
 			String script;
 
-			visualizationString = GraphGeneratorV2.createDeclareVisualizationString(activities, constraints, true, true);
+			visualizationString = GraphGeneratorV2.createDeclareVisualizationString(activities, constraints, true, alternativeLayout);
 			if (visualizationString != null) {
 				script = "setModel('" + visualizationString + "')";
 				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
