@@ -22,6 +22,8 @@ import javafx.stage.Stage;
 import task.DeclareDiscoveryTask;
 import task.v2.DeclarePostprocessingResult;
 import task.v2.DeclarePostprocessingTask;
+import task.v2.InitialPetriNetResult;
+import task.v2.InitialPetriNetTask;
 import task.DeclareDiscoveryResult;
 import utils.WebViewUtilsV2;
 import utils.AlertUtils;
@@ -71,6 +73,7 @@ public class MainViewControllerV2 {
 
 	private DeclareDiscoveryResult declareDiscoveryResult;
 	private DeclarePostprocessingResult declarePostprocessingResult;
+	private InitialPetriNetResult initialPetriNetResult;
 
 
 	public void setStage(Stage stage) {
@@ -227,21 +230,30 @@ public class MainViewControllerV2 {
 			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getRespActivities(), declarePostprocessingResult.getRespPrunedConstraints(), respWebView, true);
 			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getNotcoActivities(), declarePostprocessingResult.getNotcoAllConstraints(), notcoWebView, true);
 
-			//Execute initial fragments task after successful constraint filtering and pruning
-			//InitialFragmentsTask initialFragmentsTask = new InitialFragmentsTask(discoveryResult.getActivities(), constraintSubsets);
-			//addInitialFragmentsTaskHandlers(initialFragmentsTask);
-			//executorService.execute(initialFragmentsTask);
-
-
+			//Execute initial Petri net task after successful Declare post-processing
+			InitialPetriNetTask initialPetriNetTask = new InitialPetriNetTask(declarePostprocessingResult);
+			addInitialPetriNetTaskHandlers(initialPetriNetTask);
+			executorService.execute(initialPetriNetTask);
 		});
 
 		//Handle task failure
 		task.setOnFailed(event -> {
-			AlertUtils.showError("Finding constraint subsets failed");
+			AlertUtils.showError("Declare post-processing failed");
 		});
 	}
 
 
+	private void addInitialPetriNetTaskHandlers(Task<InitialPetriNetResult> task) {
+		//Handle task success
+		task.setOnSucceeded(event -> {
+			initialPetriNetResult = task.getValue();
+		});
+
+		//Handle task failure
+		task.setOnFailed(event -> {
+			AlertUtils.showError("Initial Petri net task failed");
+		});
+	}
 
 
 

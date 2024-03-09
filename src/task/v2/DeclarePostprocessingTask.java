@@ -130,7 +130,7 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 			}
 			declarePostprocessingResult.setActivityToRelationsMap(activityToRelationsMap);
 			
-			
+			System.out.println("Declare post-processing finished at: " + taskStartTime + " - total time: " + (System.currentTimeMillis() - taskStartTime));
 			
 			return declarePostprocessingResult;
 			
