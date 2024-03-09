@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Separator?>
@@ -19,6 +20,7 @@
             <Label style="-fx-font-weight: bold; -fx-font-size: 14;" text="Event Log:" />
             <Label fx:id="eventLogLabel" maxWidth="1.7976931348623157E308" style="-fx-font-size: 14;" textOverrun="CENTER_ELLIPSIS" HBox.hgrow="ALWAYS" />
             <Button mnemonicParsing="false" onAction="#selectLog" text="Select log..." />
+            <CheckBox fx:id="addStartEndCheckBox" maxHeight="1.7976931348623157E308" mnemonicParsing="false" text="Add start/end" />
             <Button fx:id="redescoverButton" mnemonicParsing="false" onAction="#discoverModel" text="Rediscover" />
          </children>
       </HBox>
@@ -105,21 +107,6 @@
                         </VBox>
                      </items>
                   </SplitPane>
-               </content>
-            </Tab>
-            <Tab text="Initial Fragments">
-               <content>
-                  <WebView fx:id="fragmentsWebView" prefHeight="200.0" prefWidth="200.0" />
-               </content>
-            </Tab>
-            <Tab text="Merge Step1">
-              <content>
-                  <WebView fx:id="mergeStep1WebView" prefHeight="200.0" prefWidth="200.0" />
-              </content>
-            </Tab>
-            <Tab text="Merge Step 2">
-               <content>
-                  <WebView fx:id="mergeStep2WebView" prefHeight="200.0" prefWidth="200.0" />
                </content>
             </Tab>
          </tabs></TabPane>

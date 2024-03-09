@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
@@ -31,6 +31,8 @@ public class MainViewControllerV2 {
 
 	@FXML
 	private HBox mainHeader;
+	@FXML
+	private CheckBox addStartEndCheckBox;
 	@FXML
 	private Button redescoverButton;
 	@FXML
@@ -57,12 +59,6 @@ public class MainViewControllerV2 {
 	private WebView preWebView;
 	@FXML
 	private WebView notcoWebView;
-	@FXML
-	private WebView fragmentsWebView;
-	@FXML
-	private WebView mergeStep1WebView;
-	@FXML
-	private WebView mergeStep2WebView;
 
 
 	private Stage stage;
@@ -80,14 +76,13 @@ public class MainViewControllerV2 {
 	private void initialize() {
 		resultTabPane.setDisable(true);
 		redescoverButton.setDisable(true);
+		addStartEndCheckBox.setSelected(true);
+		
 		WebViewUtilsV2.setupWebView(declareWebView);
 		WebViewUtilsV2.setupWebView(sucWebView);
 		WebViewUtilsV2.setupWebView(resWebView);
 		WebViewUtilsV2.setupWebView(preWebView);
 		WebViewUtilsV2.setupWebView(notcoWebView);
-		WebViewUtilsV2.setupWebView(fragmentsWebView);
-		WebViewUtilsV2.setupWebView(mergeStep1WebView);
-		WebViewUtilsV2.setupWebView(mergeStep2WebView);
 	}
 
 
@@ -141,7 +136,16 @@ public class MainViewControllerV2 {
 
 
 	private Task<DiscoveryResult> createDiscoveryTask() {
-		List<ConstraintTemplate> templates = List.of(ConstraintTemplate.Precedence, ConstraintTemplate.Response, ConstraintTemplate.Succession, ConstraintTemplate.Not_CoExistence, ConstraintTemplate.Existence, ConstraintTemplate.Absence2);
+		List<ConstraintTemplate> templates = List.of(
+				ConstraintTemplate.Precedence,
+				ConstraintTemplate.Response,
+				ConstraintTemplate.Succession,
+				ConstraintTemplate.Not_Succession,
+				ConstraintTemplate.CoExistence,
+				ConstraintTemplate.Not_CoExistence,
+				ConstraintTemplate.Existence,
+				ConstraintTemplate.Absence2
+				);
 
 		DiscoveryTaskDeclare discoveryTaskDeclare = new DiscoveryTaskDeclare();
 		discoveryTaskDeclare.setLogFile(logFile);
@@ -151,7 +155,7 @@ public class MainViewControllerV2 {
 		discoveryTaskDeclare.setSelectedTemplates(templates);
 		discoveryTaskDeclare.setMinSupport(100);
 
-		discoveryTaskDeclare.setArtifStartEnd(true);
+		discoveryTaskDeclare.setArtifStartEnd(addStartEndCheckBox.isSelected());
 
 		return discoveryTaskDeclare;
 	}
