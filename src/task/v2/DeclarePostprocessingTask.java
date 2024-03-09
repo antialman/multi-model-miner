@@ -29,7 +29,9 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 	protected DeclarePostprocessingResult call() throws Exception {
 		try {
 			long taskStartTime = System.currentTimeMillis();
-			System.out.println("Discovering Declare model started at: " + taskStartTime);
+			System.out.println("Declare post-processing started at: " + taskStartTime);
+			
+			
 			DeclarePostprocessingResult declarePostprocessingResult = new DeclarePostprocessingResult();
 			declarePostprocessingResult.setAllActivities(declareDiscoveryResult.getActivities());
 			declarePostprocessingResult.setAllConstraints(declareDiscoveryResult.getConstraints());
@@ -135,7 +137,7 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 			
 			
 		} catch (Exception e) {
-			System.err.println("Discovering Declare model failed: " + e.getMessage());
+			System.err.println("Declare post-processing failed: " + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		}
