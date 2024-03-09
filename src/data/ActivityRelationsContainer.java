@@ -142,9 +142,22 @@ public class ActivityRelationsContainer {
 	public Set<DiscoveredActivity> getPrunedInActivities() {
 		return prunedInActivities;
 	}
-	public Set<DiscoveredActivity> getOutPrunedActivities() {
+	public Set<DiscoveredActivity> getPrunedOutActivities() {
 		return prunedOutActivities;
 	}
+	
+	
+	//Some shorthand methods for testing containment
+	public boolean notSuccAllInContains(DiscoveredActivity discoveredActivity) {
+		return notSuccAllInMap.containsKey(discoveredActivity);
+	}
+	public boolean notSuccAllOutContains(DiscoveredActivity discoveredActivity) {
+		return notSuccAllOutMap.containsKey(discoveredActivity);
+	}
+	public boolean notCoexAllContains(DiscoveredActivity discoveredActivity) {
+		return notCoexAllMap.containsKey(discoveredActivity);
+	}
+	
 	
 	@Override
 	public String toString() {
