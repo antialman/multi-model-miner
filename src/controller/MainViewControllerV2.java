@@ -38,8 +38,6 @@ public class MainViewControllerV2 {
 	@FXML
 	private HBox mainHeader;
 	@FXML
-	private CheckBox addStartEndCheckBox;
-	@FXML
 	private Button redescoverButton;
 	@FXML
 	private Label eventLogLabel;
@@ -84,7 +82,6 @@ public class MainViewControllerV2 {
 	private void initialize() {
 		resultTabPane.setDisable(true);
 		redescoverButton.setDisable(true);
-		addStartEndCheckBox.setSelected(true);
 
 		WebViewUtilsV2.setupWebView(declareWebView);
 		WebViewUtilsV2.setupWebView(succWebView);
@@ -162,8 +159,7 @@ public class MainViewControllerV2 {
 		declareDiscoveryTaskDeclare.setPruningType(DeclarePruningType.NONE);
 		declareDiscoveryTaskDeclare.setSelectedTemplates(templates);
 		declareDiscoveryTaskDeclare.setMinSupport(100);
-
-		declareDiscoveryTaskDeclare.setArtifStartEnd(addStartEndCheckBox.isSelected());
+		declareDiscoveryTaskDeclare.setArtifStartEnd(true);
 
 		return declareDiscoveryTaskDeclare;
 	}
