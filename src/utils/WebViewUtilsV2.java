@@ -72,14 +72,15 @@ public class WebViewUtilsV2 {
 			String visualizationString;
 			String script;
 			
-			//Taking the outgoing transitions of the initial place is a workaround to get V1 code to work with as little modifications as possible
-			visualizationString = GraphGeneratorV2.createFragmentsVisualizationString(modelFactory.getInitialPlace().getOutgoingTransitions());
 			
-			if (visualizationString != null) {
-				script = "setModel('" + visualizationString + "')";
-				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
-				initialPnWebView.getEngine().executeScript(script);
+				visualizationString = GraphGeneratorV2.createFragmentsVisualizationString(Set.of(modelFactory.getArtificialStartTransition()));
+				
+				if (visualizationString != null) {
+					script = "setModel('" + visualizationString + "')";
+					System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
+					initialPnWebView.getEngine().executeScript(script);
+				}
 			}
-		}
+		
 	}
 }

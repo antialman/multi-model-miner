@@ -211,7 +211,7 @@ public class MainViewControllerV2 {
 					).collect(Collectors.toList());
 			WebViewUtilsV2.updateDeclareWebView(declarePostprocessingResult.getAllActivities(), patternConstraints, declareWebView, false);
 
-			AlertUtils.showSuccess("Declare model discovered and post-processing done! Starting Petri net construction.");
+			//AlertUtils.showSuccess("Declare model discovered and post-processing done! Starting Petri net construction.");
 
 
 			for (DiscoveredActivity reqActivity : declarePostprocessingResult.getReqActivities()) {

@@ -19,7 +19,7 @@ public class InitialFragmentsTask extends Task<InitialFragmentsResult> {
 	private List<DiscoveredActivity> discoveredActivities;
 	private ConstraintSubsets constraintSubsets;
 	private Map<DiscoveredActivity, ActivityRelations> activityRelationsMap;
-	private ArrayList<Set<DiscoveredActivity>> notcoCliques;
+	private List<Set<DiscoveredActivity>> notcoCliques;
 
 
 	public InitialFragmentsTask(List<DiscoveredActivity> discoveredActivities, ConstraintSubsets constraintSubsets) {
