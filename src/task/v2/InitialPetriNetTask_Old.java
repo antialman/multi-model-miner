@@ -12,7 +12,7 @@ import javafx.concurrent.Task;
 import model.v2.ModelFactory;
 import utils.CliqueUtilsV2;
 
-public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
+public class InitialPetriNetTask_Old extends Task<InitialPetriNetResult> {
 
 	private DeclarePostprocessingResult declarePostprocessingResult;
 	private Map<DiscoveredActivity, ActivityRelationsContainer> activityToRelationsMap;
@@ -20,12 +20,12 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 
 	private ModelFactory modelFactory = new ModelFactory();
 	private Set<DiscoveredActivity> processedActivities = new HashSet<DiscoveredActivity>();
-	private Set<DiscoveredActivity> unprocessedActivities = new HashSet<DiscoveredActivity>();
+	private Set<DiscoveredActivity> unProcessedActivities = new HashSet<DiscoveredActivity>();
 
-	public InitialPetriNetTask(DeclarePostprocessingResult declarePostprocessingResult) {
+	public InitialPetriNetTask_Old(DeclarePostprocessingResult declarePostprocessingResult) {
 		this.declarePostprocessingResult = declarePostprocessingResult;
 		this.activityToRelationsMap = declarePostprocessingResult.getActivityToRelationsMap(); //For easier reference
-		unprocessedActivities.addAll(declarePostprocessingResult.getAllActivities());
+		unProcessedActivities.addAll(declarePostprocessingResult.getAllActivities());
 	}
 
 	@Override
@@ -41,18 +41,39 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 			modelFactory.setArtificialStart(declarePostprocessingResult.getArtificialStart());
 			modelFactory.setArtificialEnd(declarePostprocessingResult.getArtificialEnd());
 
-			while (modelFactory.hasUnProcessedActivities()) {
-				processActivity(modelFactory.getUnProcessedActivities().iterator().next());
-			}
+			//while (true) {
+				while (modelFactory.hasUnProcessedActivities()) {
+					processActivity(modelFactory.getUnProcessedActivities().iterator().next());
+				}
+				
+				System.out.println("Unprocessed activities: " + unProcessedActivities);
+				
+				Set<DiscoveredActivity> earliestUnprocessedActivities = getImmediateOutActivities(new ArrayList<DiscoveredActivity>(unProcessedActivities));
+				Set<DiscoveredActivity> latestProcessedActivities = getImmediateInActivities(new ArrayList<DiscoveredActivity>(processedActivities));
+				
+				
+				
+//				if (!unProcessedActivities.isEmpty()) {
+//					Set<DiscoveredActivity> earliestUnprocessedActivities = getImmediateOutActivities(new ArrayList<DiscoveredActivity>(unProcessedActivities));
+//					Set<DiscoveredActivity> latestUnprocessedActivities = getImmediateInActivities(new ArrayList<DiscoveredActivity>(unProcessedActivities));
+//					System.out.println("Earliest of these" + earliestUnprocessedActivities);
+//					System.out.println("Latest of these" + latestUnprocessedActivities);
+//					
+//					earliestUnprocessedActivities.forEach(act -> {modelFactory.addUnprocessedActivity(act);});
+//					latestUnprocessedActivities.forEach(act -> {modelFactory.addUnprocessedActivity(act);});
+//				} else {
+//					break;
+//				}	
+//			}
+			
+			
+			
 
-			
-			System.out.println("All unprocessed activities: " + unprocessedActivities);
-			Set<DiscoveredActivity> earliestUnprocessedActivities = getImmediateOutActivities(new ArrayList<DiscoveredActivity>(unprocessedActivities));
-			System.out.println("Earliest unprocessed activities: " + earliestUnprocessedActivities);
-			
-			for (DiscoveredActivity unprocessedActivity : earliestUnprocessedActivities) {
-				System.out.println("\tClosest processed in activities to " + unprocessedActivity.getActivityName() + " are: " + getProcessedInActivities(unprocessedActivity));
-			}
+			System.out.println("Unprocessed activities: " + unProcessedActivities);
+			System.out.println("Earliest of these" + getImmediateOutActivities(new ArrayList<DiscoveredActivity>(unProcessedActivities)));
+			System.out.println("Latest of these" + getImmediateInActivities(new ArrayList<DiscoveredActivity>(unProcessedActivities)));
+
+			//modelFactory.connectArtificialEnd(declarePostprocessingResult.getArtificialEnd());
 
 
 			System.out.println("Initial Petri net task finished at: " + taskStartTime + " - total time: " + (System.currentTimeMillis() - taskStartTime));
@@ -74,13 +95,11 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 		//Immediate outgoing activities (i.e., activities that are not reached through intermediary XOR branches) 
 		Set<DiscoveredActivity> outActivities = new HashSet<DiscoveredActivity>(currActivityRelations.getPrunedOutActivities());
 		Set<DiscoveredActivity> immediateOutActivities = getImmediateOutActivities(new ArrayList<DiscoveredActivity>(outActivities));
-		//Set<DiscoveredActivity> immediateOutActivities = outActivities;
 		System.out.println("Immediate out activities of " + currActivity.getActivityName() + ": " + immediateOutActivities);
 
 		//Immediate incoming activities (i.e., activities that are not reached through intermediary XOR branches)
 		Set<DiscoveredActivity> inActivities = new HashSet<DiscoveredActivity>(currActivityRelations.getPrunedInActivities());
 		Set<DiscoveredActivity> immediateInActivities = getImmediateInActivities(new ArrayList<DiscoveredActivity>(inActivities));
-		//Set<DiscoveredActivity> immediateInActivities = inActivities;
 		System.out.println("Immediate in activities of " + currActivity.getActivityName() + ": " + immediateInActivities);
 
 
@@ -174,7 +193,7 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 		modelFactory.markActivityAsProcessed(currActivity);
 
 		processedActivities.add(currActivity);
-		unprocessedActivities.remove(currActivity);
+		unProcessedActivities.remove(currActivity);
 	}
 
 
@@ -203,6 +222,13 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 		return immediateOutActivities;
 	}
 
+
+
+
+
+
+
+
 	private Set<DiscoveredActivity> getImmediateInActivities(List<DiscoveredActivity> activitiesInList) {
 		Set<DiscoveredActivity> immediateInActivities = new HashSet<DiscoveredActivity>(activitiesInList);
 
@@ -226,15 +252,5 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 	}
 
 
-	private Set<DiscoveredActivity> getProcessedInActivities(DiscoveredActivity unprocessedActivity) {
-		ActivityRelationsContainer unprocessedActRelations = activityToRelationsMap.get(unprocessedActivity);
-		List<DiscoveredActivity> candidatesList = new ArrayList<DiscoveredActivity>();
-		for (DiscoveredActivity processedActivity : processedActivities) {
-			if (!unprocessedActRelations.getNotCoexActivities().contains(processedActivity) && unprocessedActRelations.getNotSuccAllOutActivities().contains(processedActivity)) {
-				candidatesList.add(processedActivity);
-			}
-		}
-		return getImmediateInActivities(candidatesList);
-		
-	}
+
 }

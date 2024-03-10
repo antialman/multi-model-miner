@@ -14,6 +14,7 @@ public class ModelFactory {
 	
 	private PlaceNode initialPlace;
 	private TransitionNode firstTransition; //Reference for starting Petri net construction and visualisation
+	private TransitionNode lastTransition; //Just in case
 	private PlaceNode finalPlace;
 	
 	private Set<DiscoveredActivity> unProcessedActivities = new HashSet<DiscoveredActivity>();
@@ -35,6 +36,13 @@ public class ModelFactory {
 		activityTransitionsMap.put(artificialStartActivity, firstTransition);
 	}
 	
+	public void setArtificialEnd(DiscoveredActivity artificialEndActivity) {
+		lastTransition = getNewLabeledTransition(artificialEndActivity);
+		finalPlace.addIncomingTransition(lastTransition);
+		unProcessedActivities.add(artificialEndActivity);
+		activityTransitionsMap.put(artificialEndActivity, lastTransition);
+	}
+	
 	public TransitionNode getArtificialStartTransition() {
 		return firstTransition;
 	}
@@ -46,6 +54,10 @@ public class ModelFactory {
 		return unProcessedActivities;
 	}
 	public void markActivityAsProcessed(DiscoveredActivity discoveredActivity) {
+		if (activityTransitionsMap.get(discoveredActivity).getOutgoingPlaces().isEmpty()) {
+			//TODO: Handle XOR-joins immediately followed by XOR-splits (find closest follower activities, process pruned in relations of each, then replace the inActivity with discoveredActivity)
+			System.out.println("Missing out transitions for: " + discoveredActivity.getActivityName());
+		}
 		unProcessedActivities.remove(discoveredActivity);
 	}
 	
@@ -185,15 +197,6 @@ public class ModelFactory {
 	
 	
 	
-	public void connectArtificialEnd(DiscoveredActivity artificialEndActivity) {
-		if (!activityTransitionsMap.containsKey(artificialEndActivity)) { //Can only be missing if model has been partially built
-			activityTransitionsMap.put(artificialEndActivity, getNewLabeledTransition(artificialEndActivity));
-		}
-		finalPlace.addIncomingTransition(activityTransitionsMap.get(artificialEndActivity));
-		
-	}
-	
-	
 	//Private methods to create new nodes
 	private TransitionNode getNewLabeledTransition(DiscoveredActivity da) {
 		return new TransitionNode(nextNodeId++, da);
@@ -211,6 +214,8 @@ public class ModelFactory {
 	private PlaceNode getNewPlace() {
 		return new PlaceNode(nextNodeId++, false, false);
 	}
+
+	
 
 	
 }
