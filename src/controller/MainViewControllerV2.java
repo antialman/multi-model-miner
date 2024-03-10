@@ -11,7 +11,6 @@ import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
@@ -63,6 +62,8 @@ public class MainViewControllerV2 {
 	private WebView precWebView;
 	@FXML
 	private WebView notcoWebView;
+	@FXML
+	private WebView initialPnWebView;
 
 
 	private Stage stage;
@@ -88,6 +89,8 @@ public class MainViewControllerV2 {
 		WebViewUtilsV2.setupWebView(respWebView);
 		WebViewUtilsV2.setupWebView(precWebView);
 		WebViewUtilsV2.setupWebView(notcoWebView);
+		
+		WebViewUtilsV2.setupWebView(initialPnWebView);
 	}
 
 
@@ -206,7 +209,7 @@ public class MainViewControllerV2 {
 					c.getTemplate() == ConstraintTemplate.Existence ||
 					c.getTemplate() == ConstraintTemplate.Absence2) 
 					).collect(Collectors.toList());
-			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getAllActivities(), patternConstraints, declareWebView, false);
+			WebViewUtilsV2.updateDeclareWebView(declarePostprocessingResult.getAllActivities(), patternConstraints, declareWebView, false);
 
 			AlertUtils.showSuccess("Declare model discovered and post-processing done! Starting Petri net construction.");
 
@@ -221,10 +224,10 @@ public class MainViewControllerV2 {
 				noCardActivitiesListview.getItems().add(noCardActivity.getActivityName());
 			}
 
-			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getSuccActivities(), declarePostprocessingResult.getSuccPrunedConstraints(), succWebView, true);
-			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getPrecActivities(), declarePostprocessingResult.getPrecPrunedConstraints(), precWebView, true);
-			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getRespActivities(), declarePostprocessingResult.getRespPrunedConstraints(), respWebView, true);
-			WebViewUtilsV2.updateSubsetsWebView(declarePostprocessingResult.getNotcoActivities(), declarePostprocessingResult.getNotcoAllConstraints(), notcoWebView, true);
+			WebViewUtilsV2.updateDeclareWebView(declarePostprocessingResult.getSuccActivities(), declarePostprocessingResult.getSuccPrunedConstraints(), succWebView, true);
+			WebViewUtilsV2.updateDeclareWebView(declarePostprocessingResult.getPrecActivities(), declarePostprocessingResult.getPrecPrunedConstraints(), precWebView, true);
+			WebViewUtilsV2.updateDeclareWebView(declarePostprocessingResult.getRespActivities(), declarePostprocessingResult.getRespPrunedConstraints(), respWebView, true);
+			WebViewUtilsV2.updateDeclareWebView(declarePostprocessingResult.getNotcoActivities(), declarePostprocessingResult.getNotcoAllConstraints(), notcoWebView, true);
 
 			//Execute initial Petri net task after successful Declare post-processing
 			InitialPetriNetTask initialPetriNetTask = new InitialPetriNetTask(declarePostprocessingResult);
@@ -243,6 +246,8 @@ public class MainViewControllerV2 {
 		//Handle task success
 		task.setOnSucceeded(event -> {
 			initialPetriNetResult = task.getValue();
+			
+			WebViewUtilsV2.updatePnWebView(initialPnWebView, initialPetriNetResult.getModelFactory());
 		});
 
 		//Handle task failure

@@ -5,31 +5,37 @@ import data.DiscoveredActivity;
 public class ModelFactory {
 	 
 	private int nextNodeId;
+	private PlaceNode initialPlace; //Only one possible because of a fixed artificial start activity is added to all traces
+	private PlaceNode finalPlace; //Only one possible because of a fixed artificial end activity is added to all traces
 	
 	public ModelFactory() {
 		this.nextNodeId = 0;
+		this.initialPlace = new PlaceNode(nextNodeId++, true, false); 
+		this.finalPlace = new PlaceNode(nextNodeId++, false, true);
 	}
 	
 	
-	public TransitionNode getNewActivityTransition(DiscoveredActivity da) {
+	public TransitionNode getNewLabeledTransition(DiscoveredActivity da) {
 		return new TransitionNode(nextNodeId++, da);
 	}
-	
-	public TransitionNode getNewSilentTransition() {
+	public TransitionNode getNewRoutingTransition() {
+		return new TransitionNode(nextNodeId++, null);
+	}
+	public TransitionNode getNewSkipStart() {
+		return new TransitionNode(nextNodeId++, null);
+	}
+	public TransitionNode getNewSkipEnd() {
 		return new TransitionNode(nextNodeId++, null);
 	}
 	
-	
-	public PlaceNode getNewIntermediatePlace() {
+	public PlaceNode getNewPlace() {
 		return new PlaceNode(nextNodeId++, false, false);
 	}
-	
-	public PlaceNode getNewInitialPlace() {
-		return new PlaceNode(nextNodeId++, true, false);
+	public PlaceNode getInitialPlace() {
+		return initialPlace;
 	}
-	
-	public PlaceNode getNewFinalPlace() {
-		return new PlaceNode(nextNodeId++, false, true);
+	public PlaceNode getFinalPlace() {
+		return finalPlace;
 	}
 	
 }

@@ -76,8 +76,8 @@ public class PlaceNode extends Node {
 
 	@Override
 	public String toString() {
-		return "PlaceNode [nodeId=" + nodeId + ", incomingTransitions=" + incomingTransitions + ", outgoingTransitions="
-				+ outgoingTransitions + "]";
+		return "PlaceNode [nodeId=" + nodeId + ", incomingTransitions: " + incomingTransitions.size() + ", outgoingTransitions: "
+				+ outgoingTransitions.size() + "]";
 	}
 	
 }

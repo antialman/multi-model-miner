@@ -9,8 +9,8 @@ import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
-import model.v1.TransitionNode;
-import task.DeclareDiscoveryResult;
+import model.v2.TransitionNode;
+import model.v2.ModelFactory;
 
 public class WebViewUtilsV2 {
 
@@ -37,7 +37,7 @@ public class WebViewUtilsV2 {
 
 	}
 
-	public static void updateSubsetsWebView(List<DiscoveredActivity> activities, List<DiscoveredConstraint> constraints, WebView webView, boolean alternativeLayout) {
+	public static void updateDeclareWebView(List<DiscoveredActivity> activities, List<DiscoveredConstraint> constraints, WebView webView, boolean alternativeLayout) {
 		if (constraints != null) {
 			String visualizationString;
 			String script;
@@ -65,5 +65,21 @@ public class WebViewUtilsV2 {
 			}
 		}
 		
+	}
+
+	public static void updatePnWebView(WebView initialPnWebView, ModelFactory modelFactory) {
+		if (modelFactory != null) {
+			String visualizationString;
+			String script;
+			
+			//Taking the outgoing transitions of the initial place is a workaround to get V1 code to work with as little modifications as possible
+			visualizationString = GraphGeneratorV2.createFragmentsVisualizationString(modelFactory.getInitialPlace().getOutgoingTransitions());
+			
+			if (visualizationString != null) {
+				script = "setModel('" + visualizationString + "')";
+				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
+				initialPnWebView.getEngine().executeScript(script);
+			}
+		}
 	}
 }

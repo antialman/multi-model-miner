@@ -34,10 +34,13 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 			long taskStartTime = System.currentTimeMillis();
 			System.out.println("Initial Petri net task started at: " + taskStartTime);
 			
+			InitialPetriNetResult initialPetriNetResult = new InitialPetriNetResult();
+			
 			//Processing from artificial start to end
-			processActivity(declarePostprocessingResult.getArtificialStart());
+			TransitionNode artificialStartTransition = processActivity(declarePostprocessingResult.getArtificialStart());
+			modelFactory.getInitialPlace().addOutgoingTransition(artificialStartTransition);
 			
-			
+			initialPetriNetResult.setModelFactory(modelFactory);
 			
 			
 			for (DiscoveredActivity da : activityToRelationsMap.keySet()) {
@@ -56,7 +59,7 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 			
 			System.out.println("Initial Petri net task finished at: " + taskStartTime + " - total time: " + (System.currentTimeMillis() - taskStartTime));
 			
-			return null;
+			return initialPetriNetResult;
 			
 		} catch (Exception e) {
 			System.err.println("Initial Petri net task failed: " + e.getMessage());
@@ -73,7 +76,7 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 		Set<DiscoveredActivity> immediateOutActivities = getImmediateOutActivities(new ArrayList<DiscoveredActivity>(outActivities));
 		System.out.println("Immediate out activities of " + da.getActivityName() + ": " + immediateOutActivities);
 		
-		TransitionNode daTransition = modelFactory.getNewActivityTransition(da);
+		TransitionNode daTransition = modelFactory.getNewLabeledTransition(da);
 		
 		
 		

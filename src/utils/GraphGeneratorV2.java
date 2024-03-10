@@ -10,8 +10,8 @@ import java.util.Set;
 
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
-import model.v1.PlaceNode;
-import model.v1.TransitionNode;
+import model.v2.PlaceNode;
+import model.v2.TransitionNode;
 
 public class GraphGeneratorV2 {
 	// private constructor to avoid unnecessary instantiation of the class
@@ -309,8 +309,8 @@ public class GraphGeneratorV2 {
 
 		if (transitionNode.isSilent()) {
 			return " node" + transitionNode.getNodeId() + " [label=\"\"style=\"filled\",fillcolor=\"#000000\",shape=rect,height=0.3,width=.3]";
-		} else if (transitionNode.isFragmentMain()) {
-			return " node" + transitionNode.getNodeId() + " [label=\"" + transitionNode.getTransitionLabel() + "\",style=\"filled\",fillcolor=\"#eeeeee\",shape=rect,height=0.3,width=.3]";
+		//} else if (transitionNode.isFragmentMain()) {
+		//	return " node" + transitionNode.getNodeId() + " [label=\"" + transitionNode.getTransitionLabel() + "\",style=\"filled\",fillcolor=\"#eeeeee\",shape=rect,height=0.3,width=.3]";
 		} else {
 			return " node" + transitionNode.getNodeId() + " [label=\"" + transitionNode.getTransitionLabel() + "\",shape=rect,height=0.3,width=.3]";
 		}

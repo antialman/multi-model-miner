@@ -10,7 +10,8 @@ public class TransitionNode extends Node {
 	private DiscoveredActivity discoveredActivity;
 	private String transitionLabel;
 	private boolean isSilent;
-	private boolean isFragmentMain;
+	private boolean isSkipStart;
+	private boolean isSkipEnd;
 	
 	private Set<PlaceNode> incomingPlaces = new TreeSet<PlaceNode>();
 	private Set<PlaceNode> outgoingPlaces = new TreeSet<PlaceNode>();
@@ -18,13 +19,20 @@ public class TransitionNode extends Node {
 	TransitionNode(int nodeId, DiscoveredActivity discoveredActivity) {
 		super(nodeId);
 		this.discoveredActivity = discoveredActivity;
-		if (discoveredActivity != null) {
-			this.transitionLabel = discoveredActivity.getActivityName();
-			this.isSilent = false;
-		} else {
-			this.isSilent = true;
-		}
-		this.isFragmentMain = false;
+		this.transitionLabel = discoveredActivity.getActivityName();
+		this.isSilent = false;
+	}
+	
+	TransitionNode(int nodeId) {
+		super(nodeId);
+		this.isSilent = true;
+	}
+	
+	TransitionNode(int nodeId, boolean isSkipStart, boolean isSkipEnd) {
+		super(nodeId);
+		this.isSilent = true;
+		this.isSkipStart = isSkipStart;
+		this.isSkipEnd = isSkipEnd;
 	}
 	
 	public DiscoveredActivity getDiscoveredActivity() {
@@ -33,15 +41,14 @@ public class TransitionNode extends Node {
 	public boolean isSilent() {
 		return isSilent;
 	}
+	public boolean isSkipStart() {
+		return isSkipStart;
+	}
+	public boolean isSkipEnd() {
+		return isSkipEnd;
+	}
 	public String getTransitionLabel() {
 		return transitionLabel;
-	}
-	
-	public void setFragmentMain(boolean isFragmentMain) {
-		this.isFragmentMain = isFragmentMain;
-	}
-	public boolean isFragmentMain() {
-		return isFragmentMain;
 	}
 	
 	public void addIncomingPlace(PlaceNode incomingPlace) {
@@ -92,11 +99,13 @@ public class TransitionNode extends Node {
 		}
 	}
 
-
 	@Override
 	public String toString() {
-		return "TransitionNode [nodeId=" + nodeId + ", transitionLabel=" + transitionLabel + ", isSilent=" + isSilent
-				+ ", isFragmentMain=" + isFragmentMain + "]";
+		return "TransitionNode [discoveredActivity=" + discoveredActivity + ", transitionLabel=" + transitionLabel
+				+ ", isSilent=" + isSilent + ", isSkipStart=" + isSkipStart + ", isSkipEnd=" + isSkipEnd
+				+ ", incomingPlaces: " + incomingPlaces.size() + ", outgoingPlaces: " + outgoingPlaces.size() + "]";
 	}
+	
+	
 
 }
