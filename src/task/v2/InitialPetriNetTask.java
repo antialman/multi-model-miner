@@ -9,13 +9,23 @@ import java.util.Set;
 import data.ActivityRelationsContainer;
 import data.DiscoveredActivity;
 import javafx.concurrent.Task;
+import model.v2.ModelFactory;
+import model.v2.TransitionNode;
 
 public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 	
+	private DeclarePostprocessingResult declarePostprocessingResult;
 	private Map<DiscoveredActivity, ActivityRelationsContainer> activityToRelationsMap;
 	
+	
+	private ModelFactory modelFactory = new ModelFactory();
+	private Set<DiscoveredActivity> processedActivities = new HashSet<DiscoveredActivity>();
+	private Set<DiscoveredActivity> unProcessedActivities = new HashSet<DiscoveredActivity>();
+	
 	public InitialPetriNetTask(DeclarePostprocessingResult declarePostprocessingResult) {
-		this.activityToRelationsMap = declarePostprocessingResult.getActivityToRelationsMap();
+		this.declarePostprocessingResult = declarePostprocessingResult;
+		this.activityToRelationsMap = declarePostprocessingResult.getActivityToRelationsMap(); //For easier reference
+		unProcessedActivities.addAll(declarePostprocessingResult.getAllActivities());
 	}
 	
 	@Override
@@ -24,12 +34,22 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 			long taskStartTime = System.currentTimeMillis();
 			System.out.println("Initial Petri net task started at: " + taskStartTime);
 			
+			//Processing from artificial start to end
+			processActivity(declarePostprocessingResult.getArtificialStart());
+			
+			
+			
 			
 			for (DiscoveredActivity da : activityToRelationsMap.keySet()) {
 				Set<DiscoveredActivity> immediateInActivities = getImmediateInActivities(new ArrayList<DiscoveredActivity>(activityToRelationsMap.get(da).getPrunedInActivities()));
 				Set<DiscoveredActivity> immediateOutActivities = getImmediateOutActivities(new ArrayList<DiscoveredActivity>(activityToRelationsMap.get(da).getPrunedOutActivities()));
 				//System.out.println("Immediate in activities of " + da.getActivityName() + ": " + immediateInActivities);
 				//System.out.println("Immediate out activities of " + da.getActivityName() + ": " + immediateOutActivities);
+				
+				
+				
+				
+				
 			}
 			
 			
@@ -44,6 +64,26 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 			throw e;
 		}
 	}
+	
+	
+	
+	private TransitionNode processActivity(DiscoveredActivity da) {
+		ActivityRelationsContainer daRelations = activityToRelationsMap.get(da);
+		Set<DiscoveredActivity> outActivities = new HashSet<DiscoveredActivity>(daRelations.getPrunedOutActivities());
+		Set<DiscoveredActivity> immediateOutActivities = getImmediateOutActivities(new ArrayList<DiscoveredActivity>(outActivities));
+		System.out.println("Immediate out activities of " + da.getActivityName() + ": " + immediateOutActivities);
+		
+		TransitionNode daTransition = modelFactory.getNewActivityTransition(da);
+		
+		
+		
+		
+		
+		processedActivities.add(da);
+		unProcessedActivities.remove(da);
+		return daTransition;
+	}
+	
 	
 	
 	private Set<DiscoveredActivity> getImmediateInActivities(List<DiscoveredActivity> activitiesInList) {

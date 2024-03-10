@@ -21,7 +21,7 @@ import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
-import model.TransitionNode;
+import model.v1.TransitionNode;
 import task.DeclareDiscoveryTask;
 import task.v1.ConstraintSubsets;
 import task.v1.ConstraintSubsetsTask;

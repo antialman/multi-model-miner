@@ -7,8 +7,8 @@ import java.util.Set;
 
 import data.DiscoveredActivity;
 import javafx.concurrent.Task;
-import model.PlaceNode;
-import model.TransitionNode;
+import model.v1.PlaceNode;
+import model.v1.TransitionNode;
 import utils.ModelUtils;
 
 public class MergeStep1Task extends Task<MergeStep1Result> {

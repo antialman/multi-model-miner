@@ -10,8 +10,8 @@ import java.util.Set;
 
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
-import model.PlaceNode;
-import model.TransitionNode;
+import model.v1.PlaceNode;
+import model.v1.TransitionNode;
 
 public class GraphGeneratorV2 {
 	// private constructor to avoid unnecessary instantiation of the class

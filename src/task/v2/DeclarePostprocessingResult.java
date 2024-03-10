@@ -9,16 +9,16 @@ import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 
 public class DeclarePostprocessingResult {
-	
+
 	private List<DiscoveredActivity> allActivities; //Pruning keeps all activities
 	private List<DiscoveredConstraint> allConstraints; //As returned by DeclareDiscoveryTask
 	private List<DiscoveredConstraint> prunedConstraints; //Transitive closure from Declare miner, followed by basic hierarchy-based pruning
-	
+
 	//Activity cardinalities
 	private List<DiscoveredActivity> reqActivities;
 	private List<DiscoveredActivity> noRepActivities;
 	private List<DiscoveredActivity> noCardActivities;
-	
+
 	//For showing Declare models of constraint subsets 
 	private List<DiscoveredActivity> succActivities;
 	private List<DiscoveredActivity> precActivities;
@@ -28,15 +28,18 @@ public class DeclarePostprocessingResult {
 	private List<DiscoveredConstraint> precPrunedConstraints;
 	private List<DiscoveredConstraint> respPrunedConstraints;
 	private List<DiscoveredConstraint> notcoAllConstraints;
-	
+
 	//Data structure for building the Petri nets
 	private Map<DiscoveredActivity, ActivityRelationsContainer> activityToRelationsMap = new HashMap<DiscoveredActivity, ActivityRelationsContainer>();
 
-	
-	
+	private DiscoveredActivity artificialStart;
+	private DiscoveredActivity artificialEnd;
+
+
 	public DeclarePostprocessingResult() {
 	}
-	
+
+
 	public Map<DiscoveredActivity, ActivityRelationsContainer> getActivityToRelationsMap() {
 		return activityToRelationsMap;
 	}
@@ -44,8 +47,21 @@ public class DeclarePostprocessingResult {
 		this.activityToRelationsMap = activityToRelationsMap;
 	}
 
-	
-	
+
+	public DiscoveredActivity getArtificialStart() {
+		return artificialStart;
+	}
+	public void setArtificialStart(DiscoveredActivity artificialStart) {
+		this.artificialStart = artificialStart;
+	}
+	public DiscoveredActivity getArtificialEnd() {
+		return artificialEnd;
+	}
+	public void setArtificialEnd(DiscoveredActivity artificialEnd) {
+		this.artificialEnd = artificialEnd;
+	}
+
+
 	public List<DiscoveredActivity> getAllActivities() {
 		return allActivities;
 	}
@@ -59,7 +75,7 @@ public class DeclarePostprocessingResult {
 	public void setAllConstraints(List<DiscoveredConstraint> allConstraints) {
 		this.allConstraints = allConstraints;
 	}
-	
+
 	public List<DiscoveredConstraint> getPrunedConstraints() {
 		return prunedConstraints;
 	}
@@ -143,5 +159,5 @@ public class DeclarePostprocessingResult {
 	public void setNotcoAllConstraints(List<DiscoveredConstraint> notcoAllConstraints) {
 		this.notcoAllConstraints = notcoAllConstraints;
 	}
-	
+
 }

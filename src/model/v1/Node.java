@@ -1,9 +1,9 @@
-package model;
+package model.v1;
 
 public class Node implements Comparable<Node>{
 	protected int nodeId;
 
-	public Node(int nodeId) {
+	Node(int nodeId) {
 		this.nodeId = nodeId;
 	}
 	

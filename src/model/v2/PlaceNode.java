@@ -1,4 +1,4 @@
-package model;
+package model.v2;
 
 import java.util.Iterator;
 import java.util.Set;
@@ -13,24 +13,19 @@ public class PlaceNode extends Node {
 	private Set<TransitionNode> incomingTransitions = new TreeSet<TransitionNode>();
 	private Set<TransitionNode> outgoingTransitions = new TreeSet<TransitionNode>();
 	
-	public PlaceNode(int nodeId) {
+	PlaceNode(int nodeId, boolean isInitial, boolean isFinal) {
 		super(nodeId);
-		this.isInitial = false;
-		this.isFinal = false;
+		this.isInitial = isInitial;
+		this.isFinal = isFinal;
 	}
 	
-	public void setInitial(boolean isInitial) {
-		this.isInitial = isInitial;
-	}
 	public boolean isInitial() {
 		return isInitial;
-	}
-	public void setFinal(boolean isFinal) {
-		this.isFinal = isFinal;
 	}
 	public boolean isFinal() {
 		return isFinal;
 	}
+	
 	
 	public void addIncomingTransition(TransitionNode incomingTransition) {
 		incomingTransitions.add(incomingTransition);

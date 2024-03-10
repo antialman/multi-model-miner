@@ -3,7 +3,7 @@ package task.v1;
 import java.util.Set;
 import java.util.TreeSet;
 
-import model.TransitionNode;
+import model.v1.TransitionNode;
 
 public class MergeStep1Result {
 

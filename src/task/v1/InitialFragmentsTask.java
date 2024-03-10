@@ -10,8 +10,8 @@ import java.util.Set;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.concurrent.Task;
-import model.PlaceNode;
-import model.TransitionNode;
+import model.v1.PlaceNode;
+import model.v1.TransitionNode;
 import utils.ModelUtils;
 
 public class InitialFragmentsTask extends Task<InitialFragmentsResult> {

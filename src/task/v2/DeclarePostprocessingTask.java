@@ -58,6 +58,11 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 				if (!reqActivities.contains(discoveredActivity) && !noRepActivities.contains(discoveredActivity)) {
 					noCardActivities.add(discoveredActivity);
 				}
+				if (discoveredActivity.getActivityName().equals("_start_")) {
+					declarePostprocessingResult.setArtificialStart(discoveredActivity);
+				} else if (discoveredActivity.getActivityName().equals("_end_")) {
+					declarePostprocessingResult.setArtificialEnd(discoveredActivity);
+				}
 			}
 			declarePostprocessingResult.setNoCardActivities(noCardActivities);
 			

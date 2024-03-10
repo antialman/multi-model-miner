@@ -9,7 +9,7 @@ import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
-import model.TransitionNode;
+import model.v1.TransitionNode;
 import task.DeclareDiscoveryResult;
 
 public class WebViewUtilsV1 {

@@ -5,9 +5,9 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import model.Node;
-import model.PlaceNode;
-import model.TransitionNode;
+import model.v1.Node;
+import model.v1.PlaceNode;
+import model.v1.TransitionNode;
 
 public class ModelUtils {
 	// private constructor to avoid unnecessary instantiation of the class
