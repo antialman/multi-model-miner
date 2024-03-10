@@ -205,9 +205,7 @@ public class MainViewControllerV2 {
 					c.getTemplate() == ConstraintTemplate.Succession || 
 					c.getTemplate() == ConstraintTemplate.Precedence || 
 					c.getTemplate() == ConstraintTemplate.Response || 
-					c.getTemplate() == ConstraintTemplate.Not_CoExistence ||
-					c.getTemplate() == ConstraintTemplate.Existence ||
-					c.getTemplate() == ConstraintTemplate.Absence2) 
+					c.getTemplate() == ConstraintTemplate.Not_CoExistence) 
 					).collect(Collectors.toList());
 			WebViewUtilsV2.updateDeclareWebView(declarePostprocessingResult.getAllActivities(), patternConstraints, declareWebView, false);
 
