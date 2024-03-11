@@ -18,7 +18,7 @@ public class ModelFactory {
 	private PlaceNode finalPlace;
 	
 	private Set<DiscoveredActivity> unProcessedActivities = new HashSet<DiscoveredActivity>();
-	private Map<DiscoveredActivity, TransitionNode> activityTransitionsMap = new HashMap<DiscoveredActivity, TransitionNode>();
+	private Map<DiscoveredActivity, TransitionNode> activityTransitionMap = new HashMap<DiscoveredActivity, TransitionNode>();
 	
 	private Set<TransitionNode> skipStartTransitions = new HashSet<TransitionNode>();
 	private Set<TransitionNode> skipEndTransitions = new HashSet<TransitionNode>();
@@ -33,14 +33,14 @@ public class ModelFactory {
 		firstTransition = getNewLabeledTransition(artificialStartActivity);
 		initialPlace.addOutgoingTransition(firstTransition);
 		unProcessedActivities.add(artificialStartActivity);
-		activityTransitionsMap.put(artificialStartActivity, firstTransition);
+		activityTransitionMap.put(artificialStartActivity, firstTransition);
 	}
 	
 	public void setArtificialEnd(DiscoveredActivity artificialEndActivity) {
 		lastTransition = getNewLabeledTransition(artificialEndActivity);
 		finalPlace.addIncomingTransition(lastTransition);
 		unProcessedActivities.add(artificialEndActivity);
-		activityTransitionsMap.put(artificialEndActivity, lastTransition);
+		activityTransitionMap.put(artificialEndActivity, lastTransition);
 	}
 	
 	public TransitionNode getArtificialStartTransition() {
@@ -54,40 +54,40 @@ public class ModelFactory {
 		return unProcessedActivities;
 	}
 	public void markActivityAsProcessed(DiscoveredActivity discoveredActivity) {
-		if (activityTransitionsMap.get(discoveredActivity).getOutgoingPlaces().isEmpty()) {
-			//TODO: Handle XOR-joins immediately followed by XOR-splits (find closest follower activities, process pruned in relations of each, then replace the inActivity with discoveredActivity)
-			System.out.println("Missing out transitions for: " + discoveredActivity.getActivityName());
-		}
 		unProcessedActivities.remove(discoveredActivity);
+	}
+	
+	public boolean hasOutTransitions(DiscoveredActivity discoveredActivity) {
+		return !activityTransitionMap.get(discoveredActivity).getOutgoingPlaces().isEmpty();
 	}
 	
 	
 	//Handles sequences, AND-splits, AND-joins
 	//TODO: Improve the case where AND-join is immediately followed by AND-split 
 	public void addMandatoryFollower(DiscoveredActivity fromActivity, Set<DiscoveredActivity> toActivities) {
-		TransitionNode fromActivityTransition = activityTransitionsMap.get(fromActivity);
+		TransitionNode fromActivityTransition = activityTransitionMap.get(fromActivity);
 		for (DiscoveredActivity toActivity : toActivities) {
 			PlaceNode followerOutPlace = getNewPlace();
 			fromActivityTransition.addOutgoingPlace(followerOutPlace);
-			if (!activityTransitionsMap.containsKey(toActivity)) {
-				activityTransitionsMap.put(toActivity, getNewLabeledTransition(toActivity));
+			if (!activityTransitionMap.containsKey(toActivity)) {
+				activityTransitionMap.put(toActivity, getNewLabeledTransition(toActivity));
 				unProcessedActivities.add(toActivity);
 			}
-			followerOutPlace.addOutgoingTransition(activityTransitionsMap.get(toActivity));
+			followerOutPlace.addOutgoingTransition(activityTransitionMap.get(toActivity));
 		}
 	}
 	
 	
 	public void addXorSplit(DiscoveredActivity fromActivity, Set<DiscoveredActivity> notcoOutClique, boolean required) {
-		TransitionNode fromActivityTransition = activityTransitionsMap.get(fromActivity);
+		TransitionNode fromActivityTransition = activityTransitionMap.get(fromActivity);
 		PlaceNode cliqueOutPlace = getNewPlace();
 		fromActivityTransition.addOutgoingPlace(cliqueOutPlace);
 		for (DiscoveredActivity notcoActivity : notcoOutClique) {
-			if (!activityTransitionsMap.containsKey(notcoActivity)) {
-				activityTransitionsMap.put(notcoActivity, getNewLabeledTransition(notcoActivity));
+			if (!activityTransitionMap.containsKey(notcoActivity)) {
+				activityTransitionMap.put(notcoActivity, getNewLabeledTransition(notcoActivity));
 				unProcessedActivities.add(notcoActivity);
 			}
-			cliqueOutPlace.addOutgoingTransition(activityTransitionsMap.get(notcoActivity));
+			cliqueOutPlace.addOutgoingTransition(activityTransitionMap.get(notcoActivity));
 		}
 		if (!required) {
 			TransitionNode notcoSkipStart = getNewSkipStart();
@@ -97,15 +97,15 @@ public class ModelFactory {
 	}
 	
 	public void addXorJoin(DiscoveredActivity toActivity, Set<DiscoveredActivity> notcoInClique, boolean required) {
-		TransitionNode toActivityTransition = activityTransitionsMap.get(toActivity);
+		TransitionNode toActivityTransition = activityTransitionMap.get(toActivity);
 		PlaceNode cliqueInPlace = getNewPlace();
 		toActivityTransition.addIncomingPlace(cliqueInPlace);
 		for (DiscoveredActivity notcoActivity : notcoInClique) {
-			if (!activityTransitionsMap.containsKey(notcoActivity)) {
-				activityTransitionsMap.put(notcoActivity, getNewLabeledTransition(notcoActivity));
+			if (!activityTransitionMap.containsKey(notcoActivity)) {
+				activityTransitionMap.put(notcoActivity, getNewLabeledTransition(notcoActivity));
 				unProcessedActivities.add(notcoActivity);
 			}
-			cliqueInPlace.addIncomingTransition(activityTransitionsMap.get(notcoActivity));
+			cliqueInPlace.addIncomingTransition(activityTransitionMap.get(notcoActivity));
 		}
 		if (!required) {
 			TransitionNode notcoSkipEnd = getNewSkipEnd();
@@ -116,7 +116,7 @@ public class ModelFactory {
 	
 	
 	public void addOptionalAndSplit(DiscoveredActivity fromActivity, Set<DiscoveredActivity> coExOutClique) {
-		TransitionNode fromActivityTransition = activityTransitionsMap.get(fromActivity);
+		TransitionNode fromActivityTransition = activityTransitionMap.get(fromActivity);
 		PlaceNode cliqueOutPlace = getNewPlace();
 		fromActivityTransition.addOutgoingPlace(cliqueOutPlace);
 		TransitionNode coexSkipStart = getNewSkipStart();
@@ -126,18 +126,18 @@ public class ModelFactory {
 		cliqueOutPlace.addOutgoingTransition(routingTransition);
 		
 		for (DiscoveredActivity coExActivity : coExOutClique) {
-			if (!activityTransitionsMap.containsKey(coExActivity)) {
-				activityTransitionsMap.put(coExActivity, getNewLabeledTransition(coExActivity));
+			if (!activityTransitionMap.containsKey(coExActivity)) {
+				activityTransitionMap.put(coExActivity, getNewLabeledTransition(coExActivity));
 				unProcessedActivities.add(coExActivity);
 			}
 			PlaceNode coExActivityPlace = getNewPlace();
 			routingTransition.addOutgoingPlace(coExActivityPlace);
-			coExActivityPlace.addOutgoingTransition(activityTransitionsMap.get(coExActivity));
+			coExActivityPlace.addOutgoingTransition(activityTransitionMap.get(coExActivity));
 		}
 	}
 	
 	public void addOptionalAndJoin(DiscoveredActivity toActivity, Set<DiscoveredActivity> coExInClique) {
-		TransitionNode toActivityTransition = activityTransitionsMap.get(toActivity);
+		TransitionNode toActivityTransition = activityTransitionMap.get(toActivity);
 		PlaceNode cliqueInPlace = getNewPlace();
 		toActivityTransition.addIncomingPlace(cliqueInPlace);
 		TransitionNode coexSkipEnd = getNewSkipEnd();
@@ -147,52 +147,88 @@ public class ModelFactory {
 		cliqueInPlace.addIncomingTransition(routingTransition);
 		
 		for (DiscoveredActivity coExActivity : coExInClique) {
-			if (!activityTransitionsMap.containsKey(coExActivity)) {
-				activityTransitionsMap.put(coExActivity, getNewLabeledTransition(coExActivity));
+			if (!activityTransitionMap.containsKey(coExActivity)) {
+				activityTransitionMap.put(coExActivity, getNewLabeledTransition(coExActivity));
 				unProcessedActivities.add(coExActivity);
 			}
 			PlaceNode coExActivityPlace = getNewPlace();
 			routingTransition.addIncomingPlace(coExActivityPlace);
-			coExActivityPlace.addIncomingTransition(activityTransitionsMap.get(coExActivity));
+			coExActivityPlace.addIncomingTransition(activityTransitionMap.get(coExActivity));
 		}
 	}
 	
 	
 	public void addOptionalNextActivity(DiscoveredActivity currActivity, DiscoveredActivity nextActivity) {
-		TransitionNode currActivityTransition = activityTransitionsMap.get(currActivity);
+		TransitionNode currActivityTransition = activityTransitionMap.get(currActivity);
 		PlaceNode nextOutPlace = getNewPlace();
 		currActivityTransition.addOutgoingPlace(nextOutPlace);
 		TransitionNode nextActivitySkipStart = getNewSkipStart();
 		nextOutPlace.addOutgoingTransition(nextActivitySkipStart);
 		
-		if (!activityTransitionsMap.containsKey(nextActivity)) {
-			activityTransitionsMap.put(nextActivity, getNewLabeledTransition(nextActivity));
+		if (!activityTransitionMap.containsKey(nextActivity)) {
+			activityTransitionMap.put(nextActivity, getNewLabeledTransition(nextActivity));
 			unProcessedActivities.add(nextActivity);
 		}
-		nextOutPlace.addOutgoingTransition(activityTransitionsMap.get(nextActivity));
+		nextOutPlace.addOutgoingTransition(activityTransitionMap.get(nextActivity));
 	}
 	
 	
 	public void addOptionalPreviousActivity(DiscoveredActivity currActivity, DiscoveredActivity previousActivity) {
-		TransitionNode currActivityTransition = activityTransitionsMap.get(currActivity);
+		TransitionNode currActivityTransition = activityTransitionMap.get(currActivity);
 		PlaceNode previousOutPlace = getNewPlace();
 		currActivityTransition.addIncomingPlace(previousOutPlace);
 		TransitionNode previousActivitySkipEnd = getNewSkipEnd();
 		previousOutPlace.addIncomingTransition(previousActivitySkipEnd);
 		
-		if (!activityTransitionsMap.containsKey(previousActivity)) {
-			activityTransitionsMap.put(previousActivity, getNewLabeledTransition(previousActivity));
+		if (!activityTransitionMap.containsKey(previousActivity)) {
+			activityTransitionMap.put(previousActivity, getNewLabeledTransition(previousActivity));
 			unProcessedActivities.add(previousActivity);
 		}
-		previousOutPlace.addIncomingTransition(activityTransitionsMap.get(previousActivity));
+		previousOutPlace.addIncomingTransition(activityTransitionMap.get(previousActivity));
+	}
+	
+	//Handling of special cases where ordering constraints were unable to detect fixed order between XOR structures and/or skippable activities
+	public void addFollowersOfIncompleteClique(Set<DiscoveredActivity> notcoClique,	Set<DiscoveredActivity> notcoOutClique, float notcoCliqueSupport, float notcoOutCliqueSupport) {
+		PlaceNode outPlace = getNewPlace();
+		for (DiscoveredActivity incompleteActivity : notcoClique) {
+			activityTransitionMap.get(incompleteActivity).addOutgoingPlace(outPlace);
+		}
+		
+		for (DiscoveredActivity notcoOutActivity : notcoOutClique) {
+			if (!activityTransitionMap.containsKey(notcoOutActivity)) {
+				activityTransitionMap.put(notcoOutActivity, getNewLabeledTransition(notcoOutActivity));
+				unProcessedActivities.add(notcoOutActivity);
+			}
+			outPlace.addOutgoingTransition(activityTransitionMap.get(notcoOutActivity));
+		}
+		
+		if (notcoCliqueSupport < notcoOutCliqueSupport) {
+			TransitionNode skipEndTransition = getNewSkipEnd();
+			outPlace.addIncomingTransition(skipEndTransition);
+		} else if (notcoCliqueSupport > notcoOutCliqueSupport) {
+			TransitionNode skipStartTransition = getNewSkipStart();
+			outPlace.addOutgoingTransition(skipStartTransition);
+		}
 	}
 	
 	
 	public void addUnprocessedActivity(DiscoveredActivity respOutActivity) {
-		if (!activityTransitionsMap.containsKey(respOutActivity)) {
-			activityTransitionsMap.put(respOutActivity, getNewLabeledTransition(respOutActivity));
+		if (!activityTransitionMap.containsKey(respOutActivity)) {
+			activityTransitionMap.put(respOutActivity, getNewLabeledTransition(respOutActivity));
 			unProcessedActivities.add(respOutActivity);
 		}
+	}
+	
+
+
+	public Set<DiscoveredActivity> getIncompleteActivities() {
+		Set<DiscoveredActivity> incompleteActivities = new HashSet<DiscoveredActivity>();
+		activityTransitionMap.forEach((discoveredActivity, transitionNode) -> {
+			if (transitionNode.getOutgoingPlaces().isEmpty()) {
+				incompleteActivities.add(discoveredActivity);
+			}
+		});
+		return incompleteActivities;
 	}
 	
 	
@@ -215,7 +251,4 @@ public class ModelFactory {
 		return new PlaceNode(nextNodeId++, false, false);
 	}
 
-	
-
-	
 }

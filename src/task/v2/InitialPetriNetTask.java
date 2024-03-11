@@ -41,13 +41,25 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 			modelFactory.setArtificialStart(declarePostprocessingResult.getArtificialStart());
 			modelFactory.setArtificialEnd(declarePostprocessingResult.getArtificialEnd());
 
-			while (modelFactory.hasUnProcessedActivities()) {
-				processActivity(modelFactory.getUnProcessedActivities().iterator().next());
+			while (true) {
+				while (modelFactory.hasUnProcessedActivities()) {
+					processActivity(modelFactory.getUnProcessedActivities().iterator().next());
+				}
+				
+				Set<DiscoveredActivity> incompleteActivities = modelFactory.getIncompleteActivities();
+				if (!incompleteActivities.isEmpty()) {
+					System.out.println("Processing incomplete activities: " + incompleteActivities);
+					processIncompleteActivities(incompleteActivities);
+				} else {
+					break;
+				}
 			}
+			
+			
 
 			
 			System.out.println("All unprocessed activities: " + unprocessedActivities);
-			Set<DiscoveredActivity> earliestUnprocessedActivities = getImmediateOutActivities(new ArrayList<DiscoveredActivity>(unprocessedActivities));
+			Set<DiscoveredActivity> earliestUnprocessedActivities = getEarliestOutActivities(new ArrayList<DiscoveredActivity>(unprocessedActivities));
 			System.out.println("Earliest unprocessed activities: " + earliestUnprocessedActivities);
 			
 			for (DiscoveredActivity unprocessedActivity : earliestUnprocessedActivities) {
@@ -66,20 +78,18 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 		}
 	}
 
-
-
 	private void processActivity(DiscoveredActivity currActivity) {
 		ActivityRelationsContainer currActivityRelations = activityToRelationsMap.get(currActivity);
 
 		//Immediate outgoing activities (i.e., activities that are not reached through intermediary XOR branches) 
 		Set<DiscoveredActivity> outActivities = new HashSet<DiscoveredActivity>(currActivityRelations.getPrunedOutActivities());
-		Set<DiscoveredActivity> immediateOutActivities = getImmediateOutActivities(new ArrayList<DiscoveredActivity>(outActivities));
+		Set<DiscoveredActivity> immediateOutActivities = getEarliestOutActivities(new ArrayList<DiscoveredActivity>(outActivities));
 		//Set<DiscoveredActivity> immediateOutActivities = outActivities;
 		System.out.println("Immediate out activities of " + currActivity.getActivityName() + ": " + immediateOutActivities);
 
 		//Immediate incoming activities (i.e., activities that are not reached through intermediary XOR branches)
 		Set<DiscoveredActivity> inActivities = new HashSet<DiscoveredActivity>(currActivityRelations.getPrunedInActivities());
-		Set<DiscoveredActivity> immediateInActivities = getImmediateInActivities(new ArrayList<DiscoveredActivity>(inActivities));
+		Set<DiscoveredActivity> immediateInActivities = getEarliestInActivities(new ArrayList<DiscoveredActivity>(inActivities));
 		//Set<DiscoveredActivity> immediateInActivities = inActivities;
 		System.out.println("Immediate in activities of " + currActivity.getActivityName() + ": " + immediateInActivities);
 
@@ -169,19 +179,42 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 				modelFactory.addUnprocessedActivity(precInActivity);
 			}
 		}
-
-
+		
 		modelFactory.markActivityAsProcessed(currActivity);
 
 		processedActivities.add(currActivity);
 		unprocessedActivities.remove(currActivity);
 	}
+	
+	
+	private void processIncompleteActivities(Set<DiscoveredActivity> incompleteActivities) {
+		//Processing of activities that have no ordering constraints to their nearest next activities (e.g., XOR-join immediately followed by XOR-split)
+		List<Set<DiscoveredActivity>> notcoCliques = new ArrayList<Set<DiscoveredActivity>>();
+		CliqueUtilsV2.findNotCoCliques(new ArrayList<DiscoveredActivity>(), new ArrayList<DiscoveredActivity>(incompleteActivities), new ArrayList<DiscoveredActivity>(), activityToRelationsMap, notcoCliques);
+		
+		for (Set<DiscoveredActivity> notcoClique : notcoCliques) { //Each incomplete XOR
+			Set<DiscoveredActivity> closestOutActivities = new HashSet<DiscoveredActivity>();
+			float notcoCliqueSupport = 0; //Support of the incomplete XOR
+			for (DiscoveredActivity notcoActivity : notcoClique) {
+				closestOutActivities.addAll(getClosestOutActivities(notcoActivity)); //Closest out activities of the incomplete XOR
+				notcoCliqueSupport = notcoCliqueSupport + notcoActivity.getActivitySupport();
+			}
+			
+			List<Set<DiscoveredActivity>> notcoOutCliques = new ArrayList<Set<DiscoveredActivity>>();
+			CliqueUtilsV2.findNotCoCliques(new ArrayList<DiscoveredActivity>(), new ArrayList<DiscoveredActivity>(closestOutActivities), new ArrayList<DiscoveredActivity>(), activityToRelationsMap, notcoOutCliques);
+			
+			for (Set<DiscoveredActivity> notcoOutClique : notcoOutCliques) { //Each clique among the closest out activities of the incomplete XOR
+				float notcoOutCliqueSupport = 0; //Support out clique
+				for (DiscoveredActivity notcoOutActivity : notcoOutClique) {
+					notcoOutCliqueSupport = notcoOutCliqueSupport + notcoOutActivity.getActivitySupport();
+				}
+				
+				modelFactory.addFollowersOfIncompleteClique(notcoClique, notcoOutClique, notcoCliqueSupport, notcoOutCliqueSupport);
+			}
+		}
+	}
 
-
-
-
-
-	private Set<DiscoveredActivity> getImmediateOutActivities(List<DiscoveredActivity> activitiesOutList) {
+	private Set<DiscoveredActivity> getEarliestOutActivities(List<DiscoveredActivity> activitiesOutList) {
 		Set<DiscoveredActivity> immediateOutActivities = new HashSet<DiscoveredActivity>(activitiesOutList);
 
 		for (int i = 0; i < activitiesOutList.size(); i++) {
@@ -203,7 +236,7 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 		return immediateOutActivities;
 	}
 
-	private Set<DiscoveredActivity> getImmediateInActivities(List<DiscoveredActivity> activitiesInList) {
+	private Set<DiscoveredActivity> getEarliestInActivities(List<DiscoveredActivity> activitiesInList) {
 		Set<DiscoveredActivity> immediateInActivities = new HashSet<DiscoveredActivity>(activitiesInList);
 
 		for (int i = 0; i < activitiesInList.size(); i++) {
@@ -224,8 +257,19 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 		}
 		return immediateInActivities;
 	}
-
-
+	
+	private Set<DiscoveredActivity> getClosestOutActivities(DiscoveredActivity currActivity) {
+		ActivityRelationsContainer currActivityRelations = activityToRelationsMap.get(currActivity);
+		List<DiscoveredActivity> candidatesList = new ArrayList<DiscoveredActivity>();
+		for (DiscoveredActivity discoveredActivity : declarePostprocessingResult.getAllActivities()) { //Could maybe check only unprocessed activities?
+			if (!currActivityRelations.getNotCoexActivities().contains(discoveredActivity) && currActivityRelations.getNotSuccAllInActivities().contains(discoveredActivity)) {
+				candidatesList.add(discoveredActivity);
+			}
+		}
+		return getEarliestOutActivities(candidatesList);
+	}
+	
+	
 	private Set<DiscoveredActivity> getProcessedInActivities(DiscoveredActivity unprocessedActivity) {
 		ActivityRelationsContainer unprocessedActRelations = activityToRelationsMap.get(unprocessedActivity);
 		List<DiscoveredActivity> candidatesList = new ArrayList<DiscoveredActivity>();
@@ -234,7 +278,6 @@ public class InitialPetriNetTask extends Task<InitialPetriNetResult> {
 				candidatesList.add(processedActivity);
 			}
 		}
-		return getImmediateInActivities(candidatesList);
-		
+		return getEarliestInActivities(candidatesList);
 	}
 }
