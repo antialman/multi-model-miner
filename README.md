@@ -20,8 +20,8 @@ Results are displayed in three tabs:
 
 Examples of all three view are provided below.
 
-![image](https://github.com/antialman/multi-model-miner/assets/18569885/5ad26a44-f9e6-4043-94c4-65dfecde1079)
+![Pruned Declare Model](/img/313419402-5ad26a44-f9e6-4043-94c4-65dfecde1079.png)
 
-![image](https://github.com/antialman/multi-model-miner/assets/18569885/e01be1c8-cc0b-4f68-9a21-f88ac9ee1bb3)
+![Constraint Subsets](/img/313420261-e01be1c8-cc0b-4f68-9a21-f88ac9ee1bb3.png)
 
-![image](https://github.com/antialman/multi-model-miner/assets/18569885/33659fb6-855e-4bd5-9e29-24767f9d52c1)
+![Initial Petri net](/img/313420373-33659fb6-855e-4bd5-9e29-24767f9d52c1.png)
