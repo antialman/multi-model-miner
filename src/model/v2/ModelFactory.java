@@ -222,6 +222,7 @@ public class ModelFactory {
 
 
 	public Set<DiscoveredActivity> getIncompleteActivities() {
+		//TODO: Improve it by either tracking incomplete activities explicitly, or by finding if there are unprocessed relations to any closest activities
 		Set<DiscoveredActivity> incompleteActivities = new HashSet<DiscoveredActivity>();
 		activityTransitionMap.forEach((discoveredActivity, transitionNode) -> {
 			if (transitionNode.getOutgoingPlaces().isEmpty()) {
