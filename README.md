@@ -11,7 +11,7 @@ Additional required libraries (available in 'lib' folder):
 * Spex-1.1.jar
 * TheMiner-1.1.jar
 
-Application entry point: MainLauncherV2.main
+Application entry point: MainLauncherV2
 
 Results are displayed in three tabs:
 * Pruned Declare Model - Displays the discovered Succession, Precedence, Response, and Not Co-Existence constraints in a single Declare model. All relations (except Not_CoExistence are pruned). Other relations are ommitted from the visualization, but a full list of relations is provided below the model;
