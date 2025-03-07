@@ -18,4 +18,4 @@ Results are displayed in three tabs:
 * Constraint Subsets - Lists all activities of the event log on three groups: mandatory, never repeated, and unconstrained cardinality. Shows Declare models of Succession, Precedence, Response, and Not Co-Existence relations separately;
 * Initial Petri net - Displays the Petri net representation of the concurrently executed processes in the given event log (constructed using only the information in the pruned Declare model).
 
-Examples of all three views are provided in the 'img' folder
+Examples of all three views are provided in the 'img' folder.
