@@ -5,6 +5,8 @@ import org.apache.commons.lang3.StringUtils;
 
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
+import data.v3.ActivitySelector;
+import javafx.collections.ObservableList;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
 
@@ -32,8 +34,8 @@ public class WebViewUtilsV3 {
 		});
 
 	}
-
-	public static void updateDeclareWebView(List<DiscoveredActivity> activities, List<DiscoveredConstraint> constraints, WebView webView, boolean alternativeLayout) {
+	
+public static void updateDeclareWebView(List<DiscoveredActivity> activities, List<DiscoveredConstraint> constraints, WebView webView, boolean alternativeLayout) {
 		if (constraints != null) {
 			String visualizationString;
 			String script;

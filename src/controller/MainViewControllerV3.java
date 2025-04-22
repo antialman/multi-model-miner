@@ -1,7 +1,10 @@
 package controller;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -51,6 +54,12 @@ public class MainViewControllerV3 {
 	@FXML
 	private CheckBox altLayoutCheckbox;
 	@FXML
+	private CheckBox relatedActCheckBox;
+	@FXML
+	private CheckBox toggleAllActCheckBox;
+	@FXML
+	private Button applyFilterButton;
+	@FXML
 	private ListView<ActivitySelector> activityListView;
 	@FXML
 	private SplitPane splitPane2;
@@ -58,14 +67,14 @@ public class MainViewControllerV3 {
 	private WebView declareWebView;
 	@FXML
 	private ListView<String> constraintLabelListView;
-	
+
 	private Stage stage;
 
 	private File logFile;
-	
+
 	private DeclareDiscoveryResult declareDiscoveryResult;
-	
-	
+
+
 	//Setup methods
 	public void setStage(Stage stage) {
 		this.stage = stage;
@@ -76,25 +85,25 @@ public class MainViewControllerV3 {
 		redescoverButton.setDisable(true);
 
 		WebViewUtilsV3.setupWebView(declareWebView);
-		
+
 		//Setup for getting the SplitPane dividers working correctly at startup
 		ChangeListener<Number> changeListener = new ChangeListener<Number>() {
-	        @Override
-	        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-	        	splitPane1.setDividerPositions(0.1);
-	            splitPane2.setDividerPositions(0.8);
-	        }
-	    };
-	    splitPane1.widthProperty().addListener(changeListener);
-	    splitPane2.heightProperty().addListener(changeListener);
-	    
-	    //Setup for alternate layout
-	    altLayoutCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> {
-	    	WebViewUtilsV3.updateDeclareWebView(declareDiscoveryResult.getActivities(), declareDiscoveryResult.getConstraints(), declareWebView, newValue);
-	    });
-	    
-	    //Setup for activity filtering
-	    StringConverter<ActivitySelector> activityConverter = new StringConverter<ActivitySelector>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				splitPane1.setDividerPositions(0.1);
+				splitPane2.setDividerPositions(0.8);
+			}
+		};
+		splitPane1.widthProperty().addListener(changeListener);
+		splitPane2.heightProperty().addListener(changeListener);
+
+		//Setup for alternate layout
+		altLayoutCheckbox.selectedProperty().addListener((ev) -> {
+			WebViewUtilsV3.updateDeclareWebView(declareDiscoveryResult.getActivities(), declareDiscoveryResult.getConstraints(), declareWebView, altLayoutCheckbox.isSelected());
+		});
+
+		//Setup for activity filtering list
+		StringConverter<ActivitySelector> activityConverter = new StringConverter<ActivitySelector>() {
 			@Override
 			public String toString(ActivitySelector object) {
 				return object != null ? object.getDiscoveredActivity().getActivityName() : "";
@@ -104,10 +113,10 @@ public class MainViewControllerV3 {
 				return null;
 			}
 		};
-	    activityListView.setCellFactory(CheckBoxListCell.forListView(ActivitySelector::isSelectedProperty, activityConverter));
+		activityListView.setCellFactory(CheckBoxListCell.forListView(ActivitySelector::isSelectedProperty, activityConverter));
 	}
-	
-	
+
+
 	@FXML
 	private void selectLog() {
 		File logFile = FileUtils.showLogOpenDialog(stage);
@@ -118,7 +127,7 @@ public class MainViewControllerV3 {
 			discoverModel();
 		}
 	}
-	
+
 	@FXML
 	private void discoverModel() {
 		System.out.println("Starting model discovery from event log: " + logFile.getAbsolutePath());
@@ -128,6 +137,34 @@ public class MainViewControllerV3 {
 		Task<DeclareDiscoveryResult> task = createDeclareDiscoveryTask();
 		addDeclareDiscoveryTaskHandlers(task);
 		executorService.execute(task);
+	}
+
+	@FXML
+	private void applyFilter() { //Automatic update would be possible, but requires special care because execution of the visualization script is asynchronous
+		Set<DiscoveredActivity> filteredActivities = new HashSet<DiscoveredActivity>();
+		activityListView.getItems().filtered(item -> item.getIsSelected()).forEach(item -> filteredActivities.add(item.getDiscoveredActivity()));
+
+		Set<DiscoveredConstraint> filteredConstraints = new HashSet<DiscoveredConstraint>();
+		for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
+			if (relatedActCheckBox.isSelected()) {
+				if (filteredActivities.contains(discoveredConstraint.getActivationActivity()) || filteredActivities.contains(discoveredConstraint.getTargetActivity())) {
+					filteredConstraints.add(discoveredConstraint);
+				}
+			} else {
+				if (filteredActivities.contains(discoveredConstraint.getActivationActivity()) && filteredActivities.contains(discoveredConstraint.getTargetActivity())) {
+					filteredConstraints.add(discoveredConstraint);
+				}
+			}
+		}
+		if (relatedActCheckBox.isSelected()) {
+			for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
+				filteredActivities.add(discoveredConstraint.getActivationActivity());
+				filteredActivities.add(discoveredConstraint.getTargetActivity());
+			}
+		}
+
+		WebViewUtilsV3.updateDeclareWebView(new ArrayList<DiscoveredActivity>(filteredActivities), new ArrayList<DiscoveredConstraint>(filteredConstraints), declareWebView, altLayoutCheckbox.isSelected());
+		applyFilterButton.setStyle("-fx-font-weight: Normal;");
 	}
 
 
@@ -160,15 +197,16 @@ public class MainViewControllerV3 {
 			declareDiscoveryResult = delcareDiscoveryTask.getValue();
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
-			WebViewUtilsV3.updateDeclareWebView(declareDiscoveryResult.getActivities(), declareDiscoveryResult.getConstraints(), declareWebView, false);
+			WebViewUtilsV3.updateDeclareWebView(declareDiscoveryResult.getActivities(), declareDiscoveryResult.getConstraints(), declareWebView, altLayoutCheckbox.isSelected());
 			updateActivityFilters();
 			updateConstraintLabels();
 
+
 			//Execute Declare post-processing task //TODO
-//			DeclarePostprocessingTask declarePostprocessingTask = new DeclarePostprocessingTask();
-//			declarePostprocessingTask.setDeclareDiscoveryResult(declareDiscoveryResult);
-//			addDeclarePostprocessingTaskHandlers(declarePostprocessingTask);
-//			executorService.execute(declarePostprocessingTask);
+			//			DeclarePostprocessingTask declarePostprocessingTask = new DeclarePostprocessingTask();
+			//			declarePostprocessingTask.setDeclareDiscoveryResult(declareDiscoveryResult);
+			//			addDeclarePostprocessingTaskHandlers(declarePostprocessingTask);
+			//			executorService.execute(declarePostprocessingTask);
 
 		});
 
@@ -179,12 +217,12 @@ public class MainViewControllerV3 {
 		});
 
 	}
-	
+
 	private void updateActivityFilters() {
 		activityListView.getItems().clear();
 		ActivitySelector startSelector = null;
 		ActivitySelector endSelector = null;
-		
+
 		for (DiscoveredActivity discoveredActivity : declareDiscoveryResult.getActivities()) {
 			if (discoveredActivity.getActivityName().equals(LogUtils.ARTIF_START)) {
 				startSelector = new ActivitySelector(discoveredActivity, true);
@@ -203,8 +241,35 @@ public class MainViewControllerV3 {
 		if (startSelector != null) { //Artificial start to the top of the list (shifting artificial end one index lower)
 			activityListView.getItems().add(0,startSelector);
 		}
+
+		//Updating toggle all checkbox state based on individual activity selections
+		for (ActivitySelector activitySelector : activityListView.getItems()) {
+			activitySelector.isSelectedProperty().addListener((observable, oldValue, newValue) -> {
+				int totalElemSize = activityListView.getItems().size();
+				int selectedElemSize = activityListView.getItems().filtered(item -> item.getIsSelected()).size();
+
+				if (totalElemSize == selectedElemSize) {
+					toggleAllActCheckBox.setIndeterminate(false);
+					toggleAllActCheckBox.setSelected(true);
+				} else if (selectedElemSize == 0) {
+					toggleAllActCheckBox.setIndeterminate(false);
+					toggleAllActCheckBox.setSelected(false);
+				} else {
+					toggleAllActCheckBox.setIndeterminate(true);
+				}
+
+				applyFilterButton.setStyle("-fx-font-weight: Bold;");
+
+			});
+		}
+
+		//Toggle all checkbox behavior
+		toggleAllActCheckBox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+			activityListView.getItems().forEach(item -> {item.setIsSelected(newValue);});
+		});
+
 	}
-	
+
 	private void updateConstraintLabels() {
 		constraintLabelListView.getItems().clear();
 		for (DiscoveredConstraint constraint : declareDiscoveryResult.getConstraints()) {
