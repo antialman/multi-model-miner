@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import data.ActivityRelationsContainer;
 import data.DiscoveredActivity;
+import data.v1v2.ActivityRelationsContainer;
 
 public class CliqueUtilsV2 { //V1 was implemented as part of creating the initial fragments
 
@@ -43,7 +43,7 @@ public class CliqueUtilsV2 { //V1 was implemented as part of creating the initia
 
 	//Result is placed into List<Set<DiscoveredActivity>> notcoCliques, which is assumed to be empty on initial method call
 	public static void findNotCoCliques(List<DiscoveredActivity> potentialClique, List<DiscoveredActivity> candidates, List<DiscoveredActivity> alreadyFound, Map<DiscoveredActivity, ActivityRelationsContainer> activityToRelationsMap, List<Set<DiscoveredActivity>> notcoCliques) {
-		//Based on the following Bron–Kerbosch algorithm implementation: https://github.com/liziliao/Bron-Kerbosch/blob/master/Bron-Kerbosch.java
+		//Based on the following Bronï¿½Kerbosch algorithm implementation: https://github.com/liziliao/Bron-Kerbosch/blob/master/Bron-Kerbosch.java
 
 		List<DiscoveredActivity> candidatesArray = new ArrayList<DiscoveredActivity>(candidates);
 		if (!end(candidates, alreadyFound, activityToRelationsMap)) {

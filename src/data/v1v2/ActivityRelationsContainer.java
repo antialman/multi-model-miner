@@ -1,9 +1,12 @@
-package data;
+package data.v1v2;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
+import data.DiscoveredActivity;
+import data.DiscoveredConstraint;
 
 public class ActivityRelationsContainer {
 

@@ -229,7 +229,7 @@ public class InitialFragmentsTask extends Task<InitialFragmentsResult> {
 
 
 	public List<Set<TransitionNode>> findCliques(List<DiscoveredActivity> potentialClique, List<DiscoveredActivity> candidates, List<DiscoveredActivity> alreadyFound) {
-		//Based on the following Bron–Kerbosch algorithm implementation: https://github.com/liziliao/Bron-Kerbosch/blob/master/Bron-Kerbosch.java
+		//Based on the following Bronï¿½Kerbosch algorithm implementation: https://github.com/liziliao/Bron-Kerbosch/blob/master/Bron-Kerbosch.java
 
 		List<DiscoveredActivity> candidatesArray = new ArrayList<DiscoveredActivity>(candidates);
 		if (!end(candidates, alreadyFound)) {

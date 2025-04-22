@@ -6,8 +6,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import data.ActivityRelationsContainer;
 import data.DiscoveredActivity;
+import data.v1v2.ActivityRelationsContainer;
 import javafx.concurrent.Task;
 import model.v2.ModelFactory;
 import utils.CliqueUtilsV2;

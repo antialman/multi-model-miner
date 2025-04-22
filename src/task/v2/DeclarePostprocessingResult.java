@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import data.ActivityRelationsContainer;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
+import data.v1v2.ActivityRelationsContainer;
 
 public class DeclarePostprocessingResult {
 

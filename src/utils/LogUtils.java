@@ -20,6 +20,9 @@ public class LogUtils {
 	private LogUtils() {
 		//Private constructor to avoid unnecessary instantiation of the class
 	}
+	
+	public static final String ARTIF_START = "_start_";
+	public static final String ARTIF_END = "_end_";
 
 
 	public static XLog convertToXlog(String logPath) {
@@ -51,11 +54,11 @@ public class LogUtils {
 	
 	public static XLog addArtificialStartEnd(XLog xLog) {
 		XEvent artifStart = new XEventImpl(new XAttributeMapImpl());
-		XConceptExtension.instance().assignName(artifStart, "_start_");
+		XConceptExtension.instance().assignName(artifStart, ARTIF_START);
 		XLifecycleExtension.instance().assignStandardTransition(artifStart, StandardModel.COMPLETE);
 		
 		XEvent artifEnd = new XEventImpl(new XAttributeMapImpl());
-		XConceptExtension.instance().assignName(artifEnd, "_end_");
+		XConceptExtension.instance().assignName(artifEnd, ARTIF_END);
 		XLifecycleExtension.instance().assignStandardTransition(artifEnd, StandardModel.COMPLETE);
 		
 		for (XTrace xTrace : xLog) {

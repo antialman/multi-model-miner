@@ -8,9 +8,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import data.ActivityRelationsContainer;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
+import data.v1v2.ActivityRelationsContainer;
 import javafx.concurrent.Task;
 import task.DeclareDiscoveryResult;
 import utils.ConstraintTemplate;
