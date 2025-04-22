@@ -88,6 +88,11 @@ public class MainViewControllerV3 {
 	    splitPane1.widthProperty().addListener(changeListener);
 	    splitPane2.heightProperty().addListener(changeListener);
 	    
+	    //Setup for alternate layout
+	    altLayoutCheckbox.selectedProperty().addListener((observable, oldValue, newValue) -> {
+	    	WebViewUtilsV3.updateDeclareWebView(declareDiscoveryResult.getActivities(), declareDiscoveryResult.getConstraints(), declareWebView, newValue);
+	    });
+	    
 	    //Setup for activity filtering
 	    StringConverter<ActivitySelector> activityConverter = new StringConverter<ActivitySelector>() {
 			@Override
