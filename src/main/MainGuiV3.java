@@ -46,8 +46,6 @@ public class MainGuiV3 extends Application {
 				System.exit(0);
 			}
 		});
-		
-		mainViewControllerV3.markInitDone();
 	}
 	
 }

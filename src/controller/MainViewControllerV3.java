@@ -60,7 +60,6 @@ public class MainViewControllerV3 {
 	private ListView<String> constraintLabelListView;
 	
 	private Stage stage;
-	private boolean initDone = false;
 
 	private File logFile;
 	
@@ -82,13 +81,8 @@ public class MainViewControllerV3 {
 		ChangeListener<Number> changeListener = new ChangeListener<Number>() {
 	        @Override
 	        public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
-	        	System.out.println(oldValue);
-	        	System.out.println(newValue);
 	        	splitPane1.setDividerPositions(0.1);
-	            splitPane2.setDividerPositions(0.9);
-	            if (initDone) {
-	            	observable.removeListener(this);
-				}
+	            splitPane2.setDividerPositions(0.8);
 	        }
 	    };
 	    splitPane1.widthProperty().addListener(changeListener);
@@ -106,11 +100,6 @@ public class MainViewControllerV3 {
 			}
 		};
 	    activityListView.setCellFactory(CheckBoxListCell.forListView(ActivitySelector::isSelectedProperty, activityConverter));
-	}
-	
-	
-	public void markInitDone() { //Used for getting the SplitPane dividers working correctly at startup
-		this.initDone = true;
 	}
 	
 	
