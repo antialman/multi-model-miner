@@ -2,9 +2,7 @@ package controller;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -141,29 +139,29 @@ public class MainViewControllerV3 {
 
 	@FXML
 	private void applyFilter() { //Automatic update would be possible, but requires special care because execution of the visualization script is asynchronous
-		Set<DiscoveredActivity> filteredActivities = new HashSet<DiscoveredActivity>();
+		List<DiscoveredActivity> filteredActivities = new ArrayList<DiscoveredActivity>();
 		activityListView.getItems().filtered(item -> item.getIsSelected()).forEach(item -> filteredActivities.add(item.getDiscoveredActivity()));
 
-		Set<DiscoveredConstraint> filteredConstraints = new HashSet<DiscoveredConstraint>();
+		List<DiscoveredConstraint> filteredConstraints = new ArrayList<DiscoveredConstraint>();
 		for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
 			if (relatedActCheckBox.isSelected()) {
-				if (filteredActivities.contains(discoveredConstraint.getActivationActivity()) || filteredActivities.contains(discoveredConstraint.getTargetActivity())) {
+				if (!filteredConstraints.contains(discoveredConstraint) && (filteredActivities.contains(discoveredConstraint.getActivationActivity()) || filteredActivities.contains(discoveredConstraint.getTargetActivity()))) {
 					filteredConstraints.add(discoveredConstraint);
 				}
 			} else {
-				if (filteredActivities.contains(discoveredConstraint.getActivationActivity()) && filteredActivities.contains(discoveredConstraint.getTargetActivity())) {
+				if (!filteredConstraints.contains(discoveredConstraint) && (filteredActivities.contains(discoveredConstraint.getActivationActivity()) && filteredActivities.contains(discoveredConstraint.getTargetActivity()))) {
 					filteredConstraints.add(discoveredConstraint);
 				}
 			}
 		}
 		if (relatedActCheckBox.isSelected()) {
 			for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
-				filteredActivities.add(discoveredConstraint.getActivationActivity());
-				filteredActivities.add(discoveredConstraint.getTargetActivity());
+				if(!filteredActivities.contains(discoveredConstraint.getActivationActivity())) filteredActivities.add(discoveredConstraint.getActivationActivity());
+				if(!filteredActivities.contains(discoveredConstraint.getTargetActivity())) filteredActivities.add(discoveredConstraint.getTargetActivity());
 			}
 		}
 
-		WebViewUtilsV3.updateDeclareWebView(new ArrayList<DiscoveredActivity>(filteredActivities), new ArrayList<DiscoveredConstraint>(filteredConstraints), declareWebView, altLayoutCheckbox.isSelected());
+		WebViewUtilsV3.updateDeclareWebView(filteredActivities, new ArrayList<DiscoveredConstraint>(filteredConstraints), declareWebView, altLayoutCheckbox.isSelected());
 		applyFilterButton.setStyle("-fx-font-weight: Normal;");
 	}
 
@@ -195,6 +193,9 @@ public class MainViewControllerV3 {
 		//Handle task success
 		delcareDiscoveryTask.setOnSucceeded(event -> {
 			declareDiscoveryResult = delcareDiscoveryTask.getValue();
+			sortDiscoveredActivities(declareDiscoveryResult.getActivities());
+			
+			//Updating the UI
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
 			WebViewUtilsV3.updateDeclareWebView(declareDiscoveryResult.getActivities(), declareDiscoveryResult.getConstraints(), declareWebView, altLayoutCheckbox.isSelected());
@@ -215,32 +216,11 @@ public class MainViewControllerV3 {
 			mainHeader.setDisable(false);
 			AlertUtils.showError("Running Declare Miner failed!");
 		});
-
 	}
 
 	private void updateActivityFilters() {
 		activityListView.getItems().clear();
-		ActivitySelector startSelector = null;
-		ActivitySelector endSelector = null;
-
-		for (DiscoveredActivity discoveredActivity : declareDiscoveryResult.getActivities()) {
-			if (discoveredActivity.getActivityName().equals(LogUtils.ARTIF_START)) {
-				startSelector = new ActivitySelector(discoveredActivity, true);
-			} else if(discoveredActivity.getActivityName().equals(LogUtils.ARTIF_END)) {
-				endSelector = new ActivitySelector(discoveredActivity, true);
-			} else {
-				activityListView.getItems().add(new ActivitySelector(discoveredActivity, true));
-			}
-		}
-		activityListView.getItems().sort((o1,o2)->{ //Alphabetical-order for "real" activities
-			return o1.getDiscoveredActivity().getActivityName().compareToIgnoreCase(o2.getDiscoveredActivity().getActivityName());
-		});
-		if (endSelector != null) { //Artificial end to the top of the list
-			activityListView.getItems().add(0,endSelector);
-		}
-		if (startSelector != null) { //Artificial start to the top of the list (shifting artificial end one index lower)
-			activityListView.getItems().add(0,startSelector);
-		}
+		declareDiscoveryResult.getActivities().forEach(act -> activityListView.getItems().add(new ActivitySelector(act, true)));
 
 		//Updating toggle all checkbox state based on individual activity selections
 		for (ActivitySelector activitySelector : activityListView.getItems()) {
@@ -277,5 +257,27 @@ public class MainViewControllerV3 {
 		}
 	}
 
+	private void sortDiscoveredActivities(List<DiscoveredActivity> discoveredActivities) {
+		//Sorting activities by name, and moving artificial start and end to be the first activities in the activity list (makes the UI a bit nicer)
+		discoveredActivities.sort((o1,o2)->{
+			return o1.getActivityName().compareToIgnoreCase(o2.getActivityName());
+		});
+		DiscoveredActivity artificialStart = null;
+		DiscoveredActivity artificialEnd = null;
+		for (DiscoveredActivity discoveredActivity : declareDiscoveryResult.getActivities()) {
+			if (discoveredActivity.getActivityName().equals(LogUtils.ARTIF_START)) 
+				artificialStart = discoveredActivity;
+			if (discoveredActivity.getActivityName().equals(LogUtils.ARTIF_END)) 
+				artificialEnd = discoveredActivity;
+		}
+		if (artificialEnd != null) {
+			discoveredActivities.remove(artificialEnd);
+			discoveredActivities.add(0, artificialEnd);
+		}
+		if (artificialStart != null) {
+			discoveredActivities.remove(artificialStart);
+			discoveredActivities.add(0, artificialStart);
+		}
+	}
 
 }
