@@ -155,7 +155,7 @@ public class MainViewControllerV3 {
 			}
 		}
 		if (relatedActCheckBox.isSelected()) {
-			for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
+			for (DiscoveredConstraint discoveredConstraint : filteredConstraints) {
 				if(!filteredActivities.contains(discoveredConstraint.getActivationActivity())) filteredActivities.add(discoveredConstraint.getActivationActivity());
 				if(!filteredActivities.contains(discoveredConstraint.getTargetActivity())) filteredActivities.add(discoveredConstraint.getTargetActivity());
 			}
@@ -220,6 +220,8 @@ public class MainViewControllerV3 {
 
 	private void updateActivityFilters() {
 		activityListView.getItems().clear();
+		relatedActCheckBox.setSelected(true);
+		toggleAllActCheckBox.setSelected(true);
 		declareDiscoveryResult.getActivities().forEach(act -> activityListView.getItems().add(new ActivitySelector(act, true)));
 
 		//Updating toggle all checkbox state based on individual activity selections
