@@ -56,7 +56,7 @@ public class MainViewControllerV3 {
 	@FXML
 	private CheckBox toggleAllActCheckBox;
 	@FXML
-	private Button applyFilterButton;
+	private Button updateModelButton;
 	@FXML
 	private ListView<ActivitySelector> activityListView;
 	@FXML
@@ -95,9 +95,11 @@ public class MainViewControllerV3 {
 		splitPane1.widthProperty().addListener(changeListener);
 		splitPane2.heightProperty().addListener(changeListener);
 
-		//Setup for alternate layout
 		altLayoutCheckbox.selectedProperty().addListener((ev) -> {
-			WebViewUtilsV3.updateDeclareWebView(declareDiscoveryResult.getActivities(), declareDiscoveryResult.getConstraints(), declareWebView, altLayoutCheckbox.isSelected());
+			updateDeclareModel();
+		});
+		relatedActCheckBox.selectedProperty().addListener((ev) -> {
+			updateDeclareModel();
 		});
 
 		//Setup for activity filtering list
@@ -138,7 +140,7 @@ public class MainViewControllerV3 {
 	}
 
 	@FXML
-	private void applyFilter() { //Automatic update would be possible, but requires special care because execution of the visualization script is asynchronous
+	private void updateDeclareModel() { //Automatic update would be possible, but requires special care because execution of the visualization script is asynchronous
 		List<DiscoveredActivity> filteredActivities = new ArrayList<DiscoveredActivity>();
 		activityListView.getItems().filtered(item -> item.getIsSelected()).forEach(item -> filteredActivities.add(item.getDiscoveredActivity()));
 
@@ -162,7 +164,7 @@ public class MainViewControllerV3 {
 		}
 
 		WebViewUtilsV3.updateDeclareWebView(filteredActivities, new ArrayList<DiscoveredConstraint>(filteredConstraints), declareWebView, altLayoutCheckbox.isSelected());
-		applyFilterButton.setStyle("-fx-font-weight: Normal;");
+		updateModelButton.setStyle("-fx-font-weight: Normal;");
 	}
 
 
@@ -194,13 +196,13 @@ public class MainViewControllerV3 {
 		delcareDiscoveryTask.setOnSucceeded(event -> {
 			declareDiscoveryResult = delcareDiscoveryTask.getValue();
 			sortDiscoveredActivities(declareDiscoveryResult.getActivities());
-			
+
 			//Updating the UI
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
-			WebViewUtilsV3.updateDeclareWebView(declareDiscoveryResult.getActivities(), declareDiscoveryResult.getConstraints(), declareWebView, altLayoutCheckbox.isSelected());
-			updateActivityFilters();
-			updateConstraintLabels();
+			populateActivityFilters();
+			populateConstraintLabels();
+			updateDeclareModel();
 
 
 			//Execute Declare post-processing task //TODO
@@ -218,7 +220,7 @@ public class MainViewControllerV3 {
 		});
 	}
 
-	private void updateActivityFilters() {
+	private void populateActivityFilters() {
 		activityListView.getItems().clear();
 		relatedActCheckBox.setSelected(true);
 		toggleAllActCheckBox.setSelected(true);
@@ -240,7 +242,7 @@ public class MainViewControllerV3 {
 					toggleAllActCheckBox.setIndeterminate(true);
 				}
 
-				applyFilterButton.setStyle("-fx-font-weight: Bold;");
+				updateModelButton.setStyle("-fx-font-weight: Bold;");
 
 			});
 		}
@@ -252,7 +254,7 @@ public class MainViewControllerV3 {
 
 	}
 
-	private void updateConstraintLabels() {
+	private void populateConstraintLabels() {
 		constraintLabelListView.getItems().clear();
 		for (DiscoveredConstraint constraint : declareDiscoveryResult.getConstraints()) {
 			constraintLabelListView.getItems().add(constraint.toString());
