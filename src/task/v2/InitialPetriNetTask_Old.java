@@ -48,8 +48,8 @@ public class InitialPetriNetTask_Old extends Task<InitialPetriNetResult> {
 				
 				System.out.println("Unprocessed activities: " + unProcessedActivities);
 				
-				Set<DiscoveredActivity> earliestUnprocessedActivities = getImmediateOutActivities(new ArrayList<DiscoveredActivity>(unProcessedActivities));
-				Set<DiscoveredActivity> latestProcessedActivities = getImmediateInActivities(new ArrayList<DiscoveredActivity>(processedActivities));
+//				Set<DiscoveredActivity> earliestUnprocessedActivities = getImmediateOutActivities(new ArrayList<DiscoveredActivity>(unProcessedActivities));
+//				Set<DiscoveredActivity> latestProcessedActivities = getImmediateInActivities(new ArrayList<DiscoveredActivity>(processedActivities));
 				
 				
 				

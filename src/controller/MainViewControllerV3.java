@@ -9,8 +9,6 @@ import java.util.concurrent.Executors;
 import org.apache.commons.collections15.BidiMap;
 import org.apache.commons.collections15.bidimap.DualHashBidiMap;
 
-import com.google.common.collect.BiMap;
-
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import data.v3.ActivitySelector;
