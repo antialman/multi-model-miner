@@ -1,10 +1,17 @@
 package utils;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+
+import org.apache.commons.collections15.BidiMap;
+import org.processmining.ltl2automaton.plugins.automaton.Automaton;
+import org.processmining.ltl2automaton.plugins.automaton.State;
+import org.processmining.ltl2automaton.plugins.automaton.Transition;
 
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
@@ -237,5 +244,103 @@ public class GraphGeneratorV3 {
 		if(b2 == 15) s += "f";
 
 		return s;
+	}
+
+
+	public static String createAutomatonVisualizationString(List<DiscoveredActivity> activities, List<DiscoveredConstraint> constraints, boolean alternativeLayout, BidiMap<DiscoveredActivity, String> activityToEncodingsMap) {
+		//Adopted from org.processmining.ltl2automaton.plugins.automaton.DOTExporter, but significantly modified
+		Automaton aut = AutomatonUtils.createAutomaton(activities, constraints, activityToEncodingsMap);
+		StringBuilder sb = new StringBuilder();
+		sb.append("digraph \"\" {");
+		
+		if (aut==null) {
+			sb.append("}");
+			return sb.toString();
+		} else {
+			sb.append(" init [shape=none, label=\"\"];");
+			if (!alternativeLayout)
+				sb.append(" rankdir = \"LR\"");
+
+			for (final State s : aut) {
+				if (!isNonAcceptingTrap(s)) {
+					sb.append(" s");
+					sb.append(s.getId());
+					if (s.isAccepting()) {
+						sb.append("[shape=doublecircle]");
+					} else {
+						sb.append("[shape=circle]");
+					}
+					sb.append(';');
+				}
+			}
+
+			for (final State s : aut) {
+				if (isNonAcceptingTrap(s)) {
+					continue; //Skipping the fail-state
+				}
+				Map<State, List<String>> outStateToLabels = new HashMap<State, List<String>>();
+				for (final Transition t : s.getOutput()) {
+					if (isNonAcceptingTrap(t.getTarget())) {
+						continue; //Skipping the edges that lead to the fail-state
+					}
+					//Replacing encodings with activity names and merging same labeled transitions (not the most efficient code)
+					if (!outStateToLabels.containsKey(t.getTarget())) {
+						outStateToLabels.put(t.getTarget(), new ArrayList<String>());
+					}
+
+					String transitionLabel = t.toString();
+					if (t.isNegative()) { //Only one outgoing negative transitions per state
+						List<String> negLabels = Arrays.asList(transitionLabel.split("&"));
+						if (negLabels.size() == activities.size()) { //Not adding the edge if all activities were negated
+							outStateToLabels.remove(t.getTarget());
+							continue;
+						}
+						for (DiscoveredActivity activity : activities) {
+							if (!negLabels.contains("!"+activityToEncodingsMap.get(activity))) {
+								outStateToLabels.get(t.getTarget()).add(activity.getActivityName());
+							}
+						}
+					} else if (t.isPositive()) { //Only one activity name per positive transition
+						outStateToLabels.get(t.getTarget()).add(activityToEncodingsMap.inverseBidiMap().get(transitionLabel).getActivityName());
+					} else { //The "any" transition remains as-is
+						outStateToLabels.get(t.getTarget()).add(transitionLabel);
+					}
+
+				}
+
+				//Adding the edge to dot string
+				for (State outState : outStateToLabels.keySet()) {
+					sb.append(" s");
+					sb.append(s.getId());
+					sb.append(" -> s");
+					sb.append(outState.getId());
+					sb.append("[label=\"");
+					sb.append(String.join("\\n", outStateToLabels.get(outState)).replaceAll("\"", "\\\""));
+					sb.append("\"];");
+				}
+			}
+
+			if (aut.getInit() != null) {
+				sb.append(" init -> s");
+				sb.append(aut.getInit().getId());
+				sb.append(';');
+			}
+
+			sb.append("}");
+
+			return sb.toString();
+		}
+
+		
+	}
+
+	public static boolean isNonAcceptingTrap(State s) {
+		if (!s.isAccepting() && s.getOutputSize()==1) {
+			Transition t = s.getOutput().iterator().next();
+			if (t.isAll() && t.getTarget()==s) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

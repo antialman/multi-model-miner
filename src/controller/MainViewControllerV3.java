@@ -6,6 +6,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.collections15.BidiMap;
+import org.apache.commons.collections15.bidimap.DualHashBidiMap;
+
+import com.google.common.collect.BiMap;
+
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import data.v3.ActivitySelector;
@@ -52,6 +57,8 @@ public class MainViewControllerV3 {
 	@FXML
 	private CheckBox altLayoutCheckbox;
 	@FXML
+	private CheckBox automatonCheckbox;
+	@FXML
 	private CheckBox relatedActCheckBox;
 	@FXML
 	private CheckBox toggleAllActCheckBox;
@@ -62,7 +69,7 @@ public class MainViewControllerV3 {
 	@FXML
 	private SplitPane splitPane2;
 	@FXML
-	private WebView declareWebView;
+	private WebView declMinerWebView;
 	@FXML
 	private ListView<String> constraintLabelListView;
 
@@ -71,6 +78,7 @@ public class MainViewControllerV3 {
 	private File logFile;
 
 	private DeclareDiscoveryResult declareDiscoveryResult;
+	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
 
 
 	//Setup methods
@@ -82,7 +90,7 @@ public class MainViewControllerV3 {
 		resultTabPane.setDisable(true);
 		redescoverButton.setDisable(true);
 
-		WebViewUtilsV3.setupWebView(declareWebView);
+		WebViewUtilsV3.setupWebView(declMinerWebView);
 
 		//Setup for getting the SplitPane dividers working correctly at startup
 		ChangeListener<Number> changeListener = new ChangeListener<Number>() {
@@ -96,10 +104,13 @@ public class MainViewControllerV3 {
 		splitPane2.heightProperty().addListener(changeListener);
 
 		altLayoutCheckbox.selectedProperty().addListener((ev) -> {
-			updateDeclareModel();
+			updateDeclMinewWebView();
+		});
+		automatonCheckbox.selectedProperty().addListener((ev) -> {
+			updateDeclMinewWebView();
 		});
 		relatedActCheckBox.selectedProperty().addListener((ev) -> {
-			updateDeclareModel();
+			updateDeclMinewWebView();
 		});
 
 		//Setup for activity filtering list
@@ -140,7 +151,7 @@ public class MainViewControllerV3 {
 	}
 
 	@FXML
-	private void updateDeclareModel() { //Automatic update would be possible, but requires special care because execution of the visualization script is asynchronous
+	private void updateDeclMinewWebView() { //Automatic update would be possible, but requires special care because execution of the visualization script is asynchronous
 		List<DiscoveredActivity> filteredActivities = new ArrayList<DiscoveredActivity>();
 		activityListView.getItems().filtered(item -> item.getIsSelected()).forEach(item -> filteredActivities.add(item.getDiscoveredActivity()));
 
@@ -163,7 +174,7 @@ public class MainViewControllerV3 {
 			}
 		}
 
-		WebViewUtilsV3.updateDeclareWebView(filteredActivities, new ArrayList<DiscoveredConstraint>(filteredConstraints), declareWebView, altLayoutCheckbox.isSelected());
+		WebViewUtilsV3.updateWebView(filteredActivities, new ArrayList<DiscoveredConstraint>(filteredConstraints), declMinerWebView, altLayoutCheckbox.isSelected(), automatonCheckbox.isSelected(), activityToEncodingsMap);
 		updateModelButton.setStyle("-fx-font-weight: Normal;");
 	}
 
@@ -196,13 +207,14 @@ public class MainViewControllerV3 {
 		delcareDiscoveryTask.setOnSucceeded(event -> {
 			declareDiscoveryResult = delcareDiscoveryTask.getValue();
 			sortDiscoveredActivities(declareDiscoveryResult.getActivities());
+			createActivityEncodings(declareDiscoveryResult.getActivities());
 
 			//Updating the UI
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
 			populateActivityFilters();
 			populateConstraintLabels();
-			updateDeclareModel();
+			updateDeclMinewWebView();
 
 
 			//Execute Declare post-processing task //TODO
@@ -220,6 +232,7 @@ public class MainViewControllerV3 {
 		});
 	}
 
+	
 	private void populateActivityFilters() {
 		activityListView.getItems().clear();
 		relatedActCheckBox.setSelected(true);
@@ -281,6 +294,13 @@ public class MainViewControllerV3 {
 		if (artificialStart != null) {
 			discoveredActivities.remove(artificialStart);
 			discoveredActivities.add(0, artificialStart);
+		}
+	}
+	
+	private void createActivityEncodings(List<DiscoveredActivity> discoveredActivities) {
+		activityToEncodingsMap = new DualHashBidiMap<DiscoveredActivity, String>();
+		for (DiscoveredActivity discoveredActivity : discoveredActivities) {
+			activityToEncodingsMap.put(discoveredActivity, "ac"+activityToEncodingsMap.size());
 		}
 	}
 

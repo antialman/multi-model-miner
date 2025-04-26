@@ -1,12 +1,11 @@
 package utils;
 
 import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 
+import org.apache.commons.collections15.BidiMap;
+import org.apache.commons.lang3.StringUtils;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
-import data.v3.ActivitySelector;
-import javafx.collections.ObservableList;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
 
@@ -34,19 +33,24 @@ public class WebViewUtilsV3 {
 		});
 
 	}
-	
-public static void updateDeclareWebView(List<DiscoveredActivity> activities, List<DiscoveredConstraint> constraints, WebView webView, boolean alternativeLayout) {
+
+	public static void updateWebView(List<DiscoveredActivity> activities, List<DiscoveredConstraint> constraints, WebView webView, boolean alternativeLayout, boolean automaton, BidiMap<DiscoveredActivity, String> activityToEncodingsMap) {
 		if (constraints != null) {
 			String visualizationString;
 			String script;
 
-			visualizationString = GraphGeneratorV3.createDeclareVisualizationString(activities, constraints, true, alternativeLayout);
+			if (automaton) {
+				visualizationString = GraphGeneratorV3.createAutomatonVisualizationString(activities, constraints, alternativeLayout, activityToEncodingsMap);
+			} else {
+				visualizationString = GraphGeneratorV3.createDeclareVisualizationString(activities, constraints, true, alternativeLayout);
+			}
+			
 			if (visualizationString != null) {
 				script = "setModel('" + visualizationString + "')";
-				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 1000));
+				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 2000));
 				webView.getEngine().executeScript(script);
 			}
 		}
-
 	}
+	
 }
