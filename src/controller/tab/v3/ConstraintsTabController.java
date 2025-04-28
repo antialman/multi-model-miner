@@ -1,5 +1,10 @@
 package controller.tab.v3;
 
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,10 +23,14 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.web.WebView;
+import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import task.DeclareDiscoveryResult;
+import utils.AlertUtils;
 import utils.ConstraintTemplate;
+import utils.FileUtils;
 import utils.LogUtils;
+import utils.ModelExporter;
 import utils.WebViewUtilsV3;
 
 public class ConstraintsTabController {
@@ -49,9 +58,19 @@ public class ConstraintsTabController {
 	@FXML
 	private ListView<String> constraintLabelListView;
 	
+	private Stage stage;
+	
 	private DeclareDiscoveryResult declareDiscoveryResult;
 	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
-
+	
+	private List<DiscoveredActivity> filteredActivities; //Used for updating visualization and also for exporting the model
+	private List<DiscoveredConstraint> filteredConstraints; //Used for updating visualization and also for exporting the model
+	
+	//Setup methods
+	public void setStage(Stage stage) {
+		this.stage = stage;
+	}
+	
 	@FXML
 	private void initialize() {
 		WebViewUtilsV3.setupWebView(declMinerWebView);
@@ -96,10 +115,10 @@ public class ConstraintsTabController {
 
 	@FXML
 	private void updateVisualization() { //Automatic update would be possible, but requires special care because execution of the visualization script is asynchronous
-		List<DiscoveredActivity> filteredActivities = new ArrayList<DiscoveredActivity>();
+		filteredActivities = new ArrayList<DiscoveredActivity>();
 		activityListView.getItems().filtered(item -> item.getIsSelected()).forEach(item -> filteredActivities.add(item.getDiscoveredActivity()));
 
-		List<DiscoveredConstraint> filteredConstraints = new ArrayList<DiscoveredConstraint>();
+		filteredConstraints = new ArrayList<DiscoveredConstraint>();
 		for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
 			if (relatedActCheckBox.isSelected()) {
 				if (!filteredConstraints.contains(discoveredConstraint) && (filteredActivities.contains(discoveredConstraint.getActivationActivity()) || filteredActivities.contains(discoveredConstraint.getTargetActivity()))) {
@@ -128,6 +147,22 @@ public class ConstraintsTabController {
 		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, declMinerWebView, altLayoutCheckBox.isSelected(), automatonCheckBox.isSelected(), activityToEncodingsMap);
 		populateConstraintLabels(filteredConstraints);
 		updateModelButton.setStyle("-fx-font-weight: Normal;");
+	}
+	
+	
+	@FXML
+	public void exportModel() {
+		File chosenFile = FileUtils.showDeclSaveDialog(stage);
+		
+		if (chosenFile != null) {
+			try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(chosenFile.getAbsolutePath()))) {
+				writer.write(ModelExporter.getDeclString(filteredActivities, filteredConstraints));
+				AlertUtils.showSuccess("Model successfully exported");
+			} catch (IOException e) {
+				AlertUtils.showError("Exporting the model failed!");
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	

@@ -64,7 +64,7 @@ public enum ConstraintTemplate {
 			this.displayText = templateName + "[A]";
 		}
 	}
-
+	
 	public String getTemplateName() {
 		return templateName;
 	}
@@ -87,5 +87,10 @@ public enum ConstraintTemplate {
 
 	public static ConstraintTemplate getByTemplateName(String templateName) {
 		return templateNameToTemplate.get(templateName);
+	}
+
+	@Override
+	public String toString() {
+		return templateName;
 	}
 }

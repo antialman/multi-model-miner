@@ -66,7 +66,7 @@ public class MainViewControllerV3 {
 			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("tab/ConstraintsTab.fxml"));
 			Region rootPane = loader.load(); //There seems to be a bug in JavaFX framework that causes IllegalStateException to be thrown instead of IOException
 			constraintsTabController = loader.getController();
-
+			constraintsTabController.setStage(this.stage);
 			constraintsTab.setContent(rootPane);
 		} catch (IOException | IllegalStateException e) {
 			e.printStackTrace();

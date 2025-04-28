@@ -44,6 +44,7 @@
                </VBox.margin>
             </Button>
             <ListView fx:id="activityListView" prefWidth="150.0" VBox.vgrow="ALWAYS" />
+            <Button layoutX="20.0" layoutY="160.0" mnemonicParsing="false" onAction="#exportModel" text="Export Decl Model" />
          </children>
       </VBox>
       <SplitPane fx:id="splitPane2" dividerPositions="0.8" orientation="VERTICAL">

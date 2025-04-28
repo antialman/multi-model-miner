@@ -1,5 +1,6 @@
 package utils;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -14,6 +15,8 @@ import org.deckfour.xes.model.XLog;
 import org.deckfour.xes.model.XTrace;
 
 import data.DiscoveredActivity;
+import data.DiscoveredConstraint;
+
 
 
 public final class ConstraintUtils {
@@ -79,5 +82,42 @@ public final class ConstraintUtils {
 		
 		return allActivities;
 	
+	}
+	
+	
+	public static String getConstraintString(DiscoveredConstraint discoveredConstraint) {
+		StringBuilder constraintStringBuilder = new StringBuilder();
+
+		constraintStringBuilder.append(discoveredConstraint.getTemplate().toString());
+		constraintStringBuilder.append("[");
+		
+		if (discoveredConstraint.getTemplate().getIsBinary()) {
+			if (discoveredConstraint.getTemplate().getReverseActivationTarget()) {
+				constraintStringBuilder.append(discoveredConstraint.getTargetActivity().getActivityFullName());
+				constraintStringBuilder.append(", ");
+				constraintStringBuilder.append(discoveredConstraint.getActivationActivity().getActivityFullName());
+				
+			} else {
+				constraintStringBuilder.append(discoveredConstraint.getActivationActivity().getActivityFullName());
+				constraintStringBuilder.append(", ");
+				constraintStringBuilder.append(discoveredConstraint.getTargetActivity().getActivityFullName());
+			}
+			
+		} else {
+			constraintStringBuilder.append(discoveredConstraint.getActivationActivity().getActivityFullName());
+		}
+		
+		constraintStringBuilder.append("]");
+		
+		
+		constraintStringBuilder.append(" |");
+		
+		if (discoveredConstraint.getTemplate().getIsBinary()) {
+			constraintStringBuilder.append(" |");	
+		}
+		
+		constraintStringBuilder.append(" |");
+		
+		return constraintStringBuilder.toString();
 	}
 }
