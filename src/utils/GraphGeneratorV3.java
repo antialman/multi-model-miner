@@ -21,7 +21,7 @@ public class GraphGeneratorV3 {
 	}
 
 
-	public static String createDeclareVisualizationString(List<DiscoveredActivity> filteredActivities, List<DiscoveredConstraint> filteredConstraints, boolean showConstraints, boolean alternativeLayout) {
+	public static String createDeclareVisualizationString(List<DiscoveredActivity> filteredActivities, List<DiscoveredConstraint> filteredConstraints, boolean alternativeLayout) {
 		StringBuilder sb = new StringBuilder("digraph \"\" {");
 
 		if (alternativeLayout)
@@ -45,20 +45,21 @@ public class GraphGeneratorV3 {
 			String label = "";
 
 			if (c.getTemplate().getIsBinary()) {
-				if (showConstraints)
-					label += c.getTemplate().toString();
+				
+				label += c.getTemplate().toString();
+				label = label.replace(" ", "\\\\n"); //Makes the visualization a bit more compact
 
-
-				label += "\\\\n";
-				float support = c.getConstraintSupport();
-				label += String.format("%.1f%%", support*100);
+				//Showing support is redundant as the approach uses 100% support threshold
+				//label += "\\\\n";
+				//float support = c.getConstraintSupport();
+				//label += String.format("%.1f%%", support*100);
 
 				edges.add(buildEdgeString(nodeNames.get(c.getActivationActivity()), nodeNames.get(c.getTargetActivity()), c.getTemplate(), label, null));
 
 			} else {
 				label = c.getTemplate().toString();
 				int index = activityToUnaryConstraints.get(c.getActivationActivity().getActivityFullName()).size();
-				label += " - " + String.format("%.1f%%", c.getConstraintSupport()*100);
+				//label += " - " + String.format("%.1f%%", c.getConstraintSupport()*100); //Showing support is redundant as the approach uses 100% support threshold
 
 				activityToUnaryConstraints.get(c.getActivationActivity().getActivityFullName()).put(index, label);
 			}

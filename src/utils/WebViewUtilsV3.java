@@ -42,7 +42,7 @@ public class WebViewUtilsV3 {
 			if (automaton) {
 				visualizationString = GraphGeneratorV3.createAutomatonVisualizationString(activities, constraints, alternativeLayout, activityToEncodingsMap);
 			} else {
-				visualizationString = GraphGeneratorV3.createDeclareVisualizationString(activities, constraints, true, alternativeLayout);
+				visualizationString = GraphGeneratorV3.createDeclareVisualizationString(activities, constraints, alternativeLayout);
 			}
 			
 			if (visualizationString != null) {
