@@ -30,7 +30,7 @@ public class MainGuiV3 extends Application {
 		scene = new Scene(parent);
 		//scene.getStylesheets().add("css/main.css");
 		
-		primaryStage.setTitle("multi-model-miner-v2");
+		primaryStage.setTitle("multi-model-miner-v3");
 		primaryStage.setScene(scene);
 		//Setting minimum and default window size
 		primaryStage.setMinWidth(1280);
