@@ -68,16 +68,16 @@ public class ConstraintsTabController {
 		splitPane2.heightProperty().addListener(changeListener);
 
 		altLayoutCheckBox.selectedProperty().addListener((ev) -> {
-			updateDeclMinewWebView();
+			updateVisualization();
 		});
 		automatonCheckBox.selectedProperty().addListener((ev) -> {
-			updateDeclMinewWebView();
+			updateVisualization();
 		});
 		cardinalityCheckBox.selectedProperty().addListener((ev) -> {
-			updateDeclMinewWebView();
+			updateVisualization();
 		});
 		relatedActCheckBox.selectedProperty().addListener((ev) -> {
-			updateDeclMinewWebView();
+			updateVisualization();
 		});
 
 		//Setup for activity filtering list
@@ -95,7 +95,7 @@ public class ConstraintsTabController {
 	}
 
 	@FXML
-	private void updateDeclMinewWebView() { //Automatic update would be possible, but requires special care because execution of the visualization script is asynchronous
+	private void updateVisualization() { //Automatic update would be possible, but requires special care because execution of the visualization script is asynchronous
 		List<DiscoveredActivity> filteredActivities = new ArrayList<DiscoveredActivity>();
 		activityListView.getItems().filtered(item -> item.getIsSelected()).forEach(item -> filteredActivities.add(item.getDiscoveredActivity()));
 
@@ -125,7 +125,8 @@ public class ConstraintsTabController {
 			}
 		}
 
-		WebViewUtilsV3.updateWebView(filteredActivities, new ArrayList<DiscoveredConstraint>(filteredConstraints), declMinerWebView, altLayoutCheckBox.isSelected(), automatonCheckBox.isSelected(), activityToEncodingsMap);
+		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, declMinerWebView, altLayoutCheckBox.isSelected(), automatonCheckBox.isSelected(), activityToEncodingsMap);
+		populateConstraintLabels(filteredConstraints);
 		updateModelButton.setStyle("-fx-font-weight: Normal;");
 	}
 	
@@ -134,8 +135,7 @@ public class ConstraintsTabController {
 		this.declareDiscoveryResult = declareDiscoveryResult;
 		createActivityEncodings(declareDiscoveryResult.getActivities());
 		populateActivityFilters();
-		populateConstraintLabels();
-		updateDeclMinewWebView();
+		updateVisualization();
 	}
 	
 	private void createActivityEncodings(List<DiscoveredActivity> discoveredActivities) {
@@ -179,9 +179,9 @@ public class ConstraintsTabController {
 
 	}
 
-	private void populateConstraintLabels() {
+	private void populateConstraintLabels(List<DiscoveredConstraint> filteredConstraints) {
 		constraintLabelListView.getItems().clear();
-		for (DiscoveredConstraint constraint : declareDiscoveryResult.getConstraints()) {
+		for (DiscoveredConstraint constraint : filteredConstraints) {
 			constraintLabelListView.getItems().add(constraint.toString());
 		}
 	}

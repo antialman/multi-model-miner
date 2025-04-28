@@ -38,7 +38,7 @@
                   <Insets left="10.0" />
                </VBox.margin>
             </CheckBox>
-            <Button fx:id="updateModelButton" mnemonicParsing="false" onAction="#updateDeclMinewWebView" text="Update">
+            <Button fx:id="updateModelButton" mnemonicParsing="false" onAction="#updateVisualization" text="Update">
                <VBox.margin>
                   <Insets left="10.0" />
                </VBox.margin>
