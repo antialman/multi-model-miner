@@ -9,14 +9,15 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
-<SplitPane fx:id="splitPane1" dividerPositions="0.2" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.tab.v3.ConstraintsTabController">
+<SplitPane fx:id="splitPane1" dividerPositions="0.2" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.tab.v3.ConstraintsTabController">
    <items>
       <VBox spacing="3.0">
          <children>
             <VBox spacing="3.0">
                <children>
-                  <CheckBox fx:id="altLayoutCheckbox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout" />
-                  <CheckBox fx:id="automatonCheckbox" contentDisplay="RIGHT" mnemonicParsing="false" text="Automaton" />
+                  <CheckBox fx:id="altLayoutCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout" />
+                  <CheckBox fx:id="automatonCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Automaton" />
+                  <CheckBox fx:id="cardinalityCheckBox" contentDisplay="RIGHT" layoutX="10.0" layoutY="30.0" mnemonicParsing="false" text="Start/End cardinality" />
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

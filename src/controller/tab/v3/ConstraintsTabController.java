@@ -20,6 +20,8 @@ import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.web.WebView;
 import javafx.util.StringConverter;
 import task.DeclareDiscoveryResult;
+import utils.ConstraintTemplate;
+import utils.LogUtils;
 import utils.WebViewUtilsV3;
 
 public class ConstraintsTabController {
@@ -27,9 +29,11 @@ public class ConstraintsTabController {
 	@FXML
 	private SplitPane splitPane1;
 	@FXML
-	private CheckBox altLayoutCheckbox;
+	private CheckBox altLayoutCheckBox;
 	@FXML
-	private CheckBox automatonCheckbox;
+	private CheckBox automatonCheckBox;
+	@FXML
+	private CheckBox cardinalityCheckBox;
 	@FXML
 	private CheckBox relatedActCheckBox;
 	@FXML
@@ -63,10 +67,13 @@ public class ConstraintsTabController {
 		splitPane1.widthProperty().addListener(changeListener);
 		splitPane2.heightProperty().addListener(changeListener);
 
-		altLayoutCheckbox.selectedProperty().addListener((ev) -> {
+		altLayoutCheckBox.selectedProperty().addListener((ev) -> {
 			updateDeclMinewWebView();
 		});
-		automatonCheckbox.selectedProperty().addListener((ev) -> {
+		automatonCheckBox.selectedProperty().addListener((ev) -> {
+			updateDeclMinewWebView();
+		});
+		cardinalityCheckBox.selectedProperty().addListener((ev) -> {
 			updateDeclMinewWebView();
 		});
 		relatedActCheckBox.selectedProperty().addListener((ev) -> {
@@ -104,14 +111,21 @@ public class ConstraintsTabController {
 				}
 			}
 		}
-		if (relatedActCheckBox.isSelected()) {
+		if (relatedActCheckBox.isSelected()) { //Adding the related (but unselected) activities if necessary
 			for (DiscoveredConstraint discoveredConstraint : filteredConstraints) {
 				if(!filteredActivities.contains(discoveredConstraint.getActivationActivity())) filteredActivities.add(discoveredConstraint.getActivationActivity());
 				if(!filteredActivities.contains(discoveredConstraint.getTargetActivity())) filteredActivities.add(discoveredConstraint.getTargetActivity());
 			}
 		}
+		if (cardinalityCheckBox.isSelected()) {
+			for (DiscoveredActivity filteredActivity : filteredActivities) {
+				if (filteredActivity.getActivityName().equals(LogUtils.ARTIF_START) || filteredActivity.getActivityName().equals(LogUtils.ARTIF_END)) {
+					filteredConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Exactly1, filteredActivity, null, 1));
+				}
+			}
+		}
 
-		WebViewUtilsV3.updateWebView(filteredActivities, new ArrayList<DiscoveredConstraint>(filteredConstraints), declMinerWebView, altLayoutCheckbox.isSelected(), automatonCheckbox.isSelected(), activityToEncodingsMap);
+		WebViewUtilsV3.updateWebView(filteredActivities, new ArrayList<DiscoveredConstraint>(filteredConstraints), declMinerWebView, altLayoutCheckBox.isSelected(), automatonCheckBox.isSelected(), activityToEncodingsMap);
 		updateModelButton.setStyle("-fx-font-weight: Normal;");
 	}
 	
