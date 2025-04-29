@@ -7,6 +7,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 import controller.tab.v3.ConstraintsTabController;
+import controller.tab.v3.TemporalTabController;
 import data.DiscoveredActivity;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -42,9 +43,12 @@ public class MainViewControllerV3 {
 	private TabPane resultTabPane;
 	@FXML
 	private Tab constraintsTab;
+	@FXML
+	private Tab temporalTab;
 
 	private Stage stage;
 	private ConstraintsTabController constraintsTabController;
+	private TemporalTabController temporalTabController;
 
 	private File logFile;
 	
@@ -68,6 +72,17 @@ public class MainViewControllerV3 {
 			constraintsTabController = loader.getController();
 			constraintsTabController.setStage(this.stage);
 			constraintsTab.setContent(rootPane);
+		} catch (IOException | IllegalStateException e) {
+			e.printStackTrace();
+			AlertUtils.showError("Error loading FXML for Declare Miner Output tab!");
+		}
+		
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("tab/TemporalTab.fxml"));
+			Region rootPane = loader.load(); //There seems to be a bug in JavaFX framework that causes IllegalStateException to be thrown instead of IOException
+			temporalTabController = loader.getController();
+			temporalTabController.setStage(this.stage);
+			temporalTab.setContent(rootPane);
 		} catch (IOException | IllegalStateException e) {
 			e.printStackTrace();
 			AlertUtils.showError("Error loading FXML for Declare Miner Output tab!");
@@ -126,6 +141,7 @@ public class MainViewControllerV3 {
 			declareDiscoveryResult = delcareDiscoveryTask.getValue();
 			sortDiscoveredActivities(declareDiscoveryResult.getActivities());
 			constraintsTabController.updateTabContents(declareDiscoveryResult);
+			temporalTabController.updateTabContents(declareDiscoveryResult);
 			
 			//Updating the UI
 			mainHeader.setDisable(false);

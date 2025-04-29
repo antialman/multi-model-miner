@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.RadioButton?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import javafx.scene.web.WebView?>
+
+
+<SplitPane dividerPositions="0.2" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.tab.v3.TemporalTabController">
+   <items>
+      <VBox spacing="3.0">
+         <children>
+            <Label text="Activity selector:">
+               <VBox.margin>
+                  <Insets left="5.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </Label>
+            <ListView fx:id="activityListView" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+      <VBox>
+         <children>
+            <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
+               <items>
+                  <VBox spacing="3.0">
+                     <children>
+                        <Label text="Directly related constraints">
+                           <VBox.margin>
+                              <Insets left="5.0" right="10.0" top="10.0" />
+                           </VBox.margin>
+                        </Label>
+                        <CheckBox fx:id="altLayoutCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
+                           <VBox.margin>
+                              <Insets left="10.0" />
+                           </VBox.margin>
+                        </CheckBox>
+                        <CheckBox fx:id="altLayoutCheckBox2" contentDisplay="RIGHT" layoutX="20.0" layoutY="40.0" mnemonicParsing="false" text="Automaton">
+                           <VBox.margin>
+                              <Insets left="10.0" />
+                           </VBox.margin>
+                        </CheckBox>
+                        <WebView minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+                  <VBox spacing="3.0">
+                     <children>
+                        <HBox spacing="10.0">
+                           <VBox.margin>
+                              <Insets left="5.0" right="10.0" top="10.0" />
+                           </VBox.margin>
+                           <children>
+                              <Label text="Constraints among:" />
+                              <RadioButton mnemonicParsing="false" selected="true" text="Followers" />
+                              <RadioButton layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceeders" />
+                           </children>
+                        </HBox>
+                        <CheckBox fx:id="altLayoutCheckBox1" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
+                           <VBox.margin>
+                              <Insets left="10.0" />
+                           </VBox.margin>
+                        </CheckBox>
+                        <CheckBox fx:id="altLayoutCheckBox11" contentDisplay="RIGHT" layoutX="20.0" layoutY="40.0" mnemonicParsing="false" text="Automaton">
+                           <VBox.margin>
+                              <Insets left="10.0" />
+                           </VBox.margin>
+                        </CheckBox>
+                        <WebView minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+                     </children>
+                  </VBox>
+               </items>
+            </SplitPane>
+            <VBox spacing="1.0">
+               <children>
+                  <Label text="Based on Constraints...">
+                     <font>
+                        <Font name="System Bold" size="12.0" />
+                     </font>
+                  </Label>
+                  <HBox>
+                     <children>
+                        <Label text="temporally closest preceeders: ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Label text="&lt;activity names&gt;" />
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <Label text="temporally closest followers: ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <Label text="&lt;activity names&gt;" />
+                     </children>
+                  </HBox>
+               </children>
+               <VBox.margin>
+                  <Insets left="5.0" />
+               </VBox.margin>
+            </VBox>
+         </children>
+      </VBox>
+   </items>
+</SplitPane>
