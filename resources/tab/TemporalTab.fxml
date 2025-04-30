@@ -6,6 +6,7 @@
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.RadioButton?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.ToggleGroup?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
@@ -35,17 +36,17 @@
                               <Insets left="5.0" right="10.0" top="10.0" />
                            </VBox.margin>
                         </Label>
-                        <CheckBox fx:id="altLayoutCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
+                        <CheckBox fx:id="altLayoutDirectCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
                            <VBox.margin>
                               <Insets left="10.0" />
                            </VBox.margin>
                         </CheckBox>
-                        <CheckBox fx:id="altLayoutCheckBox2" contentDisplay="RIGHT" layoutX="20.0" layoutY="40.0" mnemonicParsing="false" text="Automaton">
+                        <CheckBox fx:id="automatonDirectCheckBox" contentDisplay="RIGHT" layoutX="20.0" layoutY="40.0" mnemonicParsing="false" text="Automaton">
                            <VBox.margin>
                               <Insets left="10.0" />
                            </VBox.margin>
                         </CheckBox>
-                        <WebView minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+                        <WebView fx:id="directRelationsWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                      </children>
                   </VBox>
                   <VBox spacing="3.0">
@@ -56,21 +57,25 @@
                            </VBox.margin>
                            <children>
                               <Label text="Constraints among:" />
-                              <RadioButton mnemonicParsing="false" selected="true" text="Followers" />
-                              <RadioButton layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceeders" />
+                              <RadioButton fx:id="followersRadioButton" mnemonicParsing="false" selected="true" text="Followers">
+                                 <toggleGroup>
+                                    <ToggleGroup fx:id="amongToggleGroup" />
+                                 </toggleGroup>
+                              </RadioButton>
+                              <RadioButton fx:id="preceedersRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceeders" toggleGroup="$amongToggleGroup" />
                            </children>
                         </HBox>
-                        <CheckBox fx:id="altLayoutCheckBox1" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
+                        <CheckBox fx:id="altLayoutAmongCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
                            <VBox.margin>
                               <Insets left="10.0" />
                            </VBox.margin>
                         </CheckBox>
-                        <CheckBox fx:id="altLayoutCheckBox11" contentDisplay="RIGHT" layoutX="20.0" layoutY="40.0" mnemonicParsing="false" text="Automaton">
+                        <CheckBox fx:id="automatonAmongCheckBox" contentDisplay="RIGHT" layoutX="20.0" layoutY="40.0" mnemonicParsing="false" text="Automaton">
                            <VBox.margin>
                               <Insets left="10.0" />
                            </VBox.margin>
                         </CheckBox>
-                        <WebView minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+                        <WebView fx:id="amongRelationsWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                      </children>
                   </VBox>
                </items>
@@ -89,7 +94,7 @@
                               <Insets left="10.0" />
                            </HBox.margin>
                         </Label>
-                        <Label text="&lt;activity names&gt;" />
+                        <Label fx:id="closestPreceedersLabel" text="&lt;activity names&gt;" />
                      </children>
                   </HBox>
                   <HBox>
@@ -99,7 +104,7 @@
                               <Insets left="10.0" />
                            </HBox.margin>
                         </Label>
-                        <Label text="&lt;activity names&gt;" />
+                        <Label fx:id="closestFollowersLabel" text="&lt;activity names&gt;" />
                      </children>
                   </HBox>
                </children>
