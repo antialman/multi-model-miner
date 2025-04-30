@@ -6,6 +6,8 @@ import java.util.List;
 import org.apache.commons.collections15.BidiMap;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -93,32 +95,21 @@ public class TemporalTabController {
 				updateVisualization(selectedActivity);
 			}
 		});
-
-		altLayoutDirectCheckBox.selectedProperty().addListener((ev) -> {
-			if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
-				updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
+		
+		InvalidationListener visSettingsListener = new InvalidationListener() {
+			@Override
+			public void invalidated(Observable observable) {
+				if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
+					updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
+				}
 			}
-		});
-		automatonDirectCheckBox.selectedProperty().addListener((ev) -> {
-			if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
-				updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
-			}
-		});
-		altLayoutAmongCheckBox.selectedProperty().addListener((ev) -> {
-			if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
-				updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
-			}
-		});
-		automatonAmongCheckBox.selectedProperty().addListener((ev) -> {
-			if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
-				updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
-			}
-		});
-		amongToggleGroup.selectedToggleProperty().addListener(ev -> {
-			if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
-				updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
-			}
-		});
+		};
+		
+		altLayoutDirectCheckBox.selectedProperty().addListener(visSettingsListener);
+		automatonDirectCheckBox.selectedProperty().addListener(visSettingsListener);
+		altLayoutAmongCheckBox.selectedProperty().addListener(visSettingsListener);
+		automatonAmongCheckBox.selectedProperty().addListener(visSettingsListener);
+		amongToggleGroup.selectedToggleProperty().addListener(visSettingsListener);
 	}
 
 	public void updateTabContents(DeclareDiscoveryResult declareDiscoveryResult) {
@@ -130,7 +121,7 @@ public class TemporalTabController {
 	}
 
 
-	private void updateVisualization(DiscoveredActivity selectedActivity) { //TODO: Need refactoring
+	private void updateVisualization(DiscoveredActivity selectedActivity) { //TODO: Needs refactoring
 
 		//Directly related constraints WebView
 		List<DiscoveredActivity> filteredActivities = new ArrayList<DiscoveredActivity>();

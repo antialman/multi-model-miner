@@ -12,6 +12,8 @@ import org.apache.commons.collections15.BidiMap;
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import data.v3.ActivitySelector;
+import javafx.beans.InvalidationListener;
+import javafx.beans.Observable;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
@@ -83,19 +85,18 @@ public class ConstraintsTabController {
 		};
 		splitPane1.widthProperty().addListener(changeListener);
 		splitPane2.heightProperty().addListener(changeListener);
+		
+		InvalidationListener visSettingsListener = new InvalidationListener() {
+			@Override
+			public void invalidated(Observable observable) {
+				updateVisualization();
+			}
+		};
 
-		altLayoutCheckBox.selectedProperty().addListener((ev) -> {
-			updateVisualization();
-		});
-		automatonCheckBox.selectedProperty().addListener((ev) -> {
-			updateVisualization();
-		});
-		cardinalityCheckBox.selectedProperty().addListener((ev) -> {
-			updateVisualization();
-		});
-		relatedActCheckBox.selectedProperty().addListener((ev) -> {
-			updateVisualization();
-		});
+		altLayoutCheckBox.selectedProperty().addListener(visSettingsListener);
+		automatonCheckBox.selectedProperty().addListener(visSettingsListener);
+		cardinalityCheckBox.selectedProperty().addListener(visSettingsListener);
+		relatedActCheckBox.selectedProperty().addListener(visSettingsListener);
 
 		//Setup for activity filtering list
 		StringConverter<ActivitySelector> activityConverter = new StringConverter<ActivitySelector>() {
