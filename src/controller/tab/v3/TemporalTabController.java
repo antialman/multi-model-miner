@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections15.BidiMap;
-import org.apache.commons.collections15.bidimap.DualHashBidiMap;
-
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.beans.value.ChangeListener;
@@ -134,6 +132,9 @@ public class TemporalTabController {
 	public void updateTabContents(DeclareDiscoveryResult declareDiscoveryResult) {
 		this.declareDiscoveryResult = declareDiscoveryResult;
 		activityListView.getItems().setAll(declareDiscoveryResult.getActivities());
+		if (!activityListView.getItems().isEmpty()) {
+			activityListView.getSelectionModel().select(0);
+		}
 	}
 
 

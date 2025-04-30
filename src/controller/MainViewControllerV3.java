@@ -201,9 +201,4 @@ public class MainViewControllerV3 {
 		return activityToEncodingsMap;
 	}
 	
-	public DeclareDiscoveryResult getDeclareDiscoveryResult() {
-		return declareDiscoveryResult;
-	}
-	
-
 }

@@ -9,8 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.commons.collections15.BidiMap;
-import org.apache.commons.collections15.bidimap.DualHashBidiMap;
-
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import data.v3.ActivitySelector;
