@@ -29,55 +29,65 @@
          <children>
             <SplitPane fx:id="splitPane2" dividerPositions="0.5" VBox.vgrow="ALWAYS">
                <items>
-                  <VBox spacing="3.0">
-                     <children>
-                        <Label text="Directly related constraints">
-                           <VBox.margin>
-                              <Insets left="5.0" right="10.0" top="10.0" />
-                           </VBox.margin>
-                        </Label>
-                        <CheckBox fx:id="altLayoutDirectCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
-                           <VBox.margin>
-                              <Insets left="10.0" />
-                           </VBox.margin>
-                        </CheckBox>
-                        <CheckBox fx:id="automatonDirectCheckBox" contentDisplay="RIGHT" layoutX="20.0" layoutY="40.0" mnemonicParsing="false" text="Automaton">
-                           <VBox.margin>
-                              <Insets left="10.0" />
-                           </VBox.margin>
-                        </CheckBox>
-                        <WebView fx:id="directRelationsWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
-                     </children>
-                  </VBox>
-                  <VBox spacing="3.0">
-                     <children>
-                        <HBox spacing="10.0">
-                           <VBox.margin>
-                              <Insets left="5.0" right="10.0" top="10.0" />
-                           </VBox.margin>
+                  <SplitPane fx:id="splitPane3" dividerPositions="0.8" orientation="VERTICAL">
+                     <items>
+                        <VBox spacing="3.0">
                            <children>
-                              <Label text="Constraints among:" />
-                              <RadioButton fx:id="followersRadioButton" mnemonicParsing="false" selected="true" text="Followers">
-                                 <toggleGroup>
-                                    <ToggleGroup fx:id="amongToggleGroup" />
-                                 </toggleGroup>
-                              </RadioButton>
-                              <RadioButton fx:id="preceedersRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceeders" toggleGroup="$amongToggleGroup" />
+                              <Label text="Directly related constraints">
+                                 <VBox.margin>
+                                    <Insets left="5.0" right="10.0" top="10.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <CheckBox fx:id="altLayoutDirectCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
+                                 <VBox.margin>
+                                    <Insets left="10.0" />
+                                 </VBox.margin>
+                              </CheckBox>
+                              <CheckBox fx:id="automatonDirectCheckBox" contentDisplay="RIGHT" layoutX="20.0" layoutY="40.0" mnemonicParsing="false" text="Automaton">
+                                 <VBox.margin>
+                                    <Insets left="10.0" />
+                                 </VBox.margin>
+                              </CheckBox>
+                              <WebView fx:id="directRelationsWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
                            </children>
-                        </HBox>
-                        <CheckBox fx:id="altLayoutAmongCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
-                           <VBox.margin>
-                              <Insets left="10.0" />
-                           </VBox.margin>
-                        </CheckBox>
-                        <CheckBox fx:id="automatonAmongCheckBox" contentDisplay="RIGHT" layoutX="20.0" layoutY="40.0" mnemonicParsing="false" text="Automaton">
-                           <VBox.margin>
-                              <Insets left="10.0" />
-                           </VBox.margin>
-                        </CheckBox>
-                        <WebView fx:id="amongRelationsWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
-                     </children>
-                  </VBox>
+                        </VBox>
+                        <ListView fx:id="directConstraintsListView" />
+                     </items>
+                  </SplitPane>
+                  <SplitPane fx:id="splitPane4" dividerPositions="0.8" orientation="VERTICAL">
+                     <items>
+                        <VBox spacing="3.0">
+                           <children>
+                              <HBox spacing="10.0">
+                                 <VBox.margin>
+                                    <Insets left="5.0" right="10.0" top="10.0" />
+                                 </VBox.margin>
+                                 <children>
+                                    <Label text="Constraints among:" />
+                                    <RadioButton fx:id="followersRadioButton" mnemonicParsing="false" selected="true" text="Followers">
+                                       <toggleGroup>
+                                          <ToggleGroup fx:id="amongToggleGroup" />
+                                       </toggleGroup>
+                                    </RadioButton>
+                                    <RadioButton fx:id="preceedersRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceeders" toggleGroup="$amongToggleGroup" />
+                                 </children>
+                              </HBox>
+                              <CheckBox fx:id="altLayoutAmongCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
+                                 <VBox.margin>
+                                    <Insets left="10.0" />
+                                 </VBox.margin>
+                              </CheckBox>
+                              <CheckBox fx:id="automatonAmongCheckBox" contentDisplay="RIGHT" layoutX="20.0" layoutY="40.0" mnemonicParsing="false" text="Automaton">
+                                 <VBox.margin>
+                                    <Insets left="10.0" />
+                                 </VBox.margin>
+                              </CheckBox>
+                              <WebView fx:id="amongRelationsWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" VBox.vgrow="ALWAYS" />
+                           </children>
+                        </VBox>
+                        <ListView fx:id="amongConstraintsListView" />
+                     </items>
+                  </SplitPane>
                </items>
             </SplitPane>
             <VBox spacing="1.0">

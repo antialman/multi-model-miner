@@ -34,11 +34,17 @@ public class TemporalTabController {
 	@FXML
 	private SplitPane splitPane2;
 	@FXML
+	private SplitPane splitPane3;
+	@FXML
 	private CheckBox altLayoutDirectCheckBox;
 	@FXML
 	private CheckBox automatonDirectCheckBox;
 	@FXML
 	private WebView directRelationsWebView;
+	@FXML
+	private ListView<String> directConstraintsListView;
+	@FXML
+	private SplitPane splitPane4;
 	@FXML
 	private RadioButton followersRadioButton;
 	@FXML
@@ -51,6 +57,8 @@ public class TemporalTabController {
 	private CheckBox automatonAmongCheckBox;
 	@FXML
 	private WebView amongRelationsWebView;
+	@FXML
+	private ListView<String> amongConstraintsListView;
 	@FXML
 	private Label closestPreceedersLabel;
 	@FXML
@@ -71,6 +79,8 @@ public class TemporalTabController {
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				splitPane1.setDividerPositions(0.1);
 				splitPane2.setDividerPositions(0.5);
+				splitPane3.setDividerPositions(0.85);
+				splitPane4.setDividerPositions(0.85);
 			}
 		};
 		splitPane1.widthProperty().addListener(changeListener);
@@ -145,7 +155,7 @@ public class TemporalTabController {
 		}
 
 		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, directRelationsWebView, altLayoutDirectCheckBox.isSelected(), automatonDirectCheckBox.isSelected(), activityToEncodingsMap);
-		//		populateConstraintLabels(filteredConstraints);
+		populateConstraintLabels(filteredConstraints, directConstraintsListView);
 
 
 		//Constraints among WebView
@@ -180,8 +190,15 @@ public class TemporalTabController {
 		}
 
 		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, amongRelationsWebView, altLayoutAmongCheckBox.isSelected(), automatonAmongCheckBox.isSelected(), activityToEncodingsMap);
-		//		populateConstraintLabels(filteredConstraints);
+		populateConstraintLabels(filteredConstraints, amongConstraintsListView);
 
+	}
+	
+	private void populateConstraintLabels(List<DiscoveredConstraint> filteredConstraints, ListView<String> listView) {
+		listView.getItems().clear();
+		for (DiscoveredConstraint constraint : filteredConstraints) {
+			listView.getItems().add(constraint.toString());
+		}
 	}
 
 	public void setActivityEncodings(BidiMap<DiscoveredActivity, String> activityToEncodingsMap) {
