@@ -34,11 +34,15 @@ public class AutomatonUtils {
 			formulas.add(getConstraintLtlFormula(discoveredConstraint, activityToEncodingsMap));
 		}
 		
-		String automatonFormula = "((" + String.join(") /\\ (", formulas) + "))";
-		try {
-			return createAutomatonForLtlFormula(automatonFormula);
-		} catch (SyntaxParserException e) {
-			System.err.println("Malformed LTL: " + e.getMessage());
+		if (!formulas.isEmpty()) {
+			String automatonFormula = "((" + String.join(") /\\ (", formulas) + "))";
+			try {
+				return createAutomatonForLtlFormula(automatonFormula);
+			} catch (SyntaxParserException e) {
+				System.err.println("Malformed LTL: " + e.getMessage());
+				return null;
+			}	
+		} else {
 			return null;
 		}
 	}
