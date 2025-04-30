@@ -13,7 +13,7 @@
 <?import javafx.scene.web.WebView?>
 
 
-<SplitPane dividerPositions="0.2" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.tab.v3.TemporalTabController">
+<SplitPane fx:id="splitPane1" dividerPositions="0.2" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.tab.v3.TemporalTabController">
    <items>
       <VBox spacing="3.0">
          <children>
@@ -27,7 +27,7 @@
       </VBox>
       <VBox>
          <children>
-            <SplitPane dividerPositions="0.5" VBox.vgrow="ALWAYS">
+            <SplitPane fx:id="splitPane2" dividerPositions="0.5" VBox.vgrow="ALWAYS">
                <items>
                   <VBox spacing="3.0">
                      <children>

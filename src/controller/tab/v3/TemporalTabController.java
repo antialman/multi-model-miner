@@ -8,11 +8,14 @@ import org.apache.commons.collections15.bidimap.DualHashBidiMap;
 
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.RadioButton;
+import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.web.WebView;
@@ -26,7 +29,11 @@ import utils.WebViewUtilsV3;
 public class TemporalTabController {
 
 	@FXML
+	private SplitPane splitPane1;
+	@FXML
 	private ListView<DiscoveredActivity> activityListView;
+	@FXML
+	private SplitPane splitPane2;
 	@FXML
 	private CheckBox altLayoutDirectCheckBox;
 	@FXML
@@ -51,7 +58,7 @@ public class TemporalTabController {
 	private Label closestFollowersLabel;
 
 	private Stage stage;
-	
+
 	private DeclareDiscoveryResult declareDiscoveryResult;
 	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
 
@@ -63,10 +70,20 @@ public class TemporalTabController {
 
 	@FXML
 	private void initialize() {
-
 		WebViewUtilsV3.setupWebView(directRelationsWebView);
 		WebViewUtilsV3.setupWebView(amongRelationsWebView);
-		
+
+		//Setup for getting the SplitPane dividers working correctly at startup
+		ChangeListener<Number> changeListener = new ChangeListener<Number>() {
+			@Override
+			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
+				splitPane1.setDividerPositions(0.1);
+				splitPane2.setDividerPositions(0.5);
+			}
+		};
+		splitPane1.widthProperty().addListener(changeListener);
+		splitPane2.widthProperty().addListener(changeListener);
+
 		//Setup for activity selection list
 		StringConverter<DiscoveredActivity> activityConverter = new StringConverter<DiscoveredActivity>() {
 			@Override
@@ -86,7 +103,7 @@ public class TemporalTabController {
 				updateVisualization(selectedActivity);
 			}
 		});
-		
+
 		altLayoutDirectCheckBox.selectedProperty().addListener((ev) -> {
 			if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
 				updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
@@ -118,21 +135,21 @@ public class TemporalTabController {
 		this.declareDiscoveryResult = declareDiscoveryResult;
 		activityListView.getItems().setAll(declareDiscoveryResult.getActivities());
 	}
-	
-	
+
+
 	private void updateVisualization(DiscoveredActivity selectedActivity) { //TODO: Need refactoring
-		
+
 		//Directly related constraints WebView
 		List<DiscoveredActivity> filteredActivities = new ArrayList<DiscoveredActivity>();
 		filteredActivities.add(selectedActivity);
 		List<DiscoveredConstraint> filteredConstraints = new ArrayList<DiscoveredConstraint>();
-		
+
 		for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
 			if (!filteredConstraints.contains(discoveredConstraint) && (discoveredConstraint.getActivationActivity() == selectedActivity || discoveredConstraint.getTargetActivity() == selectedActivity)) {
 				filteredConstraints.add(discoveredConstraint);
 			}
 		}
-		
+
 		for (DiscoveredConstraint discoveredConstraint : filteredConstraints) {
 			if(!filteredActivities.contains(discoveredConstraint.getActivationActivity())) filteredActivities.add(discoveredConstraint.getActivationActivity());
 			if(!filteredActivities.contains(discoveredConstraint.getTargetActivity())) filteredActivities.add(discoveredConstraint.getTargetActivity());
@@ -142,12 +159,12 @@ public class TemporalTabController {
 				filteredConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Exactly1, filteredActivity, null, 1));
 			}
 		}
-		
+
 		createActivityEncodings(filteredActivities);
 		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, directRelationsWebView, altLayoutDirectCheckBox.isSelected(), automatonDirectCheckBox.isSelected(), activityToEncodingsMap);
-//		populateConstraintLabels(filteredConstraints);
-		
-		
+		//		populateConstraintLabels(filteredConstraints);
+
+
 		//Constraints among WebView
 		filteredActivities = new ArrayList<DiscoveredActivity>();
 		filteredConstraints = new ArrayList<DiscoveredConstraint>();
@@ -178,13 +195,13 @@ public class TemporalTabController {
 				filteredConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Exactly1, filteredActivity, null, 1));
 			}
 		}
-		
+
 		createActivityEncodings(filteredActivities);
 		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, amongRelationsWebView, altLayoutAmongCheckBox.isSelected(), automatonAmongCheckBox.isSelected(), activityToEncodingsMap);
-//		populateConstraintLabels(filteredConstraints);
-		
+		//		populateConstraintLabels(filteredConstraints);
+
 	}
-	
+
 	//Should move to MainViewController
 	private void createActivityEncodings(List<DiscoveredActivity> discoveredActivities) {
 		activityToEncodingsMap = new DualHashBidiMap<DiscoveredActivity, String>();
