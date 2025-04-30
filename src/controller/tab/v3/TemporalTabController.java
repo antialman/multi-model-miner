@@ -1,6 +1,13 @@
 package controller.tab.v3;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.apache.commons.collections15.BidiMap;
+import org.apache.commons.collections15.bidimap.DualHashBidiMap;
+
 import data.DiscoveredActivity;
+import data.DiscoveredConstraint;
 import javafx.fxml.FXML;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -12,6 +19,9 @@ import javafx.scene.web.WebView;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import task.DeclareDiscoveryResult;
+import utils.ConstraintTemplate;
+import utils.LogUtils;
+import utils.WebViewUtilsV3;
 
 public class TemporalTabController {
 
@@ -41,6 +51,9 @@ public class TemporalTabController {
 	private Label closestFollowersLabel;
 
 	private Stage stage;
+	
+	private DeclareDiscoveryResult declareDiscoveryResult;
+	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
 
 	//Setup methods
 	public void setStage(Stage stage) {
@@ -50,6 +63,10 @@ public class TemporalTabController {
 
 	@FXML
 	private void initialize() {
+
+		WebViewUtilsV3.setupWebView(directRelationsWebView);
+		WebViewUtilsV3.setupWebView(amongRelationsWebView);
+		
 		//Setup for activity selection list
 		StringConverter<DiscoveredActivity> activityConverter = new StringConverter<DiscoveredActivity>() {
 			@Override
@@ -64,16 +81,116 @@ public class TemporalTabController {
 		};
 		activityListView.setCellFactory(cf -> new TextFieldListCell<DiscoveredActivity>(activityConverter));
 		activityListView.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
-			
+			if (newIndex.intValue() != -1) {
+				DiscoveredActivity selectedActivity = declareDiscoveryResult.getActivities().get(newIndex.intValue());
+				updateVisualization(selectedActivity);
+			}
+		});
+		
+		altLayoutDirectCheckBox.selectedProperty().addListener((ev) -> {
+			if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
+				updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
+			}
+		});
+		automatonDirectCheckBox.selectedProperty().addListener((ev) -> {
+			if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
+				updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
+			}
+		});
+		altLayoutAmongCheckBox.selectedProperty().addListener((ev) -> {
+			if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
+				updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
+			}
+		});
+		automatonAmongCheckBox.selectedProperty().addListener((ev) -> {
+			if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
+				updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
+			}
+		});
+		amongToggleGroup.selectedToggleProperty().addListener(ev -> {
+			if (activityListView.getSelectionModel().getSelectedIndex() != -1) {
+				updateVisualization(declareDiscoveryResult.getActivities().get(activityListView.getSelectionModel().getSelectedIndex()));
+			}
 		});
 	}
 
 	public void updateTabContents(DeclareDiscoveryResult declareDiscoveryResult) {
+		this.declareDiscoveryResult = declareDiscoveryResult;
 		activityListView.getItems().setAll(declareDiscoveryResult.getActivities());
 	}
 	
 	
+	private void updateVisualization(DiscoveredActivity selectedActivity) { //TODO: Need refactoring
+		
+		//Directly related constraints WebView
+		List<DiscoveredActivity> filteredActivities = new ArrayList<DiscoveredActivity>();
+		filteredActivities.add(selectedActivity);
+		List<DiscoveredConstraint> filteredConstraints = new ArrayList<DiscoveredConstraint>();
+		
+		for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
+			if (!filteredConstraints.contains(discoveredConstraint) && (discoveredConstraint.getActivationActivity() == selectedActivity || discoveredConstraint.getTargetActivity() == selectedActivity)) {
+				filteredConstraints.add(discoveredConstraint);
+			}
+		}
+		
+		for (DiscoveredConstraint discoveredConstraint : filteredConstraints) {
+			if(!filteredActivities.contains(discoveredConstraint.getActivationActivity())) filteredActivities.add(discoveredConstraint.getActivationActivity());
+			if(!filteredActivities.contains(discoveredConstraint.getTargetActivity())) filteredActivities.add(discoveredConstraint.getTargetActivity());
+		}
+		for (DiscoveredActivity filteredActivity : filteredActivities) {
+			if (filteredActivity.getActivityName().equals(LogUtils.ARTIF_START) || filteredActivity.getActivityName().equals(LogUtils.ARTIF_END)) {
+				filteredConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Exactly1, filteredActivity, null, 1));
+			}
+		}
+		
+		createActivityEncodings(filteredActivities);
+		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, directRelationsWebView, altLayoutDirectCheckBox.isSelected(), automatonDirectCheckBox.isSelected(), activityToEncodingsMap);
+//		populateConstraintLabels(filteredConstraints);
+		
+		
+		//Constraints among WebView
+		filteredActivities = new ArrayList<DiscoveredActivity>();
+		filteredConstraints = new ArrayList<DiscoveredConstraint>();
+		if (amongToggleGroup.getSelectedToggle() == preceedersRadioButton) {
+			for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
+				if (discoveredConstraint.getTemplate().getReverseActivationTarget() && discoveredConstraint.getActivationActivity() == selectedActivity && !filteredActivities.contains(discoveredConstraint.getTargetActivity())) {
+					filteredActivities.add(discoveredConstraint.getTargetActivity());
+				} else if (!discoveredConstraint.getTemplate().getReverseActivationTarget() && discoveredConstraint.getTargetActivity() == selectedActivity && !filteredActivities.contains(discoveredConstraint.getActivationActivity())) {
+					filteredActivities.add(discoveredConstraint.getActivationActivity());
+				}
+			}
+		} else if (amongToggleGroup.getSelectedToggle() == followersRadioButton) {
+			for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
+				if (discoveredConstraint.getTemplate().getReverseActivationTarget() && discoveredConstraint.getTargetActivity() == selectedActivity && !filteredActivities.contains(discoveredConstraint.getActivationActivity())) {
+					filteredActivities.add(discoveredConstraint.getActivationActivity());
+				} else if (!discoveredConstraint.getTemplate().getReverseActivationTarget() && discoveredConstraint.getActivationActivity() == selectedActivity && !filteredActivities.contains(discoveredConstraint.getTargetActivity())) {
+					filteredActivities.add(discoveredConstraint.getTargetActivity());
+				}
+			}
+		}
+		for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
+			if (filteredActivities.contains(discoveredConstraint.getActivationActivity()) && filteredActivities.contains(discoveredConstraint.getTargetActivity())) {
+				filteredConstraints.add(discoveredConstraint);
+			}
+		}
+		for (DiscoveredActivity filteredActivity : filteredActivities) {
+			if (filteredActivity.getActivityName().equals(LogUtils.ARTIF_START) || filteredActivity.getActivityName().equals(LogUtils.ARTIF_END)) {
+				filteredConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Exactly1, filteredActivity, null, 1));
+			}
+		}
+		
+		createActivityEncodings(filteredActivities);
+		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, amongRelationsWebView, altLayoutAmongCheckBox.isSelected(), automatonAmongCheckBox.isSelected(), activityToEncodingsMap);
+//		populateConstraintLabels(filteredConstraints);
+		
+	}
 	
-	
+	//Should move to MainViewController
+	private void createActivityEncodings(List<DiscoveredActivity> discoveredActivities) {
+		activityToEncodingsMap = new DualHashBidiMap<DiscoveredActivity, String>();
+		for (DiscoveredActivity discoveredActivity : discoveredActivities) {
+			activityToEncodingsMap.put(discoveredActivity, "ac"+activityToEncodingsMap.size());
+		}
+	}
 
 }
