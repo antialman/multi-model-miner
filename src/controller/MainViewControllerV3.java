@@ -6,6 +6,9 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import org.apache.commons.collections15.BidiMap;
+import org.apache.commons.collections15.bidimap.DualHashBidiMap;
+
 import controller.tab.v3.ConstraintsTabController;
 import controller.tab.v3.TemporalTabController;
 import data.DiscoveredActivity;
@@ -53,6 +56,7 @@ public class MainViewControllerV3 {
 	private File logFile;
 	
 	private DeclareDiscoveryResult declareDiscoveryResult;
+	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
 	
 
 
@@ -140,8 +144,12 @@ public class MainViewControllerV3 {
 		delcareDiscoveryTask.setOnSucceeded(event -> {
 			declareDiscoveryResult = delcareDiscoveryTask.getValue();
 			sortDiscoveredActivities(declareDiscoveryResult.getActivities());
+			activityToEncodingsMap = createActivityEncodings(declareDiscoveryResult.getActivities());
+			
 			constraintsTabController.updateTabContents(declareDiscoveryResult);
+			constraintsTabController.setActivityEncodings(activityToEncodingsMap);
 			temporalTabController.updateTabContents(declareDiscoveryResult);
+			temporalTabController.setActivityEncodings(activityToEncodingsMap);
 			
 			//Updating the UI
 			mainHeader.setDisable(false);
@@ -185,8 +193,12 @@ public class MainViewControllerV3 {
 		}
 	}
 	
-	public File getLogFile() {
-		return logFile;
+	private BidiMap<DiscoveredActivity, String> createActivityEncodings(List<DiscoveredActivity> discoveredActivities) {
+		activityToEncodingsMap = new DualHashBidiMap<DiscoveredActivity, String>();
+		for (DiscoveredActivity discoveredActivity : discoveredActivities) {
+			activityToEncodingsMap.put(discoveredActivity, "ac"+activityToEncodingsMap.size());
+		}
+		return activityToEncodingsMap;
 	}
 	
 	public DeclareDiscoveryResult getDeclareDiscoveryResult() {

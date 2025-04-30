@@ -168,16 +168,8 @@ public class ConstraintsTabController {
 	
 	public void updateTabContents(DeclareDiscoveryResult declareDiscoveryResult) {
 		this.declareDiscoveryResult = declareDiscoveryResult;
-		createActivityEncodings(declareDiscoveryResult.getActivities());
 		populateActivityFilters();
 		updateVisualization();
-	}
-	
-	private void createActivityEncodings(List<DiscoveredActivity> discoveredActivities) {
-		activityToEncodingsMap = new DualHashBidiMap<DiscoveredActivity, String>();
-		for (DiscoveredActivity discoveredActivity : discoveredActivities) {
-			activityToEncodingsMap.put(discoveredActivity, "ac"+activityToEncodingsMap.size());
-		}
 	}
 	
 	private void populateActivityFilters() {
@@ -219,6 +211,10 @@ public class ConstraintsTabController {
 		for (DiscoveredConstraint constraint : filteredConstraints) {
 			constraintLabelListView.getItems().add(constraint.toString());
 		}
+	}
+
+	public void setActivityEncodings(BidiMap<DiscoveredActivity, String> activityToEncodingsMap) {
+		this.activityToEncodingsMap = activityToEncodingsMap;
 	}
 
 }

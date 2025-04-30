@@ -160,7 +160,6 @@ public class TemporalTabController {
 			}
 		}
 
-		createActivityEncodings(filteredActivities);
 		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, directRelationsWebView, altLayoutDirectCheckBox.isSelected(), automatonDirectCheckBox.isSelected(), activityToEncodingsMap);
 		//		populateConstraintLabels(filteredConstraints);
 
@@ -196,18 +195,13 @@ public class TemporalTabController {
 			}
 		}
 
-		createActivityEncodings(filteredActivities);
 		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, amongRelationsWebView, altLayoutAmongCheckBox.isSelected(), automatonAmongCheckBox.isSelected(), activityToEncodingsMap);
 		//		populateConstraintLabels(filteredConstraints);
 
 	}
 
-	//Should move to MainViewController
-	private void createActivityEncodings(List<DiscoveredActivity> discoveredActivities) {
-		activityToEncodingsMap = new DualHashBidiMap<DiscoveredActivity, String>();
-		for (DiscoveredActivity discoveredActivity : discoveredActivities) {
-			activityToEncodingsMap.put(discoveredActivity, "ac"+activityToEncodingsMap.size());
-		}
+	public void setActivityEncodings(BidiMap<DiscoveredActivity, String> activityToEncodingsMap) {
+		this.activityToEncodingsMap = activityToEncodingsMap;
 	}
 
 }
