@@ -17,7 +17,6 @@ import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.web.WebView;
-import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import task.DeclareDiscoveryResult;
 import utils.ConstraintTemplate;
@@ -55,15 +54,8 @@ public class TemporalTabController {
 	@FXML
 	private Label closestFollowersLabel;
 
-	private Stage stage;
-
 	private DeclareDiscoveryResult declareDiscoveryResult;
 	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
-
-	//Setup methods
-	public void setStage(Stage stage) {
-		this.stage = stage;
-	}
 
 
 	@FXML
