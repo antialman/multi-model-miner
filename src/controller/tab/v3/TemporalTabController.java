@@ -50,7 +50,7 @@ public class TemporalTabController {
 	@FXML
 	private ToggleGroup amongToggleGroup;
 	@FXML
-	private RadioButton preceedersRadioButton;
+	private RadioButton precedersRadioButton;
 	@FXML
 	private CheckBox altLayoutAmongCheckBox;
 	@FXML
@@ -60,7 +60,7 @@ public class TemporalTabController {
 	@FXML
 	private ListView<String> amongConstraintsListView;
 	@FXML
-	private Label closestPreceedersLabel;
+	private Label closestPrecedersLabel;
 	@FXML
 	private Label closestFollowersLabel;
 
@@ -161,7 +161,7 @@ public class TemporalTabController {
 		//Constraints among WebView
 		filteredActivities = new ArrayList<DiscoveredActivity>();
 		filteredConstraints = new ArrayList<DiscoveredConstraint>();
-		if (amongToggleGroup.getSelectedToggle() == preceedersRadioButton) {
+		if (amongToggleGroup.getSelectedToggle() == precedersRadioButton) {
 			for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
 				if (discoveredConstraint.getTemplate().getReverseActivationTarget() && discoveredConstraint.getActivationActivity() == selectedActivity && !filteredActivities.contains(discoveredConstraint.getTargetActivity())) {
 					filteredActivities.add(discoveredConstraint.getTargetActivity());

@@ -12,7 +12,6 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.web.WebView?>
 
-
 <SplitPane fx:id="splitPane1" dividerPositions="0.2" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.tab.v3.TemporalTabController">
    <items>
       <VBox spacing="3.0">
@@ -69,7 +68,7 @@
                                           <ToggleGroup fx:id="amongToggleGroup" />
                                        </toggleGroup>
                                     </RadioButton>
-                                    <RadioButton fx:id="preceedersRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceeders" toggleGroup="$amongToggleGroup" />
+                                    <RadioButton fx:id="precedersRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceders" toggleGroup="$amongToggleGroup" />
                                  </children>
                               </HBox>
                               <CheckBox fx:id="altLayoutAmongCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
@@ -99,12 +98,12 @@
                   </Label>
                   <HBox>
                      <children>
-                        <Label text="temporally closest preceeders: ">
+                        <Label text="temporally closest preceders: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
                         </Label>
-                        <Label fx:id="closestPreceedersLabel" text="&lt;activity names&gt;" />
+                        <Label fx:id="closestPrecedersLabel" text="&lt;activity names&gt;" />
                      </children>
                   </HBox>
                   <HBox>
