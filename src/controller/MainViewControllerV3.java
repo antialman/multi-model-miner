@@ -24,6 +24,8 @@ import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import task.DeclareDiscoveryResult;
 import task.DeclareDiscoveryTask;
+import task.v3.DeclarePostprocessingResult;
+import task.v3.DeclarePostprocessingTask;
 import utils.AlertUtils;
 import utils.ConstraintTemplate;
 import utils.DeclarePruningType;
@@ -54,22 +56,23 @@ public class MainViewControllerV3 {
 	private TemporalTabController temporalTabController;
 
 	private File logFile;
-	
+
 	private DeclareDiscoveryResult declareDiscoveryResult;
 	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
-	
+	private DeclarePostprocessingResult declarePostprocessingResult;
+
 
 
 	//Setup methods
 	public void setStage(Stage stage) {
 		this.stage = stage;
 	}
-	
+
 	@FXML
 	private void initialize() {
 		resultTabPane.setDisable(true);
 		redescoverButton.setDisable(true);
-		
+
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("tab/ConstraintsTab.fxml"));
 			Region rootPane = loader.load(); //There seems to be a bug in JavaFX framework that causes IllegalStateException to be thrown instead of IOException
@@ -80,7 +83,7 @@ public class MainViewControllerV3 {
 			e.printStackTrace();
 			AlertUtils.showError("Error loading FXML for Declare Miner Output tab!");
 		}
-		
+
 		try {
 			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("tab/TemporalTab.fxml"));
 			Region rootPane = loader.load(); //There seems to be a bug in JavaFX framework that causes IllegalStateException to be thrown instead of IOException
@@ -91,8 +94,8 @@ public class MainViewControllerV3 {
 			AlertUtils.showError("Error loading FXML for Declare Miner Output tab!");
 		}
 	}
-	
-	
+
+
 	@FXML
 	private void selectLog() {
 		File logFile = FileUtils.showLogOpenDialog(stage);
@@ -103,7 +106,7 @@ public class MainViewControllerV3 {
 			discoverModel();
 		}
 	}
-	
+
 	@FXML
 	private void discoverModel() {
 		System.out.println("Starting model discovery from event log: " + logFile.getAbsolutePath());
@@ -114,8 +117,8 @@ public class MainViewControllerV3 {
 		addDeclareDiscoveryTaskHandlers(task);
 		executorService.execute(task);
 	}
-	
-	
+
+
 	private Task<DeclareDiscoveryResult> createDeclareDiscoveryTask() {
 		List<ConstraintTemplate> templates = List.of(
 				ConstraintTemplate.Alternate_Succession,
@@ -137,38 +140,50 @@ public class MainViewControllerV3 {
 
 		return declareDiscoveryTaskDeclare;
 	}
-	
+
 	private void addDeclareDiscoveryTaskHandlers(Task<DeclareDiscoveryResult> delcareDiscoveryTask) {
 		//Handle task success
 		delcareDiscoveryTask.setOnSucceeded(event -> {
 			declareDiscoveryResult = delcareDiscoveryTask.getValue();
 			sortDiscoveredActivities(declareDiscoveryResult.getActivities());
 			activityToEncodingsMap = createActivityEncodings(declareDiscoveryResult.getActivities());
-			
+
 			constraintsTabController.updateTabContents(declareDiscoveryResult);
 			constraintsTabController.setActivityEncodings(activityToEncodingsMap);
-			temporalTabController.updateTabContents(declareDiscoveryResult);
 			temporalTabController.setActivityEncodings(activityToEncodingsMap);
-			
+
 			//Updating the UI
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
 
-			//Execute Declare post-processing task //TODO
-			//			DeclarePostprocessingTask declarePostprocessingTask = new DeclarePostprocessingTask();
-			//			declarePostprocessingTask.setDeclareDiscoveryResult(declareDiscoveryResult);
-			//			addDeclarePostprocessingTaskHandlers(declarePostprocessingTask);
-			//			executorService.execute(declarePostprocessingTask);
+			//Execute Declare post-processing task
+			DeclarePostprocessingTask declarePostprocessingTask = new DeclarePostprocessingTask();
+			declarePostprocessingTask.setDeclareDiscoveryResult(declareDiscoveryResult);
+			addDeclarePostprocessingTaskHandlers(declarePostprocessingTask);
+			executorService.execute(declarePostprocessingTask);
 
 		});
-		
+
 		//Handle task failure
-				delcareDiscoveryTask.setOnFailed(event -> {
-					mainHeader.setDisable(false);
-					AlertUtils.showError("Running Declare Miner failed!");
-				});
-			}
-	
+		delcareDiscoveryTask.setOnFailed(event -> {
+			mainHeader.setDisable(false);
+			AlertUtils.showError("Running Declare Miner failed!");
+		});
+	}
+
+	private void addDeclarePostprocessingTaskHandlers(Task<DeclarePostprocessingResult> declarePostprocessingTask) {
+		//Handle task success
+		declarePostprocessingTask.setOnSucceeded(event -> {
+			declarePostprocessingResult = declarePostprocessingTask.getValue();
+			temporalTabController.updateTabContents(declareDiscoveryResult, declarePostprocessingResult);
+		});
+
+		//Handle task failure
+		declarePostprocessingTask.setOnFailed(event -> {
+			AlertUtils.showError("Declare post-processing failed");
+		});
+	}
+
 	private void sortDiscoveredActivities(List<DiscoveredActivity> discoveredActivities) {
 		//Sorting activities by name, and moving artificial start and end to be the first activities in the activity list (makes the UI a bit nicer)
 		discoveredActivities.sort((o1,o2)->{
@@ -191,7 +206,7 @@ public class MainViewControllerV3 {
 			discoveredActivities.add(0, artificialStart);
 		}
 	}
-	
+
 	private BidiMap<DiscoveredActivity, String> createActivityEncodings(List<DiscoveredActivity> discoveredActivities) {
 		activityToEncodingsMap = new DualHashBidiMap<DiscoveredActivity, String>();
 		for (DiscoveredActivity discoveredActivity : discoveredActivities) {
@@ -199,5 +214,5 @@ public class MainViewControllerV3 {
 		}
 		return activityToEncodingsMap;
 	}
-	
+
 }

@@ -144,7 +144,7 @@ public class ConstraintsTabController {
 		}
 
 		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, declMinerWebView, altLayoutCheckBox.isSelected(), automatonCheckBox.isSelected(), activityToEncodingsMap);
-		populateConstraintLabels(filteredConstraints);
+		populateConstraintList(filteredConstraints);
 		updateModelButton.setStyle("-fx-font-weight: Normal;");
 	}
 	
@@ -205,7 +205,7 @@ public class ConstraintsTabController {
 
 	}
 
-	private void populateConstraintLabels(List<DiscoveredConstraint> filteredConstraints) {
+	private void populateConstraintList(List<DiscoveredConstraint> filteredConstraints) {
 		constraintLabelListView.getItems().clear();
 		for (DiscoveredConstraint constraint : filteredConstraints) {
 			constraintLabelListView.getItems().add(constraint.toString());

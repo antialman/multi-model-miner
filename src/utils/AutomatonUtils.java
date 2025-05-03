@@ -58,6 +58,8 @@ public class AutomatonUtils {
 	public static String getConstraintLtlFormula(DiscoveredConstraint discoveredConstraint, BidiMap<DiscoveredActivity, String> activityToEncodingsMap) {
 		String ltlFormula = AutomatonUtils.getGenericLtlFormula(discoveredConstraint.getTemplate());
 
+		System.out.println(discoveredConstraint); //For debugging a mysterious nullpointer exception that I have not managed to reliably reproduce
+		
 		//Replacing activity placeholders in the generic formula with activity encodings based on the model
 		if (discoveredConstraint.getTemplate().getReverseActivationTarget()) {
 			ltlFormula = ltlFormula.replace("\"B\"", activityToEncodingsMap.get(discoveredConstraint.getActivationActivity()));

@@ -63,13 +63,23 @@
                                  </VBox.margin>
                                  <children>
                                     <Label text="Constraints among:" />
-                                    <RadioButton fx:id="followersRadioButton" mnemonicParsing="false" selected="true" text="Followers">
+                                    <RadioButton fx:id="followersAmongRadioButton" mnemonicParsing="false" selected="true" text="Followers">
                                        <toggleGroup>
                                           <ToggleGroup fx:id="amongToggleGroup" />
                                        </toggleGroup>
                                     </RadioButton>
-                                    <RadioButton fx:id="precedersRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceders" toggleGroup="$amongToggleGroup" />
+                                    <RadioButton fx:id="precedersAmongRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceders" toggleGroup="$amongToggleGroup" />
                                  </children>
+                              </HBox>
+                              <HBox layoutX="15.0" layoutY="20.0" spacing="10.0">
+                                 <children>
+                                    <Label text="Constraints of closest:" />
+                                    <RadioButton fx:id="followersOfRadioButton" mnemonicParsing="false" text="Followers" toggleGroup="$amongToggleGroup" />
+                                    <RadioButton fx:id="precedersOfRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceders" toggleGroup="$amongToggleGroup" />
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets left="5.0" />
+                                 </VBox.margin>
                               </HBox>
                               <CheckBox fx:id="altLayoutAmongCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
                                  <VBox.margin>

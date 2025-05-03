@@ -1,7 +1,11 @@
 package controller.tab.v3;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.commons.collections15.BidiMap;
 import data.DiscoveredActivity;
@@ -21,6 +25,7 @@ import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.web.WebView;
 import javafx.util.StringConverter;
 import task.DeclareDiscoveryResult;
+import task.v3.DeclarePostprocessingResult;
 import utils.ConstraintTemplate;
 import utils.LogUtils;
 import utils.WebViewUtilsV3;
@@ -46,11 +51,15 @@ public class TemporalTabController {
 	@FXML
 	private SplitPane splitPane4;
 	@FXML
-	private RadioButton followersRadioButton;
+	private RadioButton followersAmongRadioButton;
 	@FXML
 	private ToggleGroup amongToggleGroup;
 	@FXML
-	private RadioButton precedersRadioButton;
+	private RadioButton precedersAmongRadioButton;
+	@FXML
+	private RadioButton followersOfRadioButton;
+	@FXML
+	private RadioButton precedersOfRadioButton;
 	@FXML
 	private CheckBox altLayoutAmongCheckBox;
 	@FXML
@@ -64,9 +73,9 @@ public class TemporalTabController {
 	@FXML
 	private Label closestFollowersLabel;
 
-	private DeclareDiscoveryResult declareDiscoveryResult;
 	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
-
+	private DeclareDiscoveryResult declareDiscoveryResult;
+	private DeclarePostprocessingResult declarePostprocessingResult;
 
 	@FXML
 	private void initialize() {
@@ -101,11 +110,10 @@ public class TemporalTabController {
 		activityListView.setCellFactory(cf -> new TextFieldListCell<DiscoveredActivity>(activityConverter));
 		activityListView.getSelectionModel().selectedIndexProperty().addListener((obs, oldIndex, newIndex) -> {
 			if (newIndex.intValue() != -1) {
-				DiscoveredActivity selectedActivity = declareDiscoveryResult.getActivities().get(newIndex.intValue());
-				updateVisualization(selectedActivity);
+				updateVisualization(declareDiscoveryResult.getActivities().get(newIndex.intValue()));
 			}
 		});
-		
+
 		InvalidationListener visSettingsListener = new InvalidationListener() {
 			@Override
 			public void invalidated(Observable observable) {
@@ -114,7 +122,7 @@ public class TemporalTabController {
 				}
 			}
 		};
-		
+
 		altLayoutDirectCheckBox.selectedProperty().addListener(visSettingsListener);
 		automatonDirectCheckBox.selectedProperty().addListener(visSettingsListener);
 		altLayoutAmongCheckBox.selectedProperty().addListener(visSettingsListener);
@@ -122,8 +130,9 @@ public class TemporalTabController {
 		amongToggleGroup.selectedToggleProperty().addListener(visSettingsListener);
 	}
 
-	public void updateTabContents(DeclareDiscoveryResult declareDiscoveryResult) {
+	public void updateTabContents(DeclareDiscoveryResult declareDiscoveryResult, DeclarePostprocessingResult declarePostprocessingResult) {
 		this.declareDiscoveryResult = declareDiscoveryResult;
+		this.declarePostprocessingResult = declarePostprocessingResult;
 		activityListView.getItems().setAll(declareDiscoveryResult.getActivities());
 		if (!activityListView.getItems().isEmpty()) {
 			activityListView.getSelectionModel().select(0);
@@ -131,70 +140,64 @@ public class TemporalTabController {
 	}
 
 
-	private void updateVisualization(DiscoveredActivity selectedActivity) { //TODO: Needs refactoring
+	private void updateVisualization(DiscoveredActivity selectedActivity) {
+		//Directly related WebView
+		List<DiscoveredActivity> directlyRelatedActivities = declarePostprocessingResult.getDirectlyRelatedActivities(selectedActivity);
+		directlyRelatedActivities.add(selectedActivity);
+		List<DiscoveredConstraint> directlyRelatedConstraints = declarePostprocessingResult.getDirectlyRelatedConstraints(selectedActivity);
+		processArtificialStartEnd(directlyRelatedActivities, directlyRelatedConstraints);
 
-		//Directly related constraints WebView
-		List<DiscoveredActivity> filteredActivities = new ArrayList<DiscoveredActivity>();
-		filteredActivities.add(selectedActivity);
-		List<DiscoveredConstraint> filteredConstraints = new ArrayList<DiscoveredConstraint>();
+		WebViewUtilsV3.updateWebView(directlyRelatedActivities, directlyRelatedConstraints, directRelationsWebView, altLayoutDirectCheckBox.isSelected(), automatonDirectCheckBox.isSelected(), activityToEncodingsMap);
+		populateConstraintLists(directlyRelatedConstraints, directConstraintsListView);
 
-		for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
-			if (!filteredConstraints.contains(discoveredConstraint) && (discoveredConstraint.getActivationActivity() == selectedActivity || discoveredConstraint.getTargetActivity() == selectedActivity)) {
-				filteredConstraints.add(discoveredConstraint);
+		//Among WebView
+		List<DiscoveredActivity> amongActivities = new ArrayList<DiscoveredActivity>();
+		List<DiscoveredConstraint> amongConstraints = new ArrayList<DiscoveredConstraint>();
+		if (amongToggleGroup.getSelectedToggle() == followersAmongRadioButton) {
+			amongActivities.addAll(declarePostprocessingResult.getAllFollowerActivities(selectedActivity));
+			amongConstraints.addAll(declarePostprocessingResult.getConstraintsAmongFollowers(selectedActivity));
+		} else if (amongToggleGroup.getSelectedToggle() == precedersAmongRadioButton) {
+			amongActivities.addAll(declarePostprocessingResult.getAllPrecederActivities(selectedActivity));
+			amongConstraints.addAll(declarePostprocessingResult.getConstraintsAmongPreceders(selectedActivity));
+		} else { //Visualizing all constraints that are directly related to the potentially closest followers/preceders
+			Set<DiscoveredActivity> closestActivities = new HashSet<DiscoveredActivity>();
+			if (amongToggleGroup.getSelectedToggle() == followersOfRadioButton) {
+				closestActivities.addAll(declarePostprocessingResult.getPotentialClosestFollowers(selectedActivity));
+			} else if (amongToggleGroup.getSelectedToggle() == precedersOfRadioButton) {
+				closestActivities.addAll(declarePostprocessingResult.getPotentialClosestPreceders(selectedActivity));
 			}
-		}
-
-		for (DiscoveredConstraint discoveredConstraint : filteredConstraints) {
-			if(!filteredActivities.contains(discoveredConstraint.getActivationActivity())) filteredActivities.add(discoveredConstraint.getActivationActivity());
-			if(!filteredActivities.contains(discoveredConstraint.getTargetActivity())) filteredActivities.add(discoveredConstraint.getTargetActivity());
-		}
-		for (DiscoveredActivity filteredActivity : filteredActivities) {
-			if (filteredActivity.getActivityName().equals(LogUtils.ARTIF_START) || filteredActivity.getActivityName().equals(LogUtils.ARTIF_END)) {
-				filteredConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Exactly1, filteredActivity, null, 1));
-			}
-		}
-
-		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, directRelationsWebView, altLayoutDirectCheckBox.isSelected(), automatonDirectCheckBox.isSelected(), activityToEncodingsMap);
-		populateConstraintLabels(filteredConstraints, directConstraintsListView);
-
-
-		//Constraints among WebView
-		filteredActivities = new ArrayList<DiscoveredActivity>();
-		filteredConstraints = new ArrayList<DiscoveredConstraint>();
-		if (amongToggleGroup.getSelectedToggle() == precedersRadioButton) {
-			for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
-				if (discoveredConstraint.getTemplate().getReverseActivationTarget() && discoveredConstraint.getActivationActivity() == selectedActivity && !filteredActivities.contains(discoveredConstraint.getTargetActivity())) {
-					filteredActivities.add(discoveredConstraint.getTargetActivity());
-				} else if (!discoveredConstraint.getTemplate().getReverseActivationTarget() && discoveredConstraint.getTargetActivity() == selectedActivity && !filteredActivities.contains(discoveredConstraint.getActivationActivity())) {
-					filteredActivities.add(discoveredConstraint.getActivationActivity());
+			Set<DiscoveredActivity> vizActivities = new LinkedHashSet<DiscoveredActivity>();
+			Set<DiscoveredConstraint> vizConstraints = new LinkedHashSet<DiscoveredConstraint>();	
+			for (DiscoveredActivity activity : closestActivities) {
+				vizActivities.add(activity);
+				for (DiscoveredConstraint constraint : declarePostprocessingResult.getDirectlyRelatedConstraints(activity)) {
+					vizActivities.add(constraint.getActivationActivity());
+					vizActivities.add(constraint.getTargetActivity());
+					vizConstraints.add(constraint);
 				}
 			}
-		} else if (amongToggleGroup.getSelectedToggle() == followersRadioButton) {
-			for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
-				if (discoveredConstraint.getTemplate().getReverseActivationTarget() && discoveredConstraint.getTargetActivity() == selectedActivity && !filteredActivities.contains(discoveredConstraint.getActivationActivity())) {
-					filteredActivities.add(discoveredConstraint.getActivationActivity());
-				} else if (!discoveredConstraint.getTemplate().getReverseActivationTarget() && discoveredConstraint.getActivationActivity() == selectedActivity && !filteredActivities.contains(discoveredConstraint.getTargetActivity())) {
-					filteredActivities.add(discoveredConstraint.getTargetActivity());
-				}
-			}
-		}
-		for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
-			if (filteredActivities.contains(discoveredConstraint.getActivationActivity()) && filteredActivities.contains(discoveredConstraint.getTargetActivity())) {
-				filteredConstraints.add(discoveredConstraint);
-			}
-		}
-		for (DiscoveredActivity filteredActivity : filteredActivities) {
-			if (filteredActivity.getActivityName().equals(LogUtils.ARTIF_START) || filteredActivity.getActivityName().equals(LogUtils.ARTIF_END)) {
-				filteredConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Exactly1, filteredActivity, null, 1));
-			}
+			amongActivities.addAll(vizActivities);
+			amongConstraints.addAll(vizConstraints);
 		}
 
-		WebViewUtilsV3.updateWebView(filteredActivities, filteredConstraints, amongRelationsWebView, altLayoutAmongCheckBox.isSelected(), automatonAmongCheckBox.isSelected(), activityToEncodingsMap);
-		populateConstraintLabels(filteredConstraints, amongConstraintsListView);
+		processArtificialStartEnd(amongActivities, amongConstraints);
+		WebViewUtilsV3.updateWebView(amongActivities, amongConstraints, amongRelationsWebView, altLayoutAmongCheckBox.isSelected(), automatonAmongCheckBox.isSelected(), activityToEncodingsMap);
+		populateConstraintLists(amongConstraints, amongConstraintsListView);
 
+		//Labels for followers/preceders of this activity
+		closestFollowersLabel.setText(declarePostprocessingResult.getPotentialClosestFollowers(selectedActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
+		closestPrecedersLabel.setText(declarePostprocessingResult.getPotentialClosestPreceders(selectedActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
 	}
-	
-	private void populateConstraintLabels(List<DiscoveredConstraint> filteredConstraints, ListView<String> listView) {
+
+	private void processArtificialStartEnd(List<DiscoveredActivity> discoveredActivities, List<DiscoveredConstraint> discoveredConstraints) {
+		for (DiscoveredActivity discoveredActivity : discoveredActivities) {
+			if (discoveredActivity.getActivityName().equals(LogUtils.ARTIF_START) || discoveredActivity.getActivityName().equals(LogUtils.ARTIF_END)) {
+				discoveredConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Exactly1, discoveredActivity, null, 1));
+			}
+		}
+	}
+
+	private void populateConstraintLists(List<DiscoveredConstraint> filteredConstraints, ListView<String> listView) {
 		listView.getItems().clear();
 		for (DiscoveredConstraint constraint : filteredConstraints) {
 			listView.getItems().add(constraint.toString());
