@@ -12,8 +12,6 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 	private DeclareDiscoveryResult declareDiscoveryResult;
 	
 	
-	
-	
 	public void setDeclareDiscoveryResult(DeclareDiscoveryResult declareDiscoveryResult) {
 		this.declareDiscoveryResult = declareDiscoveryResult;
 	}
@@ -66,6 +64,9 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 				for (DiscoveredActivity candidateActivity : activityRelations.getAllFollowerActivities()) {
 					boolean potentiallyClosest = true;
 					for (DiscoveredConstraint followerConstraint : activityRelations.getConstraintsAmongFollowers()) {
+						//Exclusion of response here results in considering all activities that can be executed next as temporally closest
+						//Inclusion of response here would result in considering only the activities for which an execution decision has to be made first as temporally closest
+						//TODO: Incorporate both into the post processing task
 						if (followerConstraint.getTemplate() == ConstraintTemplate.Succession || followerConstraint.getTemplate() == ConstraintTemplate.Alternate_Succession) {
 							if (followerConstraint.getTargetActivity() == candidateActivity) {
 								//If this activity is the target of a succession then it cannot be the earliest among all the followers
