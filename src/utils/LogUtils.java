@@ -52,7 +52,7 @@ public class LogUtils {
 	}
 	
 	
-	public static XLog addArtificialStartEnd(XLog xLog) {
+	public static void addArtificialStartEnd(XLog xLog) {
 		XEvent artifStart = new XEventImpl(new XAttributeMapImpl());
 		XConceptExtension.instance().assignName(artifStart, ARTIF_START);
 		XLifecycleExtension.instance().assignStandardTransition(artifStart, StandardModel.COMPLETE);
@@ -72,8 +72,6 @@ public class LogUtils {
 			XTimeExtension.instance().assignTimestamp(artifEnd, endDate);
 			xTrace.add(xTrace.size(), artifEnd);
 		}
-		
-		return xLog;
 	}
 
 }

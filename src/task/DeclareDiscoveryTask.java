@@ -84,7 +84,7 @@ public class DeclareDiscoveryTask extends Task<DeclareDiscoveryResult> {
 			xLog = LogUtils.convertToXlog(logFile.getAbsolutePath());
 			
 			if (addStartEnd) {
-				xLog = LogUtils.addArtificialStartEnd(xLog); //Adds artificial start and end activities to each trace
+				LogUtils.addArtificialStartEnd(xLog); //Adds artificial start and end activities to each trace
 			}
 			
 			
@@ -191,6 +191,7 @@ public class DeclareDiscoveryTask extends Task<DeclareDiscoveryResult> {
 			DeclareDiscoveryResult discoveryResult = new DeclareDiscoveryResult();
 			discoveryResult.setActivities(discoveredActivities);
 			discoveryResult.setConstraints(discoveredConstraints);
+			discoveryResult.setEventLog(xLog);
 
 
 			System.out.println("Discovering Declare model finished at: " + taskStartTime + " - total time: " + (System.currentTimeMillis() - taskStartTime));
