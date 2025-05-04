@@ -61,6 +61,8 @@ public class TemporalTabController {
 	@FXML
 	private RadioButton precedersOfRadioButton;
 	@FXML
+	private CheckBox assumeExistenceCheckBox;
+	@FXML
 	private CheckBox altLayoutAmongCheckBox;
 	@FXML
 	private CheckBox automatonAmongCheckBox;
@@ -129,6 +131,7 @@ public class TemporalTabController {
 
 		altLayoutDirectCheckBox.selectedProperty().addListener(visSettingsListener);
 		automatonDirectCheckBox.selectedProperty().addListener(visSettingsListener);
+		assumeExistenceCheckBox.selectedProperty().addListener(visSettingsListener);
 		altLayoutAmongCheckBox.selectedProperty().addListener(visSettingsListener);
 		automatonAmongCheckBox.selectedProperty().addListener(visSettingsListener);
 		amongToggleGroup.selectedToggleProperty().addListener(visSettingsListener);
@@ -182,6 +185,30 @@ public class TemporalTabController {
 			}
 			amongActivities.addAll(vizActivities);
 			amongConstraints.addAll(vizConstraints);
+		}
+		
+		//Adds Existence constraints to activities that must occur if the selected activity occurs
+		if (assumeExistenceCheckBox.isSelected()) {
+			for (DiscoveredConstraint discoveredConstraint : directlyRelatedConstraints) {
+				if (discoveredConstraint.getTemplate() == ConstraintTemplate.Succession || discoveredConstraint.getTemplate() == ConstraintTemplate.Alternate_Succession) {
+					//If either activity of a Succession occurs, then the other must also occur
+					if (discoveredConstraint.getActivationActivity() == selectedActivity && amongActivities.contains(discoveredConstraint.getTargetActivity())) {
+						amongConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Existence, discoveredConstraint.getTargetActivity(), null, 1));
+					} else if (discoveredConstraint.getTargetActivity() == selectedActivity && amongActivities.contains(discoveredConstraint.getActivationActivity())) {
+						amongConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Existence, discoveredConstraint.getActivationActivity(), null, 1));
+					}
+				} else if (discoveredConstraint.getTemplate() == ConstraintTemplate.Response || discoveredConstraint.getTemplate() == ConstraintTemplate.Alternate_Response) {
+					//If the activation activity of a Response occurs then the target must also occur
+					if (discoveredConstraint.getActivationActivity() == selectedActivity && amongActivities.contains(discoveredConstraint.getTargetActivity())) {
+						amongConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Existence, discoveredConstraint.getTargetActivity(), null, 1));
+					}
+				} else if (discoveredConstraint.getTemplate() == ConstraintTemplate.Precedence || discoveredConstraint.getTemplate() == ConstraintTemplate.Alternate_Precedence) {
+					//If the activation activity of a Precedence occurs then the target must also occur
+					if (discoveredConstraint.getActivationActivity() == selectedActivity && amongActivities.contains(discoveredConstraint.getTargetActivity())) {
+						amongConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Existence, discoveredConstraint.getTargetActivity(), null, 1));
+					}
+				} 
+			}
 		}
 
 		processArtificialStartEnd(amongActivities, amongConstraints);

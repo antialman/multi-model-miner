@@ -81,6 +81,11 @@
                                     <Insets left="5.0" />
                                  </VBox.margin>
                               </HBox>
+                              <CheckBox fx:id="assumeExistenceCheckBox" contentDisplay="RIGHT" layoutX="20.0" layoutY="60.0" mnemonicParsing="false" text="Assume Execution of selected activity">
+                                 <VBox.margin>
+                                    <Insets left="10.0" />
+                                 </VBox.margin>
+                              </CheckBox>
                               <CheckBox fx:id="altLayoutAmongCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout">
                                  <VBox.margin>
                                     <Insets left="10.0" />
