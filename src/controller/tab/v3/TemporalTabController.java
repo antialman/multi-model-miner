@@ -5,7 +5,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 import org.apache.commons.collections15.BidiMap;
 import data.DiscoveredActivity;
@@ -22,6 +21,7 @@ import javafx.scene.control.RadioButton;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.layout.HBox;
 import javafx.scene.web.WebView;
 import javafx.util.StringConverter;
 import task.DeclareDiscoveryResult;
@@ -69,9 +69,13 @@ public class TemporalTabController {
 	@FXML
 	private ListView<String> amongConstraintsListView;
 	@FXML
-	private Label closestPrecedersLabel;
+	private HBox prevActivitiesHBox;
 	@FXML
-	private Label closestFollowersLabel;
+	private HBox prevDecisionsHBox;
+	@FXML
+	private HBox nextActivitiesHBox;
+	@FXML
+	private HBox nextDecisionsHBox;
 
 	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
 	private DeclareDiscoveryResult declareDiscoveryResult;
@@ -162,9 +166,9 @@ public class TemporalTabController {
 		} else { //Visualizing all constraints that are directly related to the potentially closest followers/preceders
 			Set<DiscoveredActivity> closestActivities = new HashSet<DiscoveredActivity>();
 			if (amongToggleGroup.getSelectedToggle() == followersOfRadioButton) {
-				closestActivities.addAll(declarePostprocessingResult.getPotentialClosestFollowers(selectedActivity));
+				closestActivities.addAll(declarePostprocessingResult.getPotentialNextActivities(selectedActivity));
 			} else if (amongToggleGroup.getSelectedToggle() == precedersOfRadioButton) {
-				closestActivities.addAll(declarePostprocessingResult.getPotentialClosestPreceders(selectedActivity));
+				closestActivities.addAll(declarePostprocessingResult.getPotentialPrevActivities(selectedActivity));
 			}
 			Set<DiscoveredActivity> vizActivities = new LinkedHashSet<DiscoveredActivity>();
 			Set<DiscoveredConstraint> vizConstraints = new LinkedHashSet<DiscoveredConstraint>();	
@@ -183,10 +187,7 @@ public class TemporalTabController {
 		processArtificialStartEnd(amongActivities, amongConstraints);
 		WebViewUtilsV3.updateWebView(amongActivities, amongConstraints, amongRelationsWebView, altLayoutAmongCheckBox.isSelected(), automatonAmongCheckBox.isSelected(), activityToEncodingsMap);
 		populateConstraintLists(amongConstraints, amongConstraintsListView);
-
-		//Labels for followers/preceders of this activity
-		closestFollowersLabel.setText(declarePostprocessingResult.getPotentialClosestFollowers(selectedActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
-		closestPrecedersLabel.setText(declarePostprocessingResult.getPotentialClosestPreceders(selectedActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
+		populateTemporalClosenesLabels(selectedActivity, declarePostprocessingResult);
 	}
 
 	private void processArtificialStartEnd(List<DiscoveredActivity> discoveredActivities, List<DiscoveredConstraint> discoveredConstraints) {
@@ -201,6 +202,54 @@ public class TemporalTabController {
 		listView.getItems().clear();
 		for (DiscoveredConstraint constraint : filteredConstraints) {
 			listView.getItems().add(constraint.toString());
+		}
+	}
+	
+
+
+	private void populateTemporalClosenesLabels(DiscoveredActivity selectedActivity, DeclarePostprocessingResult declarePostprocessingResult) {
+		nextActivitiesHBox.getChildren().clear();
+		for (DiscoveredActivity act : declarePostprocessingResult.getPotentialNextActivities(selectedActivity)) {
+			Label l = new Label(act.getActivityName());
+			if (!declarePostprocessingResult.getPotentialNextDecisions(selectedActivity).contains(act)) {
+				l.setStyle("-fx-font-style: italic;");
+			}
+			nextActivitiesHBox.getChildren().add(l);
+			nextActivitiesHBox.getChildren().add(new Label(", "));
+		}
+		if (!nextActivitiesHBox.getChildren().isEmpty()) {
+			nextActivitiesHBox.getChildren().remove(nextActivitiesHBox.getChildren().size()-1);
+		}
+		
+		nextDecisionsHBox.getChildren().clear();
+		for (DiscoveredActivity act : declarePostprocessingResult.getPotentialNextDecisions(selectedActivity)) {
+			nextDecisionsHBox.getChildren().add(new Label(act.getActivityName()));
+			nextDecisionsHBox.getChildren().add(new Label(", "));
+		}
+		if (!nextDecisionsHBox.getChildren().isEmpty()) {
+			nextDecisionsHBox.getChildren().remove(nextDecisionsHBox.getChildren().size()-1);
+		}
+		
+		prevActivitiesHBox.getChildren().clear();
+		for (DiscoveredActivity act : declarePostprocessingResult.getPotentialPrevActivities(selectedActivity)) {
+			Label l = new Label(act.getActivityName());
+			if (!declarePostprocessingResult.getPotentialPrevDecisions(selectedActivity).contains(act)) {
+				l.setStyle("-fx-font-style: italic;");
+			}
+			prevActivitiesHBox.getChildren().add(l);
+			prevActivitiesHBox.getChildren().add(new Label(", "));
+		}
+		if (!prevActivitiesHBox.getChildren().isEmpty()) {
+			prevActivitiesHBox.getChildren().remove(prevActivitiesHBox.getChildren().size()-1);
+		}
+		
+		prevDecisionsHBox.getChildren().clear();
+		for (DiscoveredActivity act : declarePostprocessingResult.getPotentialPrevDecisions(selectedActivity)) {
+			prevDecisionsHBox.getChildren().add(new Label(act.getActivityName()));
+			prevDecisionsHBox.getChildren().add(new Label(", "));
+		}
+		if (!prevDecisionsHBox.getChildren().isEmpty()) {
+			prevDecisionsHBox.getChildren().remove(prevDecisionsHBox.getChildren().size()-1);
 		}
 	}
 

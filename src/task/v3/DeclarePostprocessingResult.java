@@ -51,11 +51,17 @@ public class DeclarePostprocessingResult {
 	}
 	
 	//Potential closest followers/preceders
-	public Set<DiscoveredActivity> getPotentialClosestFollowers(DiscoveredActivity discoveredActivity) {
-		return activityToRelationsMap.get(discoveredActivity).getPotentialClosestFollowers();
+	public Set<DiscoveredActivity> getPotentialNextActivities(DiscoveredActivity discoveredActivity) {
+		return activityToRelationsMap.get(discoveredActivity).getPotentialNextActivities();
 	}
-	public Set<DiscoveredActivity> getPotentialClosestPreceders(DiscoveredActivity discoveredActivity) {
-		return activityToRelationsMap.get(discoveredActivity).getPotentialClosestPreceders();
+	public Set<DiscoveredActivity> getPotentialNextDecisions(DiscoveredActivity discoveredActivity) {
+		return activityToRelationsMap.get(discoveredActivity).getPotentialNextDecisions();
+	}
+	public Set<DiscoveredActivity> getPotentialPrevActivities(DiscoveredActivity discoveredActivity) {
+		return activityToRelationsMap.get(discoveredActivity).getPotentialPrevActivities();
+	}
+	public Set<DiscoveredActivity> getPotentialPrevDecisions(DiscoveredActivity discoveredActivity) {
+		return activityToRelationsMap.get(discoveredActivity).getPotentialPrevDecisions();
 	}
 
 }

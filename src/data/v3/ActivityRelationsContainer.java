@@ -15,8 +15,10 @@ public class ActivityRelationsContainer {
 	private Set<DiscoveredActivity> allPrecederActivities = new LinkedHashSet<DiscoveredActivity>();
 	
 	//Potential closest followers/preceders of this activity based on constraints
-	private Set<DiscoveredActivity> potentialClosestFollowers = new LinkedHashSet<DiscoveredActivity>();
-	private Set<DiscoveredActivity> potentialClosestPreceders = new LinkedHashSet<DiscoveredActivity>();
+	private Set<DiscoveredActivity> potentialNextActivities = new LinkedHashSet<DiscoveredActivity>(); //Activities that can be executed next
+	private Set<DiscoveredActivity> potentialNextDecisions = new LinkedHashSet<DiscoveredActivity>(); //Activities that require an execution decision next (subset of potentialNextExecutions)
+	private Set<DiscoveredActivity> potentialPrevActivities = new LinkedHashSet<DiscoveredActivity>();
+	private Set<DiscoveredActivity> potentialPrevDecisions = new LinkedHashSet<DiscoveredActivity>();
 	
 	//Directional constraints on this activity
 	private Set<DiscoveredConstraint> constraintsToFollowers = new LinkedHashSet<DiscoveredConstraint>();
@@ -53,20 +55,32 @@ public class ActivityRelationsContainer {
 	}
 	
 	
-	public void addPotentialClosestFollower(DiscoveredActivity potentialClosestFollower) {
-		potentialClosestFollowers.add(potentialClosestFollower);
+	public void addPotentialNextActivity(DiscoveredActivity potentialNextActivity) {
+		potentialNextActivities.add(potentialNextActivity);
 	}
-	public Set<DiscoveredActivity> getPotentialClosestFollowers() {
-		return potentialClosestFollowers;
+	public Set<DiscoveredActivity> getPotentialNextActivities() {
+		return potentialNextActivities;
+	}
+	public void addPotentialNextDecision(DiscoveredActivity potentialNextActivity) {
+		potentialNextDecisions.add(potentialNextActivity);
+	}
+	public Set<DiscoveredActivity> getPotentialNextDecisions() {
+		return potentialNextDecisions;
 	}
 	
+	public void addPotentialPrevActivity(DiscoveredActivity potentialPrevActivity) {
+		potentialPrevActivities.add(potentialPrevActivity);
+	}
+	public Set<DiscoveredActivity> getPotentialPrevActivities() {
+		return potentialPrevActivities;
+	}
+	public void addPotentialPrevDecision(DiscoveredActivity potentialNextActivity) {
+		potentialPrevDecisions.add(potentialNextActivity);
+	}
+	public Set<DiscoveredActivity> getPotentialPrevDecisions() {
+		return potentialPrevDecisions;
+	}
 	
-	public void addPotentialClosestPreceder(DiscoveredActivity potentialClosestPreceder) {
-		potentialClosestPreceders.add(potentialClosestPreceder);
-	}
-	public Set<DiscoveredActivity> getPotentialClosestPreceders() {
-		return potentialClosestPreceders;
-	}
 	
 	
 	public void addConstraintToFollower(DiscoveredConstraint constraintToFollower) {

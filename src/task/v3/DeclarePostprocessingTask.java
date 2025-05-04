@@ -62,7 +62,8 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 				
 				//Potential closest follower activities based on constraints (i.e., which activities, if they occur, must occur the earliest among all the followers)
 				for (DiscoveredActivity candidateActivity : activityRelations.getAllFollowerActivities()) {
-					boolean potentiallyClosest = true;
+					boolean closestExecution = true;
+					boolean closestDecision = true;
 					for (DiscoveredConstraint followerConstraint : activityRelations.getConstraintsAmongFollowers()) {
 						//Exclusion of response here results in considering all activities that can be executed next as temporally closest
 						//Inclusion of response here would result in considering only the activities for which an execution decision has to be made first as temporally closest
@@ -70,42 +71,65 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 						if (followerConstraint.getTemplate() == ConstraintTemplate.Succession || followerConstraint.getTemplate() == ConstraintTemplate.Alternate_Succession) {
 							if (followerConstraint.getTargetActivity() == candidateActivity) {
 								//If this activity is the target of a succession then it cannot be the earliest among all the followers
-								potentiallyClosest = false;
+								closestExecution = false;
+								closestDecision = false;
 								break;
 							}
 						} else if (followerConstraint.getTemplate() == ConstraintTemplate.Precedence || followerConstraint.getTemplate() == ConstraintTemplate.Alternate_Precedence) {
 							if (followerConstraint.getActivationActivity() == candidateActivity) {
 								//If this activity is the activation of a precedence then it cannot be the earliest among all the followers
-								potentiallyClosest = false;
+								closestExecution = false;
+								closestDecision = false;
 								break;
+							}
+						} else if (followerConstraint.getTemplate() == ConstraintTemplate.Response || followerConstraint.getTemplate() == ConstraintTemplate.Alternate_Response) {
+							if (followerConstraint.getTargetActivity() == candidateActivity) {
+								//If this activity is the target of a response then it can be the earliest among the followers
+								//...but executing it the earliest among the followers requires first deciding to not execute the activation of that response
+								closestDecision = false;
 							}
 						}
 					}
-					if (potentiallyClosest) {
-						activityRelations.addPotentialClosestFollower(candidateActivity);
+					if (closestExecution) {
+						activityRelations.addPotentialNextActivity(candidateActivity);
+					}
+					if (closestDecision) {
+						activityRelations.addPotentialNextDecision(candidateActivity);
 					}
 				}
 				
 				//Potential closest preceder activities based on constraints (i.e., which activities, if they occur, must occur the latest among all the preceders)
 				for (DiscoveredActivity candidateActivity : activityRelations.getAllPrecederActivities()) {
-					boolean potentiallyClosest = true;
+					boolean closestExecution = true;
+					boolean closestDecision = true;
 					for (DiscoveredConstraint precederConstraint : activityRelations.getConstraintsAmongPreceders()) {
 						if (precederConstraint.getTemplate() == ConstraintTemplate.Succession || precederConstraint.getTemplate() == ConstraintTemplate.Alternate_Succession) {
 							if (precederConstraint.getActivationActivity() == candidateActivity) {
 								//If this activity is the activation of a succession then it cannot be the latest among the preceders
-								potentiallyClosest = false;
+								closestExecution = false;
+								closestDecision = false;
 								break;
 							}
 						} else if (precederConstraint.getTemplate() == ConstraintTemplate.Response || precederConstraint.getTemplate() == ConstraintTemplate.Alternate_Response) {
 							if (precederConstraint.getActivationActivity() == candidateActivity) {
 								//If this activity is the activation of a response then it cannot be the latest among the preceders
-								potentiallyClosest = false;
+								closestExecution = false;
+								closestDecision = false;
 								break;
+							}
+						} else if (precederConstraint.getTemplate() == ConstraintTemplate.Precedence || precederConstraint.getTemplate() == ConstraintTemplate.Alternate_Precedence) {
+							if (precederConstraint.getTargetActivity() == candidateActivity) {
+								//If this activity is the target of a precedence then it can be the latest among the preceders
+								//...but executing it the latest among preceders requires deciding to skip the activation of that precedence afterwards
+								closestDecision = false;
 							}
 						}
 					}
-					if (potentiallyClosest) {
-						activityRelations.addPotentialClosestPreceder(candidateActivity);
+					if (closestExecution) {
+						activityRelations.addPotentialPrevActivity(candidateActivity);
+					}
+					if (closestDecision) {
+						activityRelations.addPotentialPrevDecision(candidateActivity);
 					}
 				}
 			}

@@ -101,29 +101,65 @@
             </SplitPane>
             <VBox spacing="1.0">
                <children>
-                  <Label text="Based on Constraints...">
+                  <Label text="Based on constraints, the temporally closest...">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
                   <HBox>
                      <children>
-                        <Label text="temporally closest preceders: ">
+                        <Label text="potential previous activities: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
                         </Label>
-                        <Label fx:id="closestPrecedersLabel" text="&lt;activity names&gt;" />
+                        <HBox fx:id="prevActivitiesHBox">
+                           <children>
+                              <Label text="&lt;activity names&gt;" />
+                           </children>
+                        </HBox>
                      </children>
                   </HBox>
                   <HBox>
                      <children>
-                        <Label text="temporally closest followers: ">
+                        <Label text="previous decisions: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
                         </Label>
-                        <Label fx:id="closestFollowersLabel" text="&lt;activity names&gt;" />
+                        <HBox fx:id="prevDecisionsHBox">
+                           <children>
+                              <Label text="&lt;activity names&gt;" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
+                  <HBox layoutX="10.0" layoutY="46.0">
+                     <children>
+                        <Label text="potential next activities: ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <HBox fx:id="nextActivitiesHBox">
+                           <children>
+                              <Label text="&lt;activity names&gt;" />
+                           </children>
+                        </HBox>
+                     </children>
+                  </HBox>
+                  <HBox layoutX="10.0" layoutY="64.0">
+                     <children>
+                        <Label text="next decisions: ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <HBox fx:id="nextDecisionsHBox">
+                           <children>
+                              <Label text="&lt;activity names&gt;" />
+                           </children>
+                        </HBox>
                      </children>
                   </HBox>
                </children>
