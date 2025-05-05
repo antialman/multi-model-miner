@@ -127,7 +127,7 @@
                   </HBox>
                   <HBox>
                      <children>
-                        <Label text="preceding decisions: ">
+                        <Label text="predecessor decisions made on: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
@@ -155,7 +155,7 @@
                   </HBox>
                   <HBox layoutX="10.0" layoutY="64.0">
                      <children>
-                        <Label text="follower decisions: ">
+                        <Label text="follower decisions made on: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
