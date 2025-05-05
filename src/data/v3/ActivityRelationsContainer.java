@@ -10,11 +10,11 @@ public class ActivityRelationsContainer {
 	
 	private DiscoveredActivity activity;
 	
-	//All followers/preceders of this activity
+	//All followers/predecessors of this activity
 	private Set<DiscoveredActivity> allFollowerActivities = new LinkedHashSet<DiscoveredActivity>();
-	private Set<DiscoveredActivity> allPrecederActivities = new LinkedHashSet<DiscoveredActivity>();
+	private Set<DiscoveredActivity> allPredecessorActivities = new LinkedHashSet<DiscoveredActivity>();
 	
-	//Potential closest followers/preceders of this activity based on constraints
+	//Potential closest followers/predecessors of this activity based on constraints
 	private Set<DiscoveredActivity> potentialNextActivities = new LinkedHashSet<DiscoveredActivity>(); //Activities that can be executed next
 	private Set<DiscoveredActivity> potentialNextDecisions = new LinkedHashSet<DiscoveredActivity>(); //Activities that require an execution decision next (subset of potentialNextExecutions)
 	private Set<DiscoveredActivity> potentialPrevActivities = new LinkedHashSet<DiscoveredActivity>();
@@ -22,11 +22,11 @@ public class ActivityRelationsContainer {
 	
 	//Directional constraints on this activity
 	private Set<DiscoveredConstraint> constraintsToFollowers = new LinkedHashSet<DiscoveredConstraint>();
-	private Set<DiscoveredConstraint> constraintsFromPreceders = new LinkedHashSet<DiscoveredConstraint>();
+	private Set<DiscoveredConstraint> constraintsFromPredecessors = new LinkedHashSet<DiscoveredConstraint>();
 	
-	//Directional constraints between the followers/preceders of this activity
+	//Directional constraints between the followers/predecessors of this activity
 	private Set<DiscoveredConstraint> constraintsAmongFollowers = new LinkedHashSet<DiscoveredConstraint>();
-	private Set<DiscoveredConstraint> constraintsAmongPreceders = new LinkedHashSet<DiscoveredConstraint>();
+	private Set<DiscoveredConstraint> constraintsAmongPredecessors = new LinkedHashSet<DiscoveredConstraint>();
 	
 	
 	
@@ -47,11 +47,11 @@ public class ActivityRelationsContainer {
 	}
 	
 	
-	public void addPrecederActivity(DiscoveredActivity precederActivity) {
-		allPrecederActivities.add(precederActivity);
+	public void addPredecessorActivity(DiscoveredActivity predecessorActivity) {
+		allPredecessorActivities.add(predecessorActivity);
 	}
-	public Set<DiscoveredActivity> getAllPrecederActivities() {
-		return allPrecederActivities;
+	public Set<DiscoveredActivity> getAllPredecessorActivities() {
+		return allPredecessorActivities;
 	}
 	
 	
@@ -91,11 +91,11 @@ public class ActivityRelationsContainer {
 	}
 	
 	
-	public void addConstraintFromPreceder(DiscoveredConstraint constraintFromPreceder) {
-		constraintsFromPreceders.add(constraintFromPreceder);
+	public void addConstraintFromPredecessor(DiscoveredConstraint constraintFromPredecessor) {
+		constraintsFromPredecessors.add(constraintFromPredecessor);
 	}
-	public Set<DiscoveredConstraint> getConstraintsFromPreceders() {
-		return constraintsFromPreceders;
+	public Set<DiscoveredConstraint> getConstraintsFromPredecessors() {
+		return constraintsFromPredecessors;
 	}
 	
 	
@@ -107,11 +107,11 @@ public class ActivityRelationsContainer {
 	}
 	
 	
-	public void addConstraintAmongPreceders(DiscoveredConstraint constraintAmongPreceders) {
-		constraintsAmongPreceders.add(constraintAmongPreceders);
+	public void addConstraintAmongPredecessors(DiscoveredConstraint constraintAmongPredecessors) {
+		constraintsAmongPredecessors.add(constraintAmongPredecessors);
 	}
-	public Set<DiscoveredConstraint> getConstraintsAmongPreceders() {
-		return constraintsAmongPreceders;
+	public Set<DiscoveredConstraint> getConstraintsAmongPredecessors() {
+		return constraintsAmongPredecessors;
 	}
 	
 }

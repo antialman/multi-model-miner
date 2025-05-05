@@ -29,20 +29,20 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 				ActivityRelationsContainer activityRelations = new ActivityRelationsContainer(discoveredActivity);
 				declarePostprocessingResult.addActivityRelationsContainer(discoveredActivity, activityRelations);
 
-				//Followers and preceders of the discovered activity
+				//Followers and predecessors of the discovered activity
 				for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
 					if (discoveredConstraint.getActivationActivity() == discoveredActivity) {
 						if (!discoveredConstraint.getTemplate().getReverseActivationTarget()) {
 							activityRelations.addFollowerActivity(discoveredConstraint.getTargetActivity());
 							activityRelations.addConstraintToFollower(discoveredConstraint);
 						} else {
-							activityRelations.addPrecederActivity(discoveredConstraint.getTargetActivity());
-							activityRelations.addConstraintFromPreceder(discoveredConstraint);
+							activityRelations.addPredecessorActivity(discoveredConstraint.getTargetActivity());
+							activityRelations.addConstraintFromPredecessor(discoveredConstraint);
 						}
 					} else if (discoveredConstraint.getTargetActivity() == discoveredActivity) {
 						if (!discoveredConstraint.getTemplate().getReverseActivationTarget()) {
-							activityRelations.addPrecederActivity(discoveredConstraint.getActivationActivity());
-							activityRelations.addConstraintFromPreceder(discoveredConstraint);
+							activityRelations.addPredecessorActivity(discoveredConstraint.getActivationActivity());
+							activityRelations.addConstraintFromPredecessor(discoveredConstraint);
 						} else {
 							activityRelations.addFollowerActivity(discoveredConstraint.getActivationActivity());
 							activityRelations.addConstraintToFollower(discoveredConstraint);
@@ -50,13 +50,13 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 					}
 				}
 
-				//Constraints among followers/preceders of the discovered activity
+				//Constraints among followers/predecessors of the discovered activity
 				for (DiscoveredConstraint discoveredConstraint : declareDiscoveryResult.getConstraints()) {
 					if (activityRelations.getAllFollowerActivities().contains(discoveredConstraint.getActivationActivity()) && activityRelations.getAllFollowerActivities().contains(discoveredConstraint.getTargetActivity())) {
 						activityRelations.addConstraintAmongFollowers(discoveredConstraint);
-					} //Technically, the same constraint should not appear among both followers and preceders, however there is a slim chance this will change when finalizing handling of loops
-					if (activityRelations.getAllPrecederActivities().contains(discoveredConstraint.getActivationActivity()) && activityRelations.getAllPrecederActivities().contains(discoveredConstraint.getTargetActivity())) {
-						activityRelations.addConstraintAmongPreceders(discoveredConstraint);
+					} //Technically, the same constraint should not appear among both followers and predecessors, however there is a slim chance this will change when finalizing handling of loops
+					if (activityRelations.getAllPredecessorActivities().contains(discoveredConstraint.getActivationActivity()) && activityRelations.getAllPredecessorActivities().contains(discoveredConstraint.getTargetActivity())) {
+						activityRelations.addConstraintAmongPredecessors(discoveredConstraint);
 					}
 				}
 
@@ -95,30 +95,30 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 					}
 				}
 
-				//Potential closest preceder activities based on constraints (i.e., which activities, if they occur, must occur the latest among all the preceders)
-				for (DiscoveredActivity candidateActivity : activityRelations.getAllPrecederActivities()) {
+				//Potential closest predecessor activities based on constraints (i.e., which activities, if they occur, must occur the latest among all the predecessors)
+				for (DiscoveredActivity candidateActivity : activityRelations.getAllPredecessorActivities()) {
 					boolean closestExecution = true;
 					boolean closestDecision = true;
-					for (DiscoveredConstraint precederConstraint : activityRelations.getConstraintsAmongPreceders()) {
-						if (precederConstraint.getTemplate() == ConstraintTemplate.Succession || precederConstraint.getTemplate() == ConstraintTemplate.Alternate_Succession) {
-							if (precederConstraint.getActivationActivity() == candidateActivity) {
-								//If this activity is the activation of a succession or response then it cannot be the latest among the preceders
+					for (DiscoveredConstraint predecessorConstraint : activityRelations.getConstraintsAmongPredecessors()) {
+						if (predecessorConstraint.getTemplate() == ConstraintTemplate.Succession || predecessorConstraint.getTemplate() == ConstraintTemplate.Alternate_Succession) {
+							if (predecessorConstraint.getActivationActivity() == candidateActivity) {
+								//If this activity is the activation of a succession or response then it cannot be the latest among the predecessors
 								closestExecution = false;
 								closestDecision = false;
 								break;
 							}
-							else if (precederConstraint.getTemplate() == ConstraintTemplate.Response || precederConstraint.getTemplate() == ConstraintTemplate.Alternate_Response) {
-								if (precederConstraint.getActivationActivity() == candidateActivity) {
-									//If this activity is the activation of a succession or response then it cannot be the latest among the preceders
+							else if (predecessorConstraint.getTemplate() == ConstraintTemplate.Response || predecessorConstraint.getTemplate() == ConstraintTemplate.Alternate_Response) {
+								if (predecessorConstraint.getActivationActivity() == candidateActivity) {
+									//If this activity is the activation of a succession or response then it cannot be the latest among the predecessors
 									closestExecution = false;
 									closestDecision = false;
 									break;
 								}
 							}
-						} else if (precederConstraint.getTemplate() == ConstraintTemplate.Precedence || precederConstraint.getTemplate() == ConstraintTemplate.Alternate_Precedence) {
-							if (precederConstraint.getTargetActivity() == candidateActivity) {
-								//If this activity is the target of a precedence then it can be the latest among the preceders
-								//...but executing it the latest among preceders requires deciding to skip the activation of that precedence afterwards (in the same loop iteration)
+						} else if (predecessorConstraint.getTemplate() == ConstraintTemplate.Precedence || predecessorConstraint.getTemplate() == ConstraintTemplate.Alternate_Precedence) {
+							if (predecessorConstraint.getTargetActivity() == candidateActivity) {
+								//If this activity is the target of a precedence then it can be the latest among the predecessors
+								//...but executing it the latest among predecessors requires deciding to skip the activation of that precedence afterwards (in the same loop iteration)
 								closestDecision = false; //Cannot break iteration here because there might also be a Succession or Response among other constraints
 							}
 						}

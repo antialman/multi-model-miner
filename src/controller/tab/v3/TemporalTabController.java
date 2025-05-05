@@ -51,15 +51,15 @@ public class TemporalTabController {
 	@FXML
 	private SplitPane splitPane4;
 	@FXML
-	private RadioButton followersAmongRadioButton;
+	private RadioButton amongFollowersRadioButton;
 	@FXML
 	private ToggleGroup amongToggleGroup;
 	@FXML
-	private RadioButton precedersAmongRadioButton;
+	private RadioButton amongPredecessorsRadioButton;
 	@FXML
-	private RadioButton followersOfRadioButton;
+	private RadioButton followerConstraintsRadioButton;
 	@FXML
-	private RadioButton precedersOfRadioButton;
+	private RadioButton predecessorČonstraintsRadioButton;
 	@FXML
 	private CheckBox assumeExistenceCheckBox;
 	@FXML
@@ -160,17 +160,17 @@ public class TemporalTabController {
 		//Among WebView
 		List<DiscoveredActivity> amongActivities = new ArrayList<DiscoveredActivity>();
 		List<DiscoveredConstraint> amongConstraints = new ArrayList<DiscoveredConstraint>();
-		if (amongToggleGroup.getSelectedToggle() == followersAmongRadioButton) {
+		if (amongToggleGroup.getSelectedToggle() == amongFollowersRadioButton) {
 			amongActivities.addAll(declarePostprocessingResult.getAllFollowerActivities(selectedActivity));
 			amongConstraints.addAll(declarePostprocessingResult.getConstraintsAmongFollowers(selectedActivity));
-		} else if (amongToggleGroup.getSelectedToggle() == precedersAmongRadioButton) {
-			amongActivities.addAll(declarePostprocessingResult.getAllPrecederActivities(selectedActivity));
-			amongConstraints.addAll(declarePostprocessingResult.getConstraintsAmongPreceders(selectedActivity));
-		} else { //Visualizing all constraints that are directly related to the potentially closest followers/preceders
+		} else if (amongToggleGroup.getSelectedToggle() == amongPredecessorsRadioButton) {
+			amongActivities.addAll(declarePostprocessingResult.getAllPredecessorActivities(selectedActivity));
+			amongConstraints.addAll(declarePostprocessingResult.getConstraintsAmongPredecessors(selectedActivity));
+		} else { //Visualizing all constraints that are directly related to the potentially closest followers/predecessors
 			Set<DiscoveredActivity> closestActivities = new HashSet<DiscoveredActivity>();
-			if (amongToggleGroup.getSelectedToggle() == followersOfRadioButton) {
+			if (amongToggleGroup.getSelectedToggle() == followerConstraintsRadioButton) {
 				closestActivities.addAll(declarePostprocessingResult.getPotentialNextActivities(selectedActivity));
-			} else if (amongToggleGroup.getSelectedToggle() == precedersOfRadioButton) {
+			} else if (amongToggleGroup.getSelectedToggle() == predecessorČonstraintsRadioButton) {
 				closestActivities.addAll(declarePostprocessingResult.getPotentialPrevActivities(selectedActivity));
 			}
 			Set<DiscoveredActivity> vizActivities = new LinkedHashSet<DiscoveredActivity>();

@@ -63,19 +63,19 @@
                                  </VBox.margin>
                                  <children>
                                     <Label text="Constraints among:" />
-                                    <RadioButton fx:id="followersAmongRadioButton" mnemonicParsing="false" selected="true" text="Followers">
+                                    <RadioButton fx:id="amongFollowersRadioButton" mnemonicParsing="false" selected="true" text="Followers">
                                        <toggleGroup>
                                           <ToggleGroup fx:id="amongToggleGroup" />
                                        </toggleGroup>
                                     </RadioButton>
-                                    <RadioButton fx:id="precedersAmongRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceders" toggleGroup="$amongToggleGroup" />
+                                    <RadioButton fx:id="amongPredecessorsRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Predecessors" toggleGroup="$amongToggleGroup" />
                                  </children>
                               </HBox>
                               <HBox layoutX="15.0" layoutY="20.0" spacing="10.0">
                                  <children>
                                     <Label text="Constraints of closest:" />
-                                    <RadioButton fx:id="followersOfRadioButton" mnemonicParsing="false" text="Followers" toggleGroup="$amongToggleGroup" />
-                                    <RadioButton fx:id="precedersOfRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Preceders" toggleGroup="$amongToggleGroup" />
+                                    <RadioButton fx:id="followerConstraintsRadioButton" mnemonicParsing="false" text="Followers" toggleGroup="$amongToggleGroup" />
+                                    <RadioButton fx:id="predecessorČonstraintsRadioButton" layoutX="113.0" layoutY="10.0" mnemonicParsing="false" text="Predecessors" toggleGroup="$amongToggleGroup" />
                                  </children>
                                  <VBox.margin>
                                     <Insets left="5.0" />
@@ -113,7 +113,7 @@
                   </Label>
                   <HBox>
                      <children>
-                        <Label text="potential previous activities: ">
+                        <Label text="closest executable predecessors: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
@@ -127,7 +127,7 @@
                   </HBox>
                   <HBox>
                      <children>
-                        <Label text="previous decisions: ">
+                        <Label text="closest preceding decisions: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
@@ -141,7 +141,7 @@
                   </HBox>
                   <HBox layoutX="10.0" layoutY="46.0">
                      <children>
-                        <Label text="potential next activities: ">
+                        <Label text="closest executable followers: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
@@ -155,7 +155,7 @@
                   </HBox>
                   <HBox layoutX="10.0" layoutY="64.0">
                      <children>
-                        <Label text="next decisions: ">
+                        <Label text="closest follower decisions: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>

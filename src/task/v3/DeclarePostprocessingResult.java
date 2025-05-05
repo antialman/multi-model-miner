@@ -22,12 +22,12 @@ public class DeclarePostprocessingResult {
 	public Set<DiscoveredActivity> getAllFollowerActivities(DiscoveredActivity discoveredActivity) {
 		return activityToRelationsMap.get(discoveredActivity).getAllFollowerActivities();
 	}
-	public Set<DiscoveredActivity> getAllPrecederActivities(DiscoveredActivity discoveredActivity) {
-		return activityToRelationsMap.get(discoveredActivity).getAllPrecederActivities();
+	public Set<DiscoveredActivity> getAllPredecessorActivities(DiscoveredActivity discoveredActivity) {
+		return activityToRelationsMap.get(discoveredActivity).getAllPredecessorActivities();
 	}
 	public List<DiscoveredActivity> getDirectlyRelatedActivities(DiscoveredActivity discoveredActivity) {
 		List<DiscoveredActivity> directlyRelatedConstraints = new ArrayList<DiscoveredActivity>(getAllFollowerActivities(discoveredActivity));
-		directlyRelatedConstraints.addAll(getAllPrecederActivities(discoveredActivity));
+		directlyRelatedConstraints.addAll(getAllPredecessorActivities(discoveredActivity));
 		return directlyRelatedConstraints;
 	}
 	
@@ -35,22 +35,22 @@ public class DeclarePostprocessingResult {
 	public Set<DiscoveredConstraint> getConstraintsToFollowers(DiscoveredActivity discoveredActivity) {
 		return activityToRelationsMap.get(discoveredActivity).getConstraintsToFollowers();
 	}
-	public Set<DiscoveredConstraint> getConstraintsFromPreceders(DiscoveredActivity discoveredActivity) {
-		return activityToRelationsMap.get(discoveredActivity).getConstraintsFromPreceders();
+	public Set<DiscoveredConstraint> getConstraintsFromPredecessors(DiscoveredActivity discoveredActivity) {
+		return activityToRelationsMap.get(discoveredActivity).getConstraintsFromPredecessors();
 	}
 	public List<DiscoveredConstraint> getDirectlyRelatedConstraints(DiscoveredActivity discoveredActivity) {
 		List<DiscoveredConstraint> directlyRelatedConstraints = new ArrayList<DiscoveredConstraint>(getConstraintsToFollowers(discoveredActivity));
-		directlyRelatedConstraints.addAll(getConstraintsFromPreceders(discoveredActivity));
+		directlyRelatedConstraints.addAll(getConstraintsFromPredecessors(discoveredActivity));
 		return directlyRelatedConstraints;
 	}
 	public Set<DiscoveredConstraint> getConstraintsAmongFollowers(DiscoveredActivity discoveredActivity) {
 		return activityToRelationsMap.get(discoveredActivity).getConstraintsAmongFollowers();
 	}
-	public Set<DiscoveredConstraint> getConstraintsAmongPreceders(DiscoveredActivity discoveredActivity) {
-		return activityToRelationsMap.get(discoveredActivity).getConstraintsAmongPreceders();
+	public Set<DiscoveredConstraint> getConstraintsAmongPredecessors(DiscoveredActivity discoveredActivity) {
+		return activityToRelationsMap.get(discoveredActivity).getConstraintsAmongPredecessors();
 	}
 	
-	//Potential closest followers/preceders
+	//Potential closest followers/predecessors
 	public Set<DiscoveredActivity> getPotentialNextActivities(DiscoveredActivity discoveredActivity) {
 		return activityToRelationsMap.get(discoveredActivity).getPotentialNextActivities();
 	}
