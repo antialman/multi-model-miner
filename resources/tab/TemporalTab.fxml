@@ -106,14 +106,14 @@
             </SplitPane>
             <VBox spacing="1.0">
                <children>
-                  <Label text="Based on constraints, the temporally closest...">
+                  <Label text="Based on constraints, the potential temporally closest...">
                      <font>
                         <Font name="System Bold" size="12.0" />
                      </font>
                   </Label>
                   <HBox>
                      <children>
-                        <Label text="closest executable predecessors: ">
+                        <Label text="executable predecessors: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
@@ -127,7 +127,7 @@
                   </HBox>
                   <HBox>
                      <children>
-                        <Label text="closest preceding decisions: ">
+                        <Label text="preceding decisions: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
@@ -141,7 +141,7 @@
                   </HBox>
                   <HBox layoutX="10.0" layoutY="46.0">
                      <children>
-                        <Label text="closest executable followers: ">
+                        <Label text="executable followers: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
@@ -155,7 +155,7 @@
                   </HBox>
                   <HBox layoutX="10.0" layoutY="64.0">
                      <children>
-                        <Label text="closest follower decisions: ">
+                        <Label text="follower decisions: ">
                            <HBox.margin>
                               <Insets left="10.0" />
                            </HBox.margin>
