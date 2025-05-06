@@ -1,7 +1,8 @@
 package task.v3;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -12,10 +13,15 @@ import data.v3.ActivityRelationsContainer;
 
 public class DeclarePostprocessingResult {
 	
-	private Map<DiscoveredActivity, ActivityRelationsContainer> activityToRelationsMap = new HashMap<DiscoveredActivity, ActivityRelationsContainer>();
+	private Map<DiscoveredActivity, ActivityRelationsContainer> activityToRelationsMap = new LinkedHashMap<DiscoveredActivity, ActivityRelationsContainer>();
 	
 	public void addActivityRelationsContainer(DiscoveredActivity discoveredActivity, ActivityRelationsContainer activityRelationsContainer) {
 		activityToRelationsMap.put(discoveredActivity, activityRelationsContainer);
+	}
+	
+	public Set<DiscoveredActivity> getAllActivities() {
+		//Returning a new set to avoid accidental modifications of activityToRelationsMap
+		return new LinkedHashSet<DiscoveredActivity>(activityToRelationsMap.keySet());
 	}
 	
 	//Related activities

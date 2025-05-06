@@ -87,6 +87,16 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 							}
 						}
 					}
+					
+//					if (closestDecision) {
+//						for (DiscoveredConstraint discoveredConstraint : activityRelations.getConstraintsFromPredecessors()) {
+//							//If the discoveredActivity activates (Alternate) Succession/Response then the candidateActivity is mandatory
+//							if (!(discoveredConstraint.getActivationActivity() == discoveredActivity && (discoveredConstraint.getTemplate() == ConstraintTemplate.Succession || discoveredConstraint.getTemplate() == ConstraintTemplate.Alternate_Succession || discoveredConstraint.getTemplate() == ConstraintTemplate.Response || discoveredConstraint.getTemplate() == ConstraintTemplate.Alternate_Response))) {
+//								closestDecision = false;
+//							}
+//						}
+//					}
+					
 					if (closestExecution) {
 						activityRelations.addPotentialNextActivity(candidateActivity);
 					}

@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+
+
+<SplitPane fx:id="splitPane1" dividerPositions="0.2" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.tab.v3.RefinedTabController">
+   <items>
+      <VBox spacing="3.0">
+         <children>
+            <Label text="Activity selector:">
+               <VBox.margin>
+                  <Insets left="5.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </Label>
+            <ListView fx:id="activityListView" VBox.vgrow="ALWAYS" />
+         </children>
+      </VBox>
+      <VBox fx:id="resultsVBox" spacing="3.0">
+         <children>
+            <HBox>
+               <children>
+                  <Label text="Selected activity: " />
+                  <Label fx:id="activityNameLabel" text="&lt;activityName&gt;" />
+               </children>
+            </HBox>
+            <HBox>
+               <children>
+                  <Label text="Executable followers based on constraints: " />
+                  <Label fx:id="constraintFollowersLabel" text="&lt;activityNames&gt;" />
+               </children>
+            </HBox>
+            <HBox>
+               <children>
+                  <Label text="The first group among these is: " />
+                  <Label fx:id="refinedFollowersLabel" text="&lt;activityNames&gt;" />
+               </children>
+            </HBox>
+            <HBox layoutX="15.0" layoutY="40.0">
+               <children>
+                  <Label text="Executable predecessors based on constraints: " />
+                  <Label fx:id="constraintPredecessorsLabel" text="&lt;activityNames&gt;" />
+               </children>
+            </HBox>
+            <HBox layoutX="15.0" layoutY="80.0">
+               <children>
+                  <Label text="The last group among these is: " />
+                  <Label fx:id="refinedPredecessorsLabel" text="&lt;activityNames&gt;" />
+               </children>
+            </HBox>
+         </children>
+         <padding>
+            <Insets left="5.0" top="10.0" />
+         </padding>
+      </VBox>
+   </items>
+</SplitPane>

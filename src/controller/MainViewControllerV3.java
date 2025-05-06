@@ -10,6 +10,7 @@ import org.apache.commons.collections15.BidiMap;
 import org.apache.commons.collections15.bidimap.DualHashBidiMap;
 
 import controller.tab.v3.ConstraintsTabController;
+import controller.tab.v3.RefinedTabController;
 import controller.tab.v3.TemporalTabController;
 import data.DiscoveredActivity;
 import javafx.concurrent.Task;
@@ -26,6 +27,8 @@ import task.DeclareDiscoveryResult;
 import task.DeclareDiscoveryTask;
 import task.v3.DeclarePostprocessingResult;
 import task.v3.DeclarePostprocessingTask;
+import task.v3.RefinedClosenessTask;
+import task.v3.RefinedClosenessTaskResult;
 import utils.AlertUtils;
 import utils.ConstraintTemplate;
 import utils.DeclarePruningType;
@@ -50,16 +53,20 @@ public class MainViewControllerV3 {
 	private Tab constraintsTab;
 	@FXML
 	private Tab temporalTab;
+	@FXML
+	private Tab refinedTab;
 
 	private Stage stage;
 	private ConstraintsTabController constraintsTabController;
 	private TemporalTabController temporalTabController;
+	private RefinedTabController refinedTabController;
 
 	private File logFile;
 
 	private DeclareDiscoveryResult declareDiscoveryResult;
 	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
 	private DeclarePostprocessingResult declarePostprocessingResult;
+	private RefinedClosenessTaskResult refinedClosenessTaskResult;
 
 
 
@@ -91,7 +98,17 @@ public class MainViewControllerV3 {
 			temporalTab.setContent(rootPane);
 		} catch (IOException | IllegalStateException e) {
 			e.printStackTrace();
-			AlertUtils.showError("Error loading FXML for Declare Miner Output tab!");
+			AlertUtils.showError("Error loading FXML for Temporal Closeness tab!");
+		}
+		
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("tab/RefinedTab.fxml"));
+			Region rootPane = loader.load(); //There seems to be a bug in JavaFX framework that causes IllegalStateException to be thrown instead of IOException
+			refinedTabController = loader.getController();
+			refinedTab.setContent(rootPane);
+		} catch (IOException | IllegalStateException e) {
+			e.printStackTrace();
+			AlertUtils.showError("Error loading FXML for Refined Closeness tab!");
 		}
 	}
 
@@ -176,12 +193,33 @@ public class MainViewControllerV3 {
 		declarePostprocessingTask.setOnSucceeded(event -> {
 			declarePostprocessingResult = declarePostprocessingTask.getValue();
 			temporalTabController.updateTabContents(declareDiscoveryResult, declarePostprocessingResult);
+			
+			//Execute Declare refined temporal closeness task
+			RefinedClosenessTask refinedClosenessTask = new RefinedClosenessTask();
+			refinedClosenessTask.setDeclarePostProcessingResult(declarePostprocessingResult);
+			refinedClosenessTask.setEventLog(declareDiscoveryResult.getEventLog());
+			addDeclarePostprocessingTaskHandlers(refinedClosenessTask);
+			executorService.execute(refinedClosenessTask);
 		});
 
 		//Handle task failure
 		declarePostprocessingTask.setOnFailed(event -> {
 			AlertUtils.showError("Declare post-processing failed");
 		});
+	}
+
+	private void addDeclarePostprocessingTaskHandlers(RefinedClosenessTask refinedClosenessTask) {
+		refinedClosenessTask.setOnSucceeded(event -> {
+			refinedClosenessTaskResult = refinedClosenessTask.getValue();
+			
+			refinedTabController.updateTabContents(declareDiscoveryResult, declarePostprocessingResult, refinedClosenessTaskResult);
+		});
+
+		//Handle task failure
+		refinedClosenessTask.setOnFailed(event -> {
+			AlertUtils.showError("Refined closeness task failed");
+		});
+		
 	}
 
 	private void sortDiscoveredActivities(List<DiscoveredActivity> discoveredActivities) {

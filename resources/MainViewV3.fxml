@@ -25,7 +25,7 @@
          <tabs>
             <Tab fx:id="constraintsTab" closable="false" text="Declare Miner Output" />
             <Tab fx:id="temporalTab" text="Temporal Closeness" />
-            <Tab text="Refined Closeness">
+            <Tab fx:id="refinedTab" text="Refined Closeness">
               <content>
                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" />
               </content>
