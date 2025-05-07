@@ -99,6 +99,21 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 						refinedClosenessTaskResult.addNextFollowerPrecGroup(discoveredActivity, nextFollowersPrecGroup);
 					}
 					
+					//Finding Succession relations based on Response and Precedence relations
+					for (int i = 0; i < refinedClosenessTaskResult.getFollowerRespGroups(discoveredActivity).size(); i++) {
+						for (int j = i+1; j < refinedClosenessTaskResult.getFollowerRespGroups(discoveredActivity).size(); j++) {
+							Set<DiscoveredActivity> respGroupA = refinedClosenessTaskResult.getFollowerRespGroups(discoveredActivity).get(i);
+							Set<DiscoveredActivity> respGroupB = refinedClosenessTaskResult.getFollowerRespGroups(discoveredActivity).get(j);
+							
+							int groupAPrecIndex = refinedClosenessTaskResult.getFollowerPrecGroups(discoveredActivity).indexOf(respGroupA);
+							int groupBPrecIndex = refinedClosenessTaskResult.getFollowerPrecGroups(discoveredActivity).indexOf(respGroupB);
+							
+							if (groupAPrecIndex != -1 && groupBPrecIndex != -1 && groupAPrecIndex < groupBPrecIndex) {
+								refinedClosenessTaskResult.addFollowerSuccRelation(discoveredActivity, respGroupA, respGroupB);
+							}
+						}
+					}
+					
 				} else {
 					refinedClosenessTaskResult.addNextFollowerRespGroup(discoveredActivity, new HashSet<DiscoveredActivity>(potentialNextActivities));
 					refinedClosenessTaskResult.addNextFollowerPrecGroup(discoveredActivity, new HashSet<DiscoveredActivity>(potentialNextActivities));

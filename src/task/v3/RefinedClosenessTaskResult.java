@@ -9,9 +9,10 @@ import java.util.Set;
 import data.DiscoveredActivity;
 
 public class RefinedClosenessTaskResult {
-	
+	 
 	private Map<DiscoveredActivity, List<Set<DiscoveredActivity>>> followerRespGroupsMap = new HashMap<DiscoveredActivity, List<Set<DiscoveredActivity>>>();
 	private Map<DiscoveredActivity, List<Set<DiscoveredActivity>>> followerPrecGroupsMap = new HashMap<DiscoveredActivity, List<Set<DiscoveredActivity>>>();
+	private Map<DiscoveredActivity, List<List<Set<DiscoveredActivity>>>> followerSuccRelationsMap = new HashMap<DiscoveredActivity, List<List<Set<DiscoveredActivity>>>>();
 	
 	public void addNextFollowerRespGroup(DiscoveredActivity followerGroupOf, Set<DiscoveredActivity> followerRespGroup) {
 		if (!followerRespGroupsMap.containsKey(followerGroupOf)) {
@@ -31,5 +32,19 @@ public class RefinedClosenessTaskResult {
 	}
 	public List<Set<DiscoveredActivity>> getFollowerPrecGroups(DiscoveredActivity followerGroupOf) {
 		return followerPrecGroupsMap.get(followerGroupOf);
+	}
+	
+	//TODO: Needs refactoring
+	public void addFollowerSuccRelation(DiscoveredActivity succRelationOf, Set<DiscoveredActivity> respGroupA, Set<DiscoveredActivity> respGroupB) {
+		if (!followerSuccRelationsMap.containsKey(succRelationOf)) {
+			followerSuccRelationsMap.put(succRelationOf, new ArrayList<List<Set<DiscoveredActivity>>>());
+		}
+		List<Set<DiscoveredActivity>> succList = new ArrayList<Set<DiscoveredActivity>>();
+		succList.add(respGroupA);
+		succList.add(respGroupB);
+		followerSuccRelationsMap.get(succRelationOf).add(succList);
+	}
+	public List<List<Set<DiscoveredActivity>>> getFollowerSuccRelations(DiscoveredActivity succRelationsOf) {
+		return followerSuccRelationsMap.get(succRelationsOf);
 	}
 }

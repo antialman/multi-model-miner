@@ -71,7 +71,7 @@
                               <Insets left="10.0" />
                            </HBox.margin>
                         </Label>
-                        <VBox fx:id="refinedFollowersPrecVBox1">
+                        <VBox fx:id="refinedFollowersSuccVBox">
                            <children>
                               <Label text="&lt;activityNames&gt;" />
                            </children>

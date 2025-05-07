@@ -1,5 +1,6 @@
 package controller.tab.v3;
 
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -33,6 +34,8 @@ public class RefinedTabController {
 	private VBox refinedFollowersRespVBox;
 	@FXML
 	private VBox refinedFollowersPrecVBox;
+	@FXML
+	private VBox refinedFollowersSuccVBox;
 	@FXML
 	private Label constraintPredecessorsLabel;
 	@FXML
@@ -79,6 +82,7 @@ public class RefinedTabController {
 		constraintFollowersLabel.setText("");
 		refinedFollowersRespVBox.getChildren().clear();
 		refinedFollowersPrecVBox.getChildren().clear();
+		refinedFollowersSuccVBox.getChildren().clear();
 	}
 
 	public void updateTabContents(DeclareDiscoveryResult declareDiscoveryResult, DeclarePostprocessingResult declarePostprocessingResult, RefinedClosenessTaskResult refinedClosenessTaskResult) {
@@ -113,6 +117,17 @@ public class RefinedTabController {
 				refinedFollowersPrecVBox.getChildren().add(l);
 			}
 		}
+		refinedFollowersSuccVBox.getChildren().clear();
+		if (refinedClosenessTaskResult.getFollowerSuccRelations(discoveredActivity) != null) {
+			for (int i = 0; i < refinedClosenessTaskResult.getFollowerSuccRelations(discoveredActivity).size(); i++) {
+				List<Set<DiscoveredActivity>> succRelation = refinedClosenessTaskResult.getFollowerSuccRelations(discoveredActivity).get(i);
+				if (!succRelation.isEmpty()) {
+					Label l = new Label("* " + "(" + succRelation.get(0).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")) + ") -> (" + succRelation.get(1).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")) + ")");
+					refinedFollowersSuccVBox.getChildren().add(l);
+				}
+			}	
+		}
+		
 		
 		constraintPredecessorsLabel.setText(declarePostprocessingResult.getPotentialPrevActivities(discoveredActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
 	}
