@@ -71,28 +71,22 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 						lastOcurrenceOrders.add(lastOcurrenceOrder);
 					}
 					
-					System.out.println(firstOcurrenceOrders);
-					System.out.println(lastOcurrenceOrders);
-					
-					//Finding the first group of activities among the refinementSet
-					Set<DiscoveredActivity> currentActivityGroup = new HashSet<DiscoveredActivity>();
-					for (Set<DiscoveredActivity> firstOcurrenceOrder : firstOcurrenceOrders) {
-						if (firstOcurrenceOrder.iterator().hasNext()) {
-							currentActivityGroup.add(firstOcurrenceOrder.iterator().next());
+					//Finding the ordered groups of activities among the refinementSet
+					while (!firstOcurrenceOrders.isEmpty()) {
+						Set<DiscoveredActivity> nextFollowersGroup = findNextFollowersGroup(firstOcurrenceOrders);
+						Iterator<Set<DiscoveredActivity>> it = firstOcurrenceOrders.iterator();
+						while (it.hasNext()) {
+							Set<DiscoveredActivity> firstOcurrenceOrder = it.next();
+							nextFollowersGroup.forEach(nextFollower -> firstOcurrenceOrder.remove(nextFollower));
+							if (firstOcurrenceOrder.isEmpty()) {
+								it.remove();
+							}
 						}
-					}
-					for (DiscoveredActivity currentActivity : currentActivityGroup) {
-						firstOcurrenceOrders.forEach(firstOcurrenceOrder -> {firstOcurrenceOrder.remove(currentActivity);});
+						refinedClosenessTaskResult.addNextFollowerGroup(discoveredActivity, nextFollowersGroup);
 					}
 					
-					System.out.println(currentActivityGroup);
-					
-					System.out.println(firstOcurrenceOrders);
-					System.out.println(lastOcurrenceOrders);
-					
-					refinedClosenessTaskResult.addFirstFollowerGroup(discoveredActivity, currentActivityGroup);
 				} else {
-					refinedClosenessTaskResult.addFirstFollowerGroup(discoveredActivity, new HashSet<DiscoveredActivity>(refinementSet));
+					refinedClosenessTaskResult.addNextFollowerGroup(discoveredActivity, new HashSet<DiscoveredActivity>(refinementSet));
 				}
 			}
 			
@@ -106,6 +100,17 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 			e.printStackTrace();
 			throw e;
 		}
-
+	}
+	
+	private Set<DiscoveredActivity> findNextFollowersGroup(Set<Set<DiscoveredActivity>> firstOcurrenceOrders) {
+		Set<DiscoveredActivity> nextFollowersGroup = new HashSet<DiscoveredActivity>();
+		
+		for (Set<DiscoveredActivity> firstOcurrenceOrder : firstOcurrenceOrders) {
+			if (firstOcurrenceOrder.iterator().hasNext()) {
+				nextFollowersGroup.add(firstOcurrenceOrder.iterator().next());
+			}
+		}
+		return nextFollowersGroup;
+		
 	}
 }

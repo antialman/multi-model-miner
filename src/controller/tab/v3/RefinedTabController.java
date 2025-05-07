@@ -1,5 +1,6 @@
 package controller.tab.v3;
 
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import data.DiscoveredActivity;
@@ -29,7 +30,7 @@ public class RefinedTabController {
 	@FXML
 	private Label constraintFollowersLabel;
 	@FXML
-	private Label refinedFollowersLabel;
+	private VBox refinedFollowersHBox;
 	@FXML
 	private Label constraintPredecessorsLabel;
 	@FXML
@@ -74,7 +75,7 @@ public class RefinedTabController {
 
 		activityNameLabel.setText("");
 		constraintFollowersLabel.setText("");
-		refinedFollowersLabel.setText("");
+		refinedFollowersHBox.getChildren().clear();
 	}
 
 	public void updateTabContents(DeclareDiscoveryResult declareDiscoveryResult, DeclarePostprocessingResult declarePostprocessingResult, RefinedClosenessTaskResult refinedClosenessTaskResult) {
@@ -92,7 +93,13 @@ public class RefinedTabController {
 	private void updateVisualization(DiscoveredActivity discoveredActivity) {
 		activityNameLabel.setText(discoveredActivity.getActivityName());
 		constraintFollowersLabel.setText(declarePostprocessingResult.getPotentialNextActivities(discoveredActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
-		refinedFollowersLabel.setText(refinedClosenessTaskResult.getFirstFollowerGroup(discoveredActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
+
+		refinedFollowersHBox.getChildren().clear();
+		for (int i = 0; i < refinedClosenessTaskResult.getFollowerGroups(discoveredActivity).size(); i++) {
+			Set<DiscoveredActivity> followerGroup = refinedClosenessTaskResult.getFollowerGroups(discoveredActivity).get(i);
+			Label l = new Label(i+1 + ": " + followerGroup.stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
+			refinedFollowersHBox.getChildren().add(l);
+		}
 	}
 
 }

@@ -36,8 +36,12 @@
             </HBox>
             <HBox>
                <children>
-                  <Label text="The first group among these is: " />
-                  <Label fx:id="refinedFollowersLabel" text="&lt;activityNames&gt;" />
+                  <Label text="The refined temporal order among these is " />
+                  <VBox fx:id="refinedFollowersHBox">
+                     <children>
+                        <Label text="&lt;activityNames&gt;" />
+                     </children>
+                  </VBox>
                </children>
             </HBox>
             <HBox layoutX="15.0" layoutY="40.0">

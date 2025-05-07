@@ -1,6 +1,8 @@
 package task.v3;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -8,13 +10,16 @@ import data.DiscoveredActivity;
 
 public class RefinedClosenessTaskResult {
 	
-	private Map<DiscoveredActivity, Set<DiscoveredActivity>> firstFollowerGroupMap = new HashMap<DiscoveredActivity, Set<DiscoveredActivity>>();
+	private Map<DiscoveredActivity, List<Set<DiscoveredActivity>>> followerGroupsMap = new HashMap<DiscoveredActivity, List<Set<DiscoveredActivity>>>();
 	
-	public void addFirstFollowerGroup(DiscoveredActivity followerGroupOf, Set<DiscoveredActivity> followerGroup) {
-		firstFollowerGroupMap.put(followerGroupOf, followerGroup);
+	public void addNextFollowerGroup(DiscoveredActivity followerGroupOf, Set<DiscoveredActivity> followerGroup) {
+		if (!followerGroupsMap.containsKey(followerGroupOf)) {
+			followerGroupsMap.put(followerGroupOf, new ArrayList<Set<DiscoveredActivity>>());
+		}
+		followerGroupsMap.get(followerGroupOf).add(followerGroup);
 	}
-	public Set<DiscoveredActivity> getFirstFollowerGroup(DiscoveredActivity followerGroupOf) {
-		return firstFollowerGroupMap.get(followerGroupOf);
+	public List<Set<DiscoveredActivity>> getFollowerGroups(DiscoveredActivity followerGroupOf) {
+		return followerGroupsMap.get(followerGroupOf);
 	}
 	
 
