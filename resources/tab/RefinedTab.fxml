@@ -37,7 +37,7 @@
             <HBox>
                <children>
                   <Label text="The refined temporal order among these is " />
-                  <VBox fx:id="refinedFollowersHBox">
+                  <VBox fx:id="refinedFollowersVBox">
                      <children>
                         <Label text="&lt;activityNames&gt;" />
                      </children>
@@ -53,7 +53,11 @@
             <HBox layoutX="15.0" layoutY="80.0">
                <children>
                   <Label text="The last group among these is: " />
-                  <Label fx:id="refinedPredecessorsLabel" text="&lt;activityNames&gt;" />
+                  <VBox fx:id="refinedPredecessorsVBox">
+                     <children>
+                        <Label text="&lt;activityNames&gt;" />
+                     </children>
+                  </VBox>
                </children>
             </HBox>
          </children>

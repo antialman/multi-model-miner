@@ -30,11 +30,11 @@ public class RefinedTabController {
 	@FXML
 	private Label constraintFollowersLabel;
 	@FXML
-	private VBox refinedFollowersHBox;
+	private VBox refinedFollowersVBox;
 	@FXML
 	private Label constraintPredecessorsLabel;
 	@FXML
-	private Label refinedPredecessorsLabel;
+	private VBox refinedPredecessorsVBox;
 	
 	
 	private DeclareDiscoveryResult declareDiscoveryResult;
@@ -75,7 +75,7 @@ public class RefinedTabController {
 
 		activityNameLabel.setText("");
 		constraintFollowersLabel.setText("");
-		refinedFollowersHBox.getChildren().clear();
+		refinedFollowersVBox.getChildren().clear();
 	}
 
 	public void updateTabContents(DeclareDiscoveryResult declareDiscoveryResult, DeclarePostprocessingResult declarePostprocessingResult, RefinedClosenessTaskResult refinedClosenessTaskResult) {
@@ -92,14 +92,18 @@ public class RefinedTabController {
 
 	private void updateVisualization(DiscoveredActivity discoveredActivity) {
 		activityNameLabel.setText(discoveredActivity.getActivityName());
+		
 		constraintFollowersLabel.setText(declarePostprocessingResult.getPotentialNextActivities(discoveredActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
-
-		refinedFollowersHBox.getChildren().clear();
+		refinedFollowersVBox.getChildren().clear();
 		for (int i = 0; i < refinedClosenessTaskResult.getFollowerGroups(discoveredActivity).size(); i++) {
 			Set<DiscoveredActivity> followerGroup = refinedClosenessTaskResult.getFollowerGroups(discoveredActivity).get(i);
-			Label l = new Label(i+1 + ": " + followerGroup.stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
-			refinedFollowersHBox.getChildren().add(l);
+			if (!followerGroup.isEmpty()) {
+				Label l = new Label(i+1 + ": " + followerGroup.stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
+				refinedFollowersVBox.getChildren().add(l);
+			}
 		}
+		
+		constraintPredecessorsLabel.setText(declarePostprocessingResult.getPotentialPrevActivities(discoveredActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
 	}
 
 }

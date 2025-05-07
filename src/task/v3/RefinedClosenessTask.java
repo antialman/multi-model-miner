@@ -1,11 +1,9 @@
 package task.v3;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -48,9 +46,9 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 			RefinedClosenessTaskResult refinedClosenessTaskResult = new RefinedClosenessTaskResult();
 			
 			for (DiscoveredActivity discoveredActivity : declarePostprocessingResult.getAllActivities()) {
-				Set<DiscoveredActivity> refinementSet = declarePostprocessingResult.getPotentialNextActivities(discoveredActivity);
+				Set<DiscoveredActivity> potentialNextActivities = declarePostprocessingResult.getPotentialNextActivities(discoveredActivity);
 				
-				if (refinementSet.size() > 1) { //The log has to be checked if there multiple potential next activities
+				if (potentialNextActivities.size() > 1) { //The log has to be checked if there multiple potential next activities
 					Set<Set<DiscoveredActivity>> firstOcurrenceOrders =  new HashSet<Set<DiscoveredActivity>>();
 					Set<Set<DiscoveredActivity>> lastOcurrenceOrders =  new HashSet<Set<DiscoveredActivity>>();
 					
@@ -60,7 +58,7 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 						Set<DiscoveredActivity> lastOcurrenceOrder = new LinkedHashSet<DiscoveredActivity>();
 						for (XEvent xEvent : xTrace) {
 							String activityName = XConceptExtension.instance().extractName(xEvent);
-							if (refinementSet.contains(activityNameToActivity.get(activityName))) {
+							if (potentialNextActivities.contains(activityNameToActivity.get(activityName))) {
 								//Repetitions can cause different activities of the same group to appear in the occurrence orders, however they will be removed in the next step
 								firstOcurrenceOrder.add(activityNameToActivity.get(activityName));
 								lastOcurrenceOrder.remove(activityNameToActivity.get(activityName));
@@ -71,7 +69,7 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 						lastOcurrenceOrders.add(lastOcurrenceOrder);
 					}
 					
-					//Finding the ordered groups of activities among the refinementSet
+					//Finding the ordered groups of activities among the potential next activities
 					while (!firstOcurrenceOrders.isEmpty()) {
 						Set<DiscoveredActivity> nextFollowersGroup = findNextFollowersGroup(firstOcurrenceOrders);
 						Iterator<Set<DiscoveredActivity>> it = firstOcurrenceOrders.iterator();
@@ -86,7 +84,7 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 					}
 					
 				} else {
-					refinedClosenessTaskResult.addNextFollowerGroup(discoveredActivity, new HashSet<DiscoveredActivity>(refinementSet));
+					refinedClosenessTaskResult.addNextFollowerGroup(discoveredActivity, new HashSet<DiscoveredActivity>(potentialNextActivities));
 				}
 			}
 			
