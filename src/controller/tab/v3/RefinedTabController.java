@@ -30,7 +30,9 @@ public class RefinedTabController {
 	@FXML
 	private Label constraintFollowersLabel;
 	@FXML
-	private VBox refinedFollowersVBox;
+	private VBox refinedFollowersRespVBox;
+	@FXML
+	private VBox refinedFollowersPrecVBox;
 	@FXML
 	private Label constraintPredecessorsLabel;
 	@FXML
@@ -75,7 +77,8 @@ public class RefinedTabController {
 
 		activityNameLabel.setText("");
 		constraintFollowersLabel.setText("");
-		refinedFollowersVBox.getChildren().clear();
+		refinedFollowersRespVBox.getChildren().clear();
+		refinedFollowersPrecVBox.getChildren().clear();
 	}
 
 	public void updateTabContents(DeclareDiscoveryResult declareDiscoveryResult, DeclarePostprocessingResult declarePostprocessingResult, RefinedClosenessTaskResult refinedClosenessTaskResult) {
@@ -94,12 +97,20 @@ public class RefinedTabController {
 		activityNameLabel.setText(discoveredActivity.getActivityName());
 		
 		constraintFollowersLabel.setText(declarePostprocessingResult.getPotentialNextActivities(discoveredActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
-		refinedFollowersVBox.getChildren().clear();
-		for (int i = 0; i < refinedClosenessTaskResult.getFollowerGroups(discoveredActivity).size(); i++) {
-			Set<DiscoveredActivity> followerGroup = refinedClosenessTaskResult.getFollowerGroups(discoveredActivity).get(i);
+		refinedFollowersRespVBox.getChildren().clear();
+		for (int i = 0; i < refinedClosenessTaskResult.getFollowerRespGroups(discoveredActivity).size(); i++) {
+			Set<DiscoveredActivity> followerGroup = refinedClosenessTaskResult.getFollowerRespGroups(discoveredActivity).get(i);
 			if (!followerGroup.isEmpty()) {
 				Label l = new Label(i+1 + ": " + followerGroup.stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
-				refinedFollowersVBox.getChildren().add(l);
+				refinedFollowersRespVBox.getChildren().add(l);
+			}
+		}
+		refinedFollowersPrecVBox.getChildren().clear();
+		for (int i = 0; i < refinedClosenessTaskResult.getFollowerPrecGroups(discoveredActivity).size(); i++) {
+			Set<DiscoveredActivity> followerGroup = refinedClosenessTaskResult.getFollowerPrecGroups(discoveredActivity).get(i);
+			if (!followerGroup.isEmpty()) {
+				Label l = new Label(i+1 + ": " + followerGroup.stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
+				refinedFollowersPrecVBox.getChildren().add(l);
 			}
 		}
 		

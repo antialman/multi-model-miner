@@ -20,7 +20,7 @@
             <ListView fx:id="activityListView" VBox.vgrow="ALWAYS" />
          </children>
       </VBox>
-      <VBox fx:id="resultsVBox" spacing="3.0">
+      <VBox fx:id="resultsVBox" spacing="10.0">
          <children>
             <HBox>
                <children>
@@ -28,38 +28,110 @@
                   <Label fx:id="activityNameLabel" text="&lt;activityName&gt;" />
                </children>
             </HBox>
-            <HBox>
+            <VBox spacing="2.0">
                <children>
-                  <Label text="Executable followers based on constraints: " />
-                  <Label fx:id="constraintFollowersLabel" text="&lt;activityNames&gt;" />
-               </children>
-            </HBox>
-            <HBox>
-               <children>
-                  <Label text="The refined temporal order among these is " />
-                  <VBox fx:id="refinedFollowersVBox">
+                  <HBox>
                      <children>
-                        <Label text="&lt;activityNames&gt;" />
+                        <Label text="Executable followers based on constraints: " />
+                        <Label fx:id="constraintFollowersLabel" text="&lt;activityNames&gt;" />
                      </children>
-                  </VBox>
-               </children>
-            </HBox>
-            <HBox layoutX="15.0" layoutY="40.0">
-               <children>
-                  <Label text="Executable predecessors based on constraints: " />
-                  <Label fx:id="constraintPredecessorsLabel" text="&lt;activityNames&gt;" />
-               </children>
-            </HBox>
-            <HBox layoutX="15.0" layoutY="80.0">
-               <children>
-                  <Label text="The last group among these is: " />
-                  <VBox fx:id="refinedPredecessorsVBox">
+                  </HBox>
+                  <HBox>
                      <children>
-                        <Label text="&lt;activityNames&gt;" />
+                        <Label text="Ordered follower groups (Response) ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <VBox fx:id="refinedFollowersRespVBox">
+                           <children>
+                              <Label text="&lt;activityNames&gt;" />
+                           </children>
+                        </VBox>
                      </children>
-                  </VBox>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <Label text="Ordered follower groups (Precedence) ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <VBox fx:id="refinedFollowersPrecVBox">
+                           <children>
+                              <Label text="&lt;activityNames&gt;" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <HBox layoutX="10.0" layoutY="48.0">
+                     <children>
+                        <Label text="Ordered follower groups (Succession) ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <VBox fx:id="refinedFollowersPrecVBox1">
+                           <children>
+                              <Label text="&lt;activityNames&gt;" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
                </children>
-            </HBox>
+            </VBox>
+            <VBox spacing="2.0">
+               <children>
+                  <HBox>
+                     <children>
+                        <Label text="Executable predecessors based on constraints: " />
+                        <Label fx:id="constraintPredecessorsLabel" text="&lt;activityNames&gt;" />
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <Label text="Ordered predecessor groups (Response) ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <VBox fx:id="refinedFollowersRespVBox1">
+                           <children>
+                              <Label text="&lt;activityNames&gt;" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <Label text="Ordered predecessor groups (Precedence) ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <VBox fx:id="refinedFollowersPrecVBox2">
+                           <children>
+                              <Label text="&lt;activityNames&gt;" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <Label text="Ordered predecessor groups (Succession) ">
+                           <HBox.margin>
+                              <Insets left="10.0" />
+                           </HBox.margin>
+                        </Label>
+                        <VBox fx:id="refinedFollowersPrecVBox11">
+                           <children>
+                              <Label text="&lt;activityNames&gt;" />
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+               </children>
+            </VBox>
          </children>
          <padding>
             <Insets left="5.0" top="10.0" />
