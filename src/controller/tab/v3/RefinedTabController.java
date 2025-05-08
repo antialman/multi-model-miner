@@ -27,7 +27,7 @@ public class RefinedTabController {
 	@FXML
 	private VBox resultsVBox;
 	@FXML
-	private Label activityNameLabel;
+	private SplitPane splitPane2;
 	@FXML
 	private Label constraintFollowersLabel;
 	@FXML
@@ -54,9 +54,11 @@ public class RefinedTabController {
 			@Override
 			public void changed(ObservableValue<? extends Number> observable, Number oldValue, Number newValue) {
 				splitPane1.setDividerPositions(0.1);
+				splitPane2.setDividerPositions(0.8);
 			}
 		};
 		splitPane1.widthProperty().addListener(changeListener);
+		splitPane2.widthProperty().addListener(changeListener);
 
 
 		//Setup for activity selection list
@@ -78,7 +80,6 @@ public class RefinedTabController {
 			}
 		});
 
-		activityNameLabel.setText("");
 		constraintFollowersLabel.setText("");
 		refinedFollowersRespVBox.getChildren().clear();
 		refinedFollowersPrecVBox.getChildren().clear();
@@ -98,8 +99,6 @@ public class RefinedTabController {
 	
 
 	private void updateVisualization(DiscoveredActivity discoveredActivity) {
-		activityNameLabel.setText(discoveredActivity.getActivityName());
-		
 		constraintFollowersLabel.setText(declarePostprocessingResult.getPotentialNextActivities(discoveredActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
 		refinedFollowersRespVBox.getChildren().clear();
 		for (int i = 0; i < refinedClosenessTaskResult.getFollowerRespGroups(discoveredActivity).size(); i++) {
