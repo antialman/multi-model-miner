@@ -84,7 +84,7 @@ public class ConstraintsTabController {
 			}
 		};
 		splitPane1.widthProperty().addListener(changeListener);
-		splitPane2.heightProperty().addListener(changeListener);
+		splitPane1.heightProperty().addListener(changeListener);
 		
 		InvalidationListener visSettingsListener = new InvalidationListener() {
 			@Override

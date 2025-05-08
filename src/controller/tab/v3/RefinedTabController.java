@@ -58,7 +58,7 @@ public class RefinedTabController {
 			}
 		};
 		splitPane1.widthProperty().addListener(changeListener);
-		splitPane2.widthProperty().addListener(changeListener);
+		splitPane1.heightProperty().addListener(changeListener);
 
 
 		//Setup for activity selection list
