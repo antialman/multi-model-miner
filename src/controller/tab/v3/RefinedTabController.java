@@ -39,7 +39,11 @@ public class RefinedTabController {
 	@FXML
 	private Label constraintPredecessorsLabel;
 	@FXML
-	private VBox refinedPredecessorsVBox;
+	private VBox refinedPredecessorsRespVBox;
+	@FXML
+	private VBox refinedPredecessorsPrecVBox;
+	@FXML
+	private VBox refinedPredecessorsSuccVBox;
 	
 	
 	private DeclareDiscoveryResult declareDiscoveryResult;
@@ -127,8 +131,33 @@ public class RefinedTabController {
 			}	
 		}
 		
-		
 		constraintPredecessorsLabel.setText(declarePostprocessingResult.getPotentialPrevActivities(discoveredActivity).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
+		refinedPredecessorsRespVBox.getChildren().clear();
+		for (int i = 0; i < refinedClosenessTaskResult.getPredecessorRespGroups(discoveredActivity).size(); i++) {
+			Set<DiscoveredActivity> predecessorGroup = refinedClosenessTaskResult.getPredecessorRespGroups(discoveredActivity).get(i);
+			if (!predecessorGroup.isEmpty()) {
+				Label l = new Label(i+1 + ": " + predecessorGroup.stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
+				refinedPredecessorsRespVBox.getChildren().add(l);
+			}
+		}
+		refinedPredecessorsPrecVBox.getChildren().clear();
+		for (int i = 0; i < refinedClosenessTaskResult.getPredecessorPrecGroups(discoveredActivity).size(); i++) {
+			Set<DiscoveredActivity> predecessorGroup = refinedClosenessTaskResult.getPredecessorPrecGroups(discoveredActivity).get(i);
+			if (!predecessorGroup.isEmpty()) {
+				Label l = new Label(i+1 + ": " + predecessorGroup.stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")));
+				refinedPredecessorsPrecVBox.getChildren().add(l);
+			}
+		}
+		refinedPredecessorsSuccVBox.getChildren().clear();
+		if (refinedClosenessTaskResult.getPredecessorSuccRelations(discoveredActivity) != null) {
+			for (int i = 0; i < refinedClosenessTaskResult.getPredecessorSuccRelations(discoveredActivity).size(); i++) {
+				List<Set<DiscoveredActivity>> succRelation = refinedClosenessTaskResult.getPredecessorSuccRelations(discoveredActivity).get(i);
+				if (!succRelation.isEmpty()) {
+					Label l = new Label("* " + "(" + succRelation.get(0).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")) + ") -> (" + succRelation.get(1).stream().map(DiscoveredActivity::getActivityName).collect(Collectors.joining(", ")) + ")");
+					refinedPredecessorsSuccVBox.getChildren().add(l);
+				}
+			}	
+		}
 	}
 
 }
