@@ -101,6 +101,7 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 						refinedClosenessTaskResult.addNextFollowerPrecGroup(discoveredActivity, nextFollowersPrecGroup);
 					}
 					
+					
 					//Finding Succession relations based on Response and Precedence relations
 					for (int i = 0; i < refinedClosenessTaskResult.getFollowerRespGroups(discoveredActivity).size(); i++) {
 						for (int j = i+1; j < refinedClosenessTaskResult.getFollowerRespGroups(discoveredActivity).size(); j++) {
@@ -120,6 +121,7 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 					refinedClosenessTaskResult.addNextFollowerRespGroup(discoveredActivity, new HashSet<DiscoveredActivity>(potentialNextActivities));
 					refinedClosenessTaskResult.addNextFollowerPrecGroup(discoveredActivity, new HashSet<DiscoveredActivity>(potentialNextActivities));
 				}
+				
 				
 				
 				//Refinement of the constraints among the potential previous activities
@@ -145,7 +147,7 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 						lastOcurrenceOrders.add(new ArrayList<DiscoveredActivity>(lastOcurrenceOrder));
 					}
 					
-					//Finding the ordered groups of activities among the potential next activities (Response relations)
+					//Finding the ordered groups of activities among the potential previous activities (Response relations)
 					while (!firstOcurrenceOrders.isEmpty()) {
 						Set<DiscoveredActivity> nextFollowersRespGroup = findNextFollowersRespGroup(firstOcurrenceOrders);
 						Iterator<Set<DiscoveredActivity>> it = firstOcurrenceOrders.iterator();
@@ -159,7 +161,7 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 						refinedClosenessTaskResult.addNextPredecessorRespGroup(discoveredActivity, nextFollowersRespGroup);
 					}
 					
-					//Finding the ordered groups of activities among the potential next activities (Precedence relations)
+					//Finding the ordered groups of activities among the potential previous activities (Precedence relations)
 					while (!lastOcurrenceOrders.isEmpty()) {
 						Set<DiscoveredActivity> nextFollowersPrecGroup = findNextFollowersPrecGroup(lastOcurrenceOrders);
 						Iterator<List<DiscoveredActivity>> it = lastOcurrenceOrders.iterator();
@@ -189,8 +191,8 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 					}
 					
 				} else {
-					refinedClosenessTaskResult.addNextPredecessorRespGroup(discoveredActivity, new HashSet<DiscoveredActivity>(potentialNextActivities));
-					refinedClosenessTaskResult.addNextPredecessorPrecGroup(discoveredActivity, new HashSet<DiscoveredActivity>(potentialNextActivities));
+					refinedClosenessTaskResult.addNextPredecessorRespGroup(discoveredActivity, new HashSet<DiscoveredActivity>(potentialPrevActivities));
+					refinedClosenessTaskResult.addNextPredecessorPrecGroup(discoveredActivity, new HashSet<DiscoveredActivity>(potentialPrevActivities));
 				}
 				
 				
