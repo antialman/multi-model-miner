@@ -87,16 +87,16 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 							}
 						}
 					}
-					
-//					if (closestDecision) {
-//						for (DiscoveredConstraint discoveredConstraint : activityRelations.getConstraintsFromPredecessors()) {
-//							//If the discoveredActivity activates (Alternate) Succession/Response then the candidateActivity is mandatory
-//							if (!(discoveredConstraint.getActivationActivity() == discoveredActivity && (discoveredConstraint.getTemplate() == ConstraintTemplate.Succession || discoveredConstraint.getTemplate() == ConstraintTemplate.Alternate_Succession || discoveredConstraint.getTemplate() == ConstraintTemplate.Response || discoveredConstraint.getTemplate() == ConstraintTemplate.Alternate_Response))) {
-//								closestDecision = false;
-//							}
-//						}
-//					}
-					
+
+					//					if (closestDecision) {
+					//						for (DiscoveredConstraint discoveredConstraint : activityRelations.getConstraintsFromPredecessors()) {
+					//							//If the discoveredActivity activates (Alternate) Succession/Response then the candidateActivity is mandatory
+					//							if (!(discoveredConstraint.getActivationActivity() == discoveredActivity && (discoveredConstraint.getTemplate() == ConstraintTemplate.Succession || discoveredConstraint.getTemplate() == ConstraintTemplate.Alternate_Succession || discoveredConstraint.getTemplate() == ConstraintTemplate.Response || discoveredConstraint.getTemplate() == ConstraintTemplate.Alternate_Response))) {
+					//								closestDecision = false;
+					//							}
+					//						}
+					//					}
+
 					if (closestExecution) {
 						activityRelations.addPotentialNextActivity(candidateActivity);
 					}
@@ -117,13 +117,13 @@ public class DeclarePostprocessingTask extends Task<DeclarePostprocessingResult>
 								closestDecision = false;
 								break;
 							}
-							else if (predecessorConstraint.getTemplate() == ConstraintTemplate.Response || predecessorConstraint.getTemplate() == ConstraintTemplate.Alternate_Response) {
-								if (predecessorConstraint.getActivationActivity() == candidateActivity) {
-									//If this activity is the activation of a succession or response then it cannot be the latest among the predecessors
-									closestExecution = false;
-									closestDecision = false;
-									break;
-								}
+						}
+						else if (predecessorConstraint.getTemplate() == ConstraintTemplate.Response || predecessorConstraint.getTemplate() == ConstraintTemplate.Alternate_Response) {
+							if (predecessorConstraint.getActivationActivity() == candidateActivity) {
+								//If this activity is the activation of a succession or response then it cannot be the latest among the predecessors
+								closestExecution = false;
+								closestDecision = false;
+								break;
 							}
 						} else if (predecessorConstraint.getTemplate() == ConstraintTemplate.Precedence || predecessorConstraint.getTemplate() == ConstraintTemplate.Alternate_Precedence) {
 							if (predecessorConstraint.getTargetActivity() == candidateActivity) {
