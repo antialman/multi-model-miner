@@ -53,7 +53,7 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 				//Refinement of the constraints among the potential next activities
 				Set<DiscoveredActivity> potentialNextActivities = declarePostprocessingResult.getPotentialNextActivities(discoveredActivity);
 				if (potentialNextActivities.size() > 1) { //The log has to be checked if there multiple potential next activities
-					Set<Set<DiscoveredActivity>> firstOcurrenceOrders =  new HashSet<Set<DiscoveredActivity>>();
+					Set<List<DiscoveredActivity>> firstOcurrenceOrders =  new HashSet<List<DiscoveredActivity>>();
 					Set<List<DiscoveredActivity>> lastOcurrenceOrders =  new HashSet<List<DiscoveredActivity>>(); //Using list here to allow iteration in reverse order
 					
 					//Finding all first and last occurrence orderings of the activities in the refinementSet
@@ -69,16 +69,16 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 								lastOcurrenceOrder.add(activityNameToActivity.get(activityName));
 							}
 						}
-						firstOcurrenceOrders.add(firstOcurrenceOrder);
+						firstOcurrenceOrders.add(new ArrayList<DiscoveredActivity>(firstOcurrenceOrder));
 						lastOcurrenceOrders.add(new ArrayList<DiscoveredActivity>(lastOcurrenceOrder));
 					}
 					
 					//Finding the ordered groups of activities among the potential next activities (Response relations)
 					while (!firstOcurrenceOrders.isEmpty()) {
 						Set<DiscoveredActivity> nextFollowersRespGroup = findNextFollowersRespGroup(firstOcurrenceOrders);
-						Iterator<Set<DiscoveredActivity>> it = firstOcurrenceOrders.iterator();
+						Iterator<List<DiscoveredActivity>> it = firstOcurrenceOrders.iterator();
 						while (it.hasNext()) {
-							Set<DiscoveredActivity> firstOcurrenceOrder = it.next();
+							List<DiscoveredActivity> firstOcurrenceOrder = it.next();
 							nextFollowersRespGroup.forEach(nextFollower -> firstOcurrenceOrder.remove(nextFollower));
 							if (firstOcurrenceOrder.isEmpty()) {
 								it.remove();
@@ -127,7 +127,7 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 				//Refinement of the constraints among the potential previous activities
 				Set<DiscoveredActivity> potentialPrevActivities = declarePostprocessingResult.getPotentialPrevActivities(discoveredActivity);
 				if (potentialPrevActivities.size() > 1) { //The log has to be checked if there multiple potential previous activities
-					Set<Set<DiscoveredActivity>> firstOcurrenceOrders =  new HashSet<Set<DiscoveredActivity>>();
+					Set<List<DiscoveredActivity>> firstOcurrenceOrders =  new HashSet<List<DiscoveredActivity>>();
 					Set<List<DiscoveredActivity>> lastOcurrenceOrders =  new HashSet<List<DiscoveredActivity>>(); //Using list here to allow iteration in reverse order
 					
 					//Finding all first and last occurrence orderings of the activities in the refinementSet
@@ -143,16 +143,16 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 								lastOcurrenceOrder.add(activityNameToActivity.get(activityName));
 							}
 						}
-						firstOcurrenceOrders.add(firstOcurrenceOrder);
+						firstOcurrenceOrders.add(new ArrayList<DiscoveredActivity>(firstOcurrenceOrder));
 						lastOcurrenceOrders.add(new ArrayList<DiscoveredActivity>(lastOcurrenceOrder));
 					}
 					
 					//Finding the ordered groups of activities among the potential previous activities (Response relations)
 					while (!firstOcurrenceOrders.isEmpty()) {
 						Set<DiscoveredActivity> nextFollowersRespGroup = findNextFollowersRespGroup(firstOcurrenceOrders);
-						Iterator<Set<DiscoveredActivity>> it = firstOcurrenceOrders.iterator();
+						Iterator<List<DiscoveredActivity>> it = firstOcurrenceOrders.iterator();
 						while (it.hasNext()) {
-							Set<DiscoveredActivity> firstOcurrenceOrder = it.next();
+							List<DiscoveredActivity> firstOcurrenceOrder = it.next();
 							nextFollowersRespGroup.forEach(nextFollower -> firstOcurrenceOrder.remove(nextFollower));
 							if (firstOcurrenceOrder.isEmpty()) {
 								it.remove();
@@ -210,9 +210,9 @@ public class RefinedClosenessTask extends Task<RefinedClosenessTaskResult> {
 		}
 	}
 	
-	private Set<DiscoveredActivity> findNextFollowersRespGroup(Set<Set<DiscoveredActivity>> firstOcurrenceOrders) {
+	private Set<DiscoveredActivity> findNextFollowersRespGroup(Set<List<DiscoveredActivity>> firstOcurrenceOrders) {
 		Set<DiscoveredActivity> nextFollowersRespGroup = new HashSet<DiscoveredActivity>();
-		for (Set<DiscoveredActivity> firstOcurrenceOrder : firstOcurrenceOrders) {
+		for (List<DiscoveredActivity> firstOcurrenceOrder : firstOcurrenceOrders) {
 			if (firstOcurrenceOrder.iterator().hasNext()) {
 				nextFollowersRespGroup.add(firstOcurrenceOrder.iterator().next());
 			}
