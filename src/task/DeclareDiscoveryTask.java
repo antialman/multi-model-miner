@@ -10,7 +10,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.deckfour.xes.extension.std.XConceptExtension;
+import org.deckfour.xes.model.XEvent;
 import org.deckfour.xes.model.XLog;
+import org.deckfour.xes.model.XTrace;
 import org.processmining.plugins.declareminer.DeclareMiner;
 import org.processmining.plugins.declareminer.DeclareMinerInput;
 import org.processmining.plugins.declareminer.DeclareMinerNoHierarc;
@@ -43,6 +46,7 @@ public class DeclareDiscoveryTask extends Task<DeclareDiscoveryResult> {
 	private List<ConstraintTemplate> selectedTemplates;
 	
 	private boolean addStartEnd;
+	private boolean selfNotChainSuccession;
 	
 	private XLog xLog;
 
@@ -72,6 +76,10 @@ public class DeclareDiscoveryTask extends Task<DeclareDiscoveryResult> {
 	
 	public void setArtifStartEnd(boolean addStartEnd) {
 		this.addStartEnd = addStartEnd;
+	}
+	
+	public void setSelfNotChainSuccession(boolean selfNotChainSuccession) {
+		this.selfNotChainSuccession = selfNotChainSuccession;
 	}
 
 	@Override
@@ -186,7 +194,44 @@ public class DeclareDiscoveryTask extends Task<DeclareDiscoveryResult> {
 			//This should probably be changed, but not important at the moment
 			List<DiscoveredActivity> discoveredActivities = activityMap.values().stream().collect(Collectors.toList());
 
-
+			
+			//Declare miner does not discover binary constraints where both parameters are the same. However, Not Chain Succession with same parameters is relevant here.
+			//TODO: Does not account for support threshold!!
+			if (selfNotChainSuccession) {
+				List<String> candidateActivityNames = activityMap.keySet().stream().collect(Collectors.toList());
+				
+				for (XTrace xTrace : xLog) {
+					String prevActName = null;
+					for (XEvent xEvent : xTrace) {
+						String currActName = XConceptExtension.instance().extractName(xEvent);
+						
+						if (candidateActivityNames.contains(currActName) && prevActName != null && prevActName == currActName) {
+							candidateActivityNames.remove(currActName);
+						}
+						prevActName = currActName;
+					}
+				}
+				
+				for (DiscoveredActivity discoveredActivity : discoveredActivities) {
+					if (candidateActivityNames.contains(discoveredActivity.getActivityName())) {
+						discoveredConstraints.add(new DiscoveredConstraint(ConstraintTemplate.Not_Chain_Succession, discoveredActivity, discoveredActivity, 100));
+					}
+				}
+			}
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
 			// Result object of the process discovery task
 			DeclareDiscoveryResult discoveryResult = new DeclareDiscoveryResult();
 			discoveryResult.setActivities(discoveredActivities);

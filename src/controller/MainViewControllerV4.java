@@ -45,7 +45,7 @@ public class MainViewControllerV4 {
 	private TabPane resultTabPane;
 	@FXML
 	private Tab constraintsTab;
-	
+
 
 	private Stage stage;
 	private ConstraintsTabController constraintsTabController;
@@ -123,6 +123,7 @@ public class MainViewControllerV4 {
 		declareDiscoveryTaskDeclare.setSelectedTemplates(templates);
 		declareDiscoveryTaskDeclare.setMinSupport(100);
 		declareDiscoveryTaskDeclare.setArtifStartEnd(true);
+		declareDiscoveryTaskDeclare.setSelfNotChainSuccession(true);
 
 		return declareDiscoveryTaskDeclare;
 	}
@@ -142,8 +143,7 @@ public class MainViewControllerV4 {
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
 
-			//TODO: Discover Not Chain Succession[A,A]
-			
+			//TODO: Construct PN fragments
 		});
 
 		//Handle task failure
@@ -152,7 +152,6 @@ public class MainViewControllerV4 {
 			AlertUtils.showError("Running Declare Miner failed!");
 		});
 	}
-
 
 	private void sortDiscoveredActivities(List<DiscoveredActivity> discoveredActivities) {
 		//Sorting activities by name, and moving artificial start and end to be the first activities in the activity list (makes the UI a bit nicer)
