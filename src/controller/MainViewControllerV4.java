@@ -9,9 +9,7 @@ import java.util.concurrent.Executors;
 import org.apache.commons.collections15.BidiMap;
 import org.apache.commons.collections15.bidimap.DualHashBidiMap;
 
-import controller.tab.v3.ConstraintsTabController;
-import controller.tab.v3.RefinedTabController;
-import controller.tab.v3.TemporalTabController;
+import controller.tab.v4.ConstraintsTabController;
 import data.DiscoveredActivity;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -25,17 +23,13 @@ import javafx.scene.layout.Region;
 import javafx.stage.Stage;
 import task.DeclareDiscoveryResult;
 import task.DeclareDiscoveryTask;
-import task.v3.DeclarePostprocessingResult;
-import task.v3.DeclarePostprocessingTask;
-import task.v3.RefinedClosenessTask;
-import task.v3.RefinedClosenessTaskResult;
 import utils.AlertUtils;
 import utils.ConstraintTemplate;
 import utils.DeclarePruningType;
 import utils.FileUtils;
 import utils.LogUtils;
 
-public class MainViewControllerV3 {
+public class MainViewControllerV4 {
 
 	//For running the Declare Miner and follow-up discovery tasks asynchronously 
 	private ExecutorService executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
@@ -51,22 +45,15 @@ public class MainViewControllerV3 {
 	private TabPane resultTabPane;
 	@FXML
 	private Tab constraintsTab;
-	@FXML
-	private Tab temporalTab;
-	@FXML
-	private Tab refinedTab;
+	
 
 	private Stage stage;
 	private ConstraintsTabController constraintsTabController;
-	private TemporalTabController temporalTabController;
-	private RefinedTabController refinedTabController;
 
 	private File logFile;
 
 	private DeclareDiscoveryResult declareDiscoveryResult;
 	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
-	private DeclarePostprocessingResult declarePostprocessingResult;
-	private RefinedClosenessTaskResult refinedClosenessTaskResult;
 
 
 
@@ -81,7 +68,7 @@ public class MainViewControllerV3 {
 		redescoverButton.setDisable(true);
 
 		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("tab/v3/ConstraintsTab.fxml"));
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("tab/v4/ConstraintsTab.fxml"));
 			Region rootPane = loader.load(); //There seems to be a bug in JavaFX framework that causes IllegalStateException to be thrown instead of IOException
 			constraintsTabController = loader.getController();
 			constraintsTabController.setStage(this.stage);
@@ -91,25 +78,6 @@ public class MainViewControllerV3 {
 			AlertUtils.showError("Error loading FXML for Declare Miner Output tab!");
 		}
 
-		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("tab/v3/TemporalTab.fxml"));
-			Region rootPane = loader.load(); //There seems to be a bug in JavaFX framework that causes IllegalStateException to be thrown instead of IOException
-			temporalTabController = loader.getController();
-			temporalTab.setContent(rootPane);
-		} catch (IOException | IllegalStateException e) {
-			e.printStackTrace();
-			AlertUtils.showError("Error loading FXML for Temporal Closeness tab!");
-		}
-		
-		try {
-			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("tab/v3/RefinedTab.fxml"));
-			Region rootPane = loader.load(); //There seems to be a bug in JavaFX framework that causes IllegalStateException to be thrown instead of IOException
-			refinedTabController = loader.getController();
-			refinedTab.setContent(rootPane);
-		} catch (IOException | IllegalStateException e) {
-			e.printStackTrace();
-			AlertUtils.showError("Error loading FXML for Refined Closeness tab!");
-		}
 	}
 
 
@@ -143,7 +111,8 @@ public class MainViewControllerV3 {
 				ConstraintTemplate.Alternate_Response,
 				ConstraintTemplate.Alternate_Precedence,
 				ConstraintTemplate.Response,
-				ConstraintTemplate.Precedence
+				ConstraintTemplate.Precedence,
+				ConstraintTemplate.Not_Chain_Succession
 				);
 
 		DeclareDiscoveryTask declareDiscoveryTaskDeclare = new DeclareDiscoveryTask();
@@ -165,20 +134,16 @@ public class MainViewControllerV3 {
 			sortDiscoveredActivities(declareDiscoveryResult.getActivities());
 			activityToEncodingsMap = createActivityEncodings(declareDiscoveryResult.getActivities());
 
-			constraintsTabController.updateTabContents(declareDiscoveryResult);
 			constraintsTabController.setActivityEncodings(activityToEncodingsMap);
-			temporalTabController.setActivityEncodings(activityToEncodingsMap);
+
+			constraintsTabController.updateTabContents(declareDiscoveryResult);
 
 			//Updating the UI
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
 
-			//Execute Declare post-processing task
-			DeclarePostprocessingTask declarePostprocessingTask = new DeclarePostprocessingTask();
-			declarePostprocessingTask.setDeclareDiscoveryResult(declareDiscoveryResult);
-			addDeclarePostprocessingTaskHandlers(declarePostprocessingTask);
-			executorService.execute(declarePostprocessingTask);
-
+			//TODO: Discover Not Chain Succession[A,A]
+			
 		});
 
 		//Handle task failure
@@ -188,39 +153,6 @@ public class MainViewControllerV3 {
 		});
 	}
 
-	private void addDeclarePostprocessingTaskHandlers(Task<DeclarePostprocessingResult> declarePostprocessingTask) {
-		//Handle task success
-		declarePostprocessingTask.setOnSucceeded(event -> {
-			declarePostprocessingResult = declarePostprocessingTask.getValue();
-			temporalTabController.updateTabContents(declareDiscoveryResult, declarePostprocessingResult);
-			
-			//Execute Declare refined temporal closeness task
-			RefinedClosenessTask refinedClosenessTask = new RefinedClosenessTask();
-			refinedClosenessTask.setDeclarePostProcessingResult(declarePostprocessingResult);
-			refinedClosenessTask.setEventLog(declareDiscoveryResult.getEventLog());
-			addDeclarePostprocessingTaskHandlers(refinedClosenessTask);
-			executorService.execute(refinedClosenessTask);
-		});
-
-		//Handle task failure
-		declarePostprocessingTask.setOnFailed(event -> {
-			AlertUtils.showError("Declare post-processing failed");
-		});
-	}
-
-	private void addDeclarePostprocessingTaskHandlers(RefinedClosenessTask refinedClosenessTask) {
-		refinedClosenessTask.setOnSucceeded(event -> {
-			refinedClosenessTaskResult = refinedClosenessTask.getValue();
-			
-			refinedTabController.updateTabContents(declareDiscoveryResult, declarePostprocessingResult, refinedClosenessTaskResult);
-		});
-
-		//Handle task failure
-		refinedClosenessTask.setOnFailed(event -> {
-			AlertUtils.showError("Refined closeness task failed");
-		});
-		
-	}
 
 	private void sortDiscoveredActivities(List<DiscoveredActivity> discoveredActivities) {
 		//Sorting activities by name, and moving artificial start and end to be the first activities in the activity list (makes the UI a bit nicer)

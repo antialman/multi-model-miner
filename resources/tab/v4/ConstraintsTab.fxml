@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.web.WebView?>
+
+<SplitPane fx:id="splitPane1" dividerPositions="0.2" prefWidth="600.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.tab.v4.ConstraintsTabController">
+   <items>
+      <VBox spacing="3.0">
+         <children>
+            <VBox spacing="3.0">
+               <children>
+                  <CheckBox fx:id="altLayoutCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Alt. Layout" />
+                  <CheckBox fx:id="automatonCheckBox" contentDisplay="RIGHT" mnemonicParsing="false" text="Automaton" />
+                  <CheckBox fx:id="cardinalityCheckBox" contentDisplay="RIGHT" layoutX="10.0" layoutY="30.0" mnemonicParsing="false" selected="true" text="Start/End cardinality" />
+               </children>
+               <VBox.margin>
+                  <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </VBox>
+            <Label text="Activity filter:">
+               <VBox.margin>
+                  <Insets left="5.0" right="10.0" top="10.0" />
+               </VBox.margin>
+            </Label>
+            <CheckBox fx:id="relatedActCheckBox" mnemonicParsing="false" selected="true" text="Show related">
+               <VBox.margin>
+                  <Insets left="10.0" />
+               </VBox.margin>
+            </CheckBox>
+            <CheckBox fx:id="toggleAllActCheckBox" mnemonicParsing="false" selected="true" text="Toggle all">
+               <VBox.margin>
+                  <Insets left="10.0" />
+               </VBox.margin>
+            </CheckBox>
+            <Button fx:id="updateModelButton" mnemonicParsing="false" onAction="#updateVisualization" text="Update">
+               <VBox.margin>
+                  <Insets left="10.0" />
+               </VBox.margin>
+            </Button>
+            <ListView fx:id="activityListView" prefWidth="150.0" VBox.vgrow="ALWAYS" />
+            <Button layoutX="20.0" layoutY="160.0" mnemonicParsing="false" onAction="#exportModel" text="Export Decl Model" />
+         </children>
+      </VBox>
+      <SplitPane fx:id="splitPane2" dividerPositions="0.8" orientation="VERTICAL">
+         <items>
+            <WebView fx:id="declMinerWebView" minHeight="-1.0" minWidth="-1.0" prefHeight="-1.0" prefWidth="-1.0" />
+            <ListView fx:id="constraintLabelListView" prefHeight="300.0" />
+         </items>
+      </SplitPane>
+   </items>
+</SplitPane>

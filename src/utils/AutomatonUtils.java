@@ -1,10 +1,15 @@
 package utils;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
 import org.apache.commons.collections15.BidiMap;
 import org.processmining.ltl2automaton.plugins.automaton.Automaton;
 import org.processmining.ltl2automaton.plugins.automaton.DeterministicAutomaton;
+import org.processmining.ltl2automaton.plugins.automaton.State;
+import org.processmining.ltl2automaton.plugins.automaton.Transition;
 import org.processmining.ltl2automaton.plugins.formula.DefaultParser;
 import org.processmining.ltl2automaton.plugins.formula.Formula;
 import org.processmining.ltl2automaton.plugins.formula.conjunction.ConjunctionFactory;
@@ -26,16 +31,25 @@ public class AutomatonUtils {
 	private AutomatonUtils() {
 		//Private constructor to avoid unnecessary instantiation of the class
 	}
-	
-	
+
+
 	public static Automaton createAutomaton(List<DiscoveredActivity> activities, List<DiscoveredConstraint> constraints, BidiMap<DiscoveredActivity, String> activityToEncodingsMap) {
 		List<String> formulas = new ArrayList<String>();
 		for (DiscoveredConstraint discoveredConstraint : constraints) {
 			formulas.add(getConstraintLtlFormula(discoveredConstraint, activityToEncodingsMap));
 		}
-		
+
 		if (!formulas.isEmpty()) {
+			
+			//Enforcing the alphabet, otherwise ltl2automata will allow satisfying negative chain constraints with activities that are not in the alphabet, which may result in many extra states  
+			List<String> encodedActivities = new ArrayList<String>();
+			activities.forEach(act -> {encodedActivities.add(activityToEncodingsMap.get(act));});
+			String activitiesFormula = "([](" + String.join(" \\/ ", encodedActivities) + "))";
+			formulas.add(activitiesFormula);
+			
+			
 			String automatonFormula = "((" + String.join(") /\\ (", formulas) + "))";
+			
 			try {
 				return createAutomatonForLtlFormula(automatonFormula);
 			} catch (SyntaxParserException e) {
@@ -46,12 +60,13 @@ public class AutomatonUtils {
 			return null;
 		}
 	}
-	
+
 	//Creates an automaton for LTL formula
 	public static DeterministicAutomaton createAutomatonForLtlFormula(String ltlFormula) throws SyntaxParserException {
 		Formula parsedFormula = new DefaultParser(ltlFormula).parse();
 		//System.out.println("Parsed formula: " + parsedFormula);
 		GroupedTreeConjunction conjunction = conjunctionFactory.instance(parsedFormula);
+
 		return conjunction.getAutomaton().op.determinize().op.complete();
 	}
 
@@ -59,7 +74,7 @@ public class AutomatonUtils {
 		String ltlFormula = AutomatonUtils.getGenericLtlFormula(discoveredConstraint.getTemplate());
 
 		System.out.println(discoveredConstraint); //For debugging a mysterious nullpointer exception that I have not managed to reliably reproduce
-		
+
 		//Replacing activity placeholders in the generic formula with activity encodings based on the model
 		if (discoveredConstraint.getTemplate().getReverseActivationTarget()) {
 			ltlFormula = ltlFormula.replace("\"B\"", activityToEncodingsMap.get(discoveredConstraint.getActivationActivity()));
