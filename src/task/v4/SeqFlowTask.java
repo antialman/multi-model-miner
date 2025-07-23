@@ -102,11 +102,11 @@ public class SeqFlowTask extends Task<HybridModelSet> {
 			
 			Set<DiscoveredConstraint> allRemainingConstraints = new HashSet<DiscoveredConstraint>(otherConstraints);
 			allRemainingConstraints.addAll(remainingSeqFlowConstraints);
-			HybridModelSet hybridModelSet = new HybridModelSet(seqFlowPnContainers, allRemainingConstraints);
+			HybridModelSet seqFlowModelSet = new HybridModelSet(seqFlowPnContainers, allRemainingConstraints);
 			
 			System.out.println(this.getClass().getSimpleName() + " finished at: " + taskStartTime + " - total time: " + (System.currentTimeMillis() - taskStartTime));
 
-			return hybridModelSet;
+			return seqFlowModelSet;
 		} catch (Exception e) {
 			System.err.println(this.getClass().getSimpleName() + " failed: " + e.getMessage());
 			e.printStackTrace();

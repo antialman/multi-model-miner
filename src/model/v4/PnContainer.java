@@ -50,4 +50,14 @@ public class PnContainer {
 	}
 	
 
+	
+	
+	
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((petrinet == null) ? 0 : petrinet.getLabel().hashCode()); //Assuming net labels are unique and no net is placed in two containers
+		return result;
+	}
 }

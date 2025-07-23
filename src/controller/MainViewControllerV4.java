@@ -10,6 +10,7 @@ import org.apache.commons.collections15.BidiMap;
 import org.apache.commons.collections15.bidimap.DualHashBidiMap;
 
 import controller.tab.v4.ConstraintsTabController;
+import controller.tab.v4.SeqFlowTabController;
 import data.DiscoveredActivity;
 import javafx.concurrent.Task;
 import javafx.fxml.FXML;
@@ -47,17 +48,20 @@ public class MainViewControllerV4 {
 	private TabPane resultTabPane;
 	@FXML
 	private Tab constraintsTab;
+	@FXML
+	private Tab seqFlowTab;
 
 
 	private Stage stage;
 	private ConstraintsTabController constraintsTabController;
+	private SeqFlowTabController seqFlowTabController;
 
 	private File logFile;
 
 	private DeclareDiscoveryResult declareDiscoveryResult;
 	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
 
-	private HybridModelSet seqFlowModel;
+	private HybridModelSet seqFlowModelSet;
 
 
 	//Setup methods
@@ -76,6 +80,16 @@ public class MainViewControllerV4 {
 			constraintsTabController = loader.getController();
 			constraintsTabController.setStage(this.stage);
 			constraintsTab.setContent(rootPane);
+		} catch (IOException | IllegalStateException e) {
+			e.printStackTrace();
+			AlertUtils.showError("Error loading FXML for Declare Miner Output tab!");
+		}
+		
+		try {
+			FXMLLoader loader = new FXMLLoader(getClass().getClassLoader().getResource("tab/v4/SeqFlowTab.fxml"));
+			Region rootPane = loader.load(); //There seems to be a bug in JavaFX framework that causes IllegalStateException to be thrown instead of IOException
+			seqFlowTabController = loader.getController();
+			seqFlowTab.setContent(rootPane);
 		} catch (IOException | IllegalStateException e) {
 			e.printStackTrace();
 			AlertUtils.showError("Error loading FXML for Declare Miner Output tab!");
@@ -161,10 +175,10 @@ public class MainViewControllerV4 {
 
 	private void addSeqFlowTaskHandlers(SeqFlowTask seqFlowTask) {
 		seqFlowTask.setOnSucceeded(event -> {
-			seqFlowModel = seqFlowTask.getValue();
+			seqFlowModelSet = seqFlowTask.getValue();
 			
-			
-			//TODO: Show results
+			seqFlowTabController.setActivityEncodings(activityToEncodingsMap);
+			seqFlowTabController.updateTabContents(seqFlowModelSet);
 			
 			//TODO: Start parallelism task
 		});
