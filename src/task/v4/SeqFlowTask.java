@@ -8,9 +8,9 @@ import java.util.Set;
 
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
-import data.v4.PnContainer;
 import javafx.concurrent.Task;
 import model.v4.HybridModelSet;
+import model.v4.PnContainer;
 import task.DeclareDiscoveryResult;
 import utils.ConstraintTemplate;
 

@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.Set;
 
 import data.DiscoveredConstraint;
-import data.v4.PnContainer;
 
 public class HybridModelSet {
 
