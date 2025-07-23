@@ -15,9 +15,9 @@
          <children>
             <VBox spacing="3.0">
                <children>
-                  <CheckBox fx:id="cardinalityCheckBox" contentDisplay="RIGHT" layoutX="10.0" layoutY="30.0" mnemonicParsing="false" selected="true" text="Start/End cardinality" />
+                  <CheckBox fx:id="cardinalityCheckBox" contentDisplay="RIGHT" layoutX="10.0" layoutY="30.0" mnemonicParsing="false" text="Start/End cardinality" />
                   <CheckBox fx:id="constraintsCheckbox" contentDisplay="RIGHT" layoutX="10.0" layoutY="30.0" mnemonicParsing="false" selected="true" text="Show constraints" />
-                  <CheckBox fx:id="constrainPnCheckbox" contentDisplay="RIGHT" mnemonicParsing="false" selected="true" text="Constrain PN nodes" />
+                  <CheckBox fx:id="constrainPnCheckbox" contentDisplay="RIGHT" mnemonicParsing="false" text="Constrain PN nodes" />
                </children>
                <VBox.margin>
                   <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />

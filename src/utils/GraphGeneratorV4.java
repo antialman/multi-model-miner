@@ -3,17 +3,22 @@ package utils;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
+import java.util.Set;
 
 import org.apache.commons.collections15.BidiMap;
 import org.processmining.ltl2automaton.plugins.automaton.Automaton;
 import org.processmining.ltl2automaton.plugins.automaton.State;
 import org.processmining.ltl2automaton.plugins.automaton.Transition;
+import org.processmining.models.graphbased.directed.petrinet.Petrinet;
+import org.processmining.models.graphbased.directed.petrinet.elements.Place;
 
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
+import model.v4.PnContainer;
 
 public class GraphGeneratorV4 {
 	// private constructor to avoid unnecessary instantiation of the class
@@ -21,16 +26,22 @@ public class GraphGeneratorV4 {
 	}
 
 
-	public static String createDeclareVisualizationString(List<DiscoveredActivity> filteredActivities, List<DiscoveredConstraint> filteredConstraints, boolean alternativeLayout) {
-		StringBuilder sb = new StringBuilder("digraph \"\" {");
+	public static String createDeclareVisualizationString(List<DiscoveredActivity> filteredActivities, List<DiscoveredConstraint> filteredConstraints, boolean alternativeLayout, boolean standalone) {
+		StringBuilder sb = new StringBuilder();
+		
+		if (standalone) {
+			sb.append("digraph \"\" {");
 
-		if (alternativeLayout)
-			sb.append("rankdir = \"LR\"");
+			if (alternativeLayout)
+				sb.append("rankdir = \"LR\"");
 
-		sb.append("ranksep = \".6\"");
-		sb.append("nodesep = \".5\"");
-		sb.append("node [style=\"filled\", shape=box, fontsize=\"8\", fontname=\"Helvetica\"]");
-		sb.append("edge [fontsize=\"8\", fontname=\"Helvetica\" arrowsize=\".8\"]");
+			sb.append("ranksep = \".6\"");
+			sb.append("nodesep = \".5\"");
+			sb.append("node [style=\"filled\", shape=box, fontsize=\"8\", fontname=\"Helvetica\"]");
+			sb.append("edge [fontsize=\"8\", fontname=\"Helvetica\" arrowsize=\".8\"]");
+		}
+		
+		
 
 		Map<DiscoveredActivity, String> nodeNames = new HashMap<>();
 		Map<String, Map<Integer, String>> activityToUnaryConstraints = new HashMap<>();
@@ -66,12 +77,15 @@ public class GraphGeneratorV4 {
 		}
 
 		for (DiscoveredActivity discoveredActivity : filteredActivities)
-			sb.append(buildNodeString(nodeNames.get(discoveredActivity), discoveredActivity.getActivityFullName(), activityToUnaryConstraints.get(discoveredActivity.getActivityFullName()), discoveredActivity.getActivitySupport(), alternativeLayout));
+			sb.append(buildNodeString(nodeNames.get(discoveredActivity), discoveredActivity.getActivityFullName(), activityToUnaryConstraints.get(discoveredActivity.getActivityFullName()), discoveredActivity.getActivitySupport(), alternativeLayout, standalone));
 
 		for (String string : edges)
 			sb.append(string);
 
-		sb.append("}");
+		
+		if (standalone) {
+			sb.append("}");
+		}
 
 		return sb.toString();
 	}
@@ -156,7 +170,7 @@ public class GraphGeneratorV4 {
 	}
 
 	//Used for discovery; creates a standard graphviz node strings
-	private static String buildNodeString(String nodeId, String activityName, Map<Integer, String> ls, double supp, boolean horizontal) {
+	private static String buildNodeString(String nodeId, String activityName, Map<Integer, String> ls, double supp, boolean horizontal, boolean standalone) {
 		String color = "";
 		String ss = "";
 		if(supp != -1) {
@@ -170,7 +184,11 @@ public class GraphGeneratorV4 {
 			color = "fillcolor=\""+color+";"+portion+":#000000\" gradientangle=90 fontcolor=\""+fc+"\"";
 		}
 		if(ls.isEmpty()) {
-			return nodeId + " [label=" + "\"" + activityName + "\\\\n" + ss +"\"" + color +" tooltip=\""+activityName+"\"]";
+			if (standalone) {
+				return nodeId + " [label=" + "\"" + activityName + "\\\\n" + ss +"\"" + color +" tooltip=\""+activityName+"\"]";
+			} else {
+				return nodeId + " [label=" + "\"" + activityName +"\"" + color +" tooltip=\""+activityName+"\" style=\"filled\" shape=box]";
+			}
 		}
 		else {
 			String unaryRep = "\"";
@@ -186,7 +204,9 @@ public class GraphGeneratorV4 {
 			}
 			unaryRep += "\"";
 			//System.out.println(n + " [shape=\"record\" label="+ unaryRep +" "+color+"]");
-			return nodeId + " [shape=\"record\" label="+ unaryRep +" "+color+" tooltip=\""+activityName+"\"]";
+			
+			return nodeId + " [shape=\"record\" label="+ unaryRep +" "+color+" tooltip=\""+activityName+"\"]"; //Not planning to show unary constraints in standalone mode
+			
 		}
 	}
 
@@ -343,4 +363,64 @@ public class GraphGeneratorV4 {
 		}
 		return false;
 	}
+
+
+	
+	public static String createHybridVisualizationString(Set<DiscoveredConstraint> remainingConstraints, Set<PnContainer> pnContainers, boolean constrainPn, BidiMap<DiscoveredActivity, String> activityToEncodingsMap) {
+		StringBuilder sb = new StringBuilder("digraph \"\" {");
+		sb.append("rankdir = \"LR\"");
+		sb.append("ranksep = \".4\"");
+		sb.append("nodesep = \".3\"");
+		sb.append("node [fontsize=\"8\", fontname=\"Helvetica\"]");
+		sb.append("edge [fontsize=\"8\", fontname=\"Helvetica\" arrowsize=\".8\"]");
+		
+		
+		if (!constrainPn) {
+			Set<DiscoveredActivity> constraintActivities = new HashSet<DiscoveredActivity>();
+			remainingConstraints.forEach(constraint -> {
+				constraintActivities.add(constraint.getActivationActivity());
+				if (constraint.getTemplate().getIsBinary()) {
+					constraintActivities.add(constraint.getTargetActivity());
+				}
+			});
+			
+			sb.append(createDeclareVisualizationString(new ArrayList<DiscoveredActivity>(constraintActivities), new ArrayList<DiscoveredConstraint>(remainingConstraints), false, false));
+			
+			for (PnContainer pnContainer : pnContainers) {
+				sb.append(createPnVisualizationString(pnContainer.getPetrinet()));
+			}
+		}
+		
+		sb.append("}");
+		
+		
+		return sb.toString();
+	}
+
+
+	private static Object createPnVisualizationString(Petrinet petrinet) {
+		StringBuilder sb = new StringBuilder();
+		
+		petrinet.getPlaces().forEach(place -> {
+			sb.append(petrinet.getLabel() + place.getLabel() + "[label=\"" + place.getLabel() + "\",fontcolor=\"#777777\",shape=circle,fixedsize=true,height=.3,width=.3]");
+			petrinet.getOutEdges(place).forEach(edge -> sb.append(" " + petrinet.getLabel() + edge.getSource().getLabel() + " -> " + petrinet.getLabel() + edge.getTarget().getLabel() + " "));
+		});
+		
+		petrinet.getTransitions().forEach(transition -> {
+			if (transition.isInvisible()) {
+				sb.append(petrinet.getLabel() + transition.getLabel() + " [label=\"\"style=\"filled\",fillcolor=\"#000000\",shape=rect,height=0.3,width=.3]");
+			} else {
+				sb.append(petrinet.getLabel() + transition.getLabel() + " [label=\"" + transition.getLabel() + "\",shape=rect,height=0.3,width=.3]");
+			}
+			petrinet.getOutEdges(transition).forEach(edge -> sb.append(" " + petrinet.getLabel() + edge.getSource().getLabel() + " -> " + petrinet.getLabel() + edge.getTarget().getLabel() + " "));
+		});
+		
+		
+		
+		
+		return sb.toString();
+	}
+	
+	
+	
 }

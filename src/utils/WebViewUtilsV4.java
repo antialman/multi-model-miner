@@ -1,6 +1,8 @@
 package utils;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.collections15.BidiMap;
 import org.apache.commons.lang3.StringUtils;
@@ -8,6 +10,8 @@ import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
+import model.v4.HybridModelSet;
+import model.v4.PnContainer;
 
 public class WebViewUtilsV4 {
 
@@ -42,7 +46,7 @@ public class WebViewUtilsV4 {
 			if (automaton) {
 				visualizationString = GraphGeneratorV4.createAutomatonVisualizationString(activities, constraints, alternativeLayout, activityToEncodingsMap);
 			} else {
-				visualizationString = GraphGeneratorV4.createDeclareVisualizationString(activities, constraints, alternativeLayout);
+				visualizationString = GraphGeneratorV4.createDeclareVisualizationString(activities, constraints, alternativeLayout, true);
 			}
 			
 			if (visualizationString != null) {
@@ -52,5 +56,22 @@ public class WebViewUtilsV4 {
 			}
 		}
 	}
+	
+	public static void updateWebView(Set<DiscoveredConstraint> remainingConstraints, Set<PnContainer> pnContainers, WebView webView, boolean constrainPn, BidiMap<DiscoveredActivity, String> activityToEncodingsMap) {
+		if (remainingConstraints != null || pnContainers != null) {
+			String visualizationString;
+			String script;
+			
+			visualizationString = GraphGeneratorV4.createHybridVisualizationString(remainingConstraints, pnContainers, constrainPn, activityToEncodingsMap);
+			
+			if (visualizationString != null) {
+				script = "setModel('" + visualizationString + "')";
+				System.out.println("Executing visualization script: " + StringUtils.abbreviate(script, 2000));
+				webView.getEngine().executeScript(script);
+			}
+		}
+	}
+	
+	
 	
 }

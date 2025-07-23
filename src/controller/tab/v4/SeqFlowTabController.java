@@ -1,7 +1,9 @@
 package controller.tab.v4;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.commons.collections15.BidiMap;
 
@@ -22,6 +24,7 @@ import javafx.scene.control.cell.CheckBoxListCell;
 import javafx.scene.web.WebView;
 import javafx.util.StringConverter;
 import model.v4.HybridModelSet;
+import model.v4.PnContainer;
 import utils.WebViewUtilsV4;
 
 public class SeqFlowTabController {
@@ -105,14 +108,25 @@ public class SeqFlowTabController {
 
 	@FXML
 	private void updateVisualization() { //Automatic update would be possible, but requires special care because execution of the visualization script is asynchronous
-		ArrayList<DiscoveredConstraint> filteredConstraints = new ArrayList<DiscoveredConstraint>(); //There should be no overlap between remaining constraints and constraints in pnContainers
+		ArrayList<DiscoveredConstraint> filteredConstraints = new ArrayList<DiscoveredConstraint>();
+		Set<PnContainer> pnContainers = new HashSet<PnContainer>();
+		
 		if (constraintsCheckbox.isSelected()) {
 			filteredConstraints.addAll(seqFlowModelSet.getRemainingConstraints());
 		}
-		modelListView.getItems().filtered(item -> item.getIsSelected()).forEach(item -> filteredConstraints.addAll(item.getPnContainer().getMatchingConstraints()));
+		
+		modelListView.getItems().filtered(item -> item.getIsSelected()).forEach(item -> {
+			filteredConstraints.addAll(item.getPnContainer().getMatchingConstraints());
+			pnContainers.add(item.getPnContainer());
+		});
 		
 		
 		populateConstraintList(filteredConstraints);
+		if (constraintsCheckbox.isSelected()) {
+			WebViewUtilsV4.updateWebView(seqFlowModelSet.getRemainingConstraints(), pnContainers, seqFlowWebView, constrainPnCheckbox.isSelected(), activityToEncodingsMap);
+		} else {
+			WebViewUtilsV4.updateWebView(new HashSet<DiscoveredConstraint>(), pnContainers, seqFlowWebView, constrainPnCheckbox.isSelected(), activityToEncodingsMap);
+		}
 	}
 	
 	
