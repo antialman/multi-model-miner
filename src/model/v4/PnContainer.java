@@ -19,9 +19,11 @@ public class PnContainer {
 	private Petrinet petrinet;
 	private Map<DiscoveredActivity, Transition> activityToTransitionMap = new HashMap<DiscoveredActivity, Transition>();
 	private Set<DiscoveredConstraint> matchingConstraints = new HashSet<DiscoveredConstraint>();
+	private DiscoveredActivity startActivity;
 	
 	public PnContainer(String pnName, DiscoveredActivity startActivity) {
 		this.petrinet = new PetrinetImpl(pnName);
+		this.startActivity = startActivity;
 		Place p = petrinet.addPlace(String.valueOf("p" + petrinet.getPlaces().size()));
 		Transition t = petrinet.addTransition(startActivity.getActivityName());
 		activityToTransitionMap.put(startActivity, t);
@@ -30,6 +32,10 @@ public class PnContainer {
 	
 	public Petrinet getPetrinet() {
 		return petrinet;
+	}
+	
+	public DiscoveredActivity getStartActivity() {
+		return startActivity;
 	}
 	
 	public Set<DiscoveredActivity> getActivities() {

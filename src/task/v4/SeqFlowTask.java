@@ -120,12 +120,22 @@ public class SeqFlowTask extends Task<HybridModelSet> {
 		Set<DiscoveredConstraint> matchingSeqFlowConstraints = new HashSet<DiscoveredConstraint>();
 		
 		for (DiscoveredConstraint constraint : remainingSeqFlowConstraints) {
-			if (constraint.getTargetActivity() == nextSeqFlowActivity && pnContainer.getActivities().contains(constraint.getActivationActivity())) {
-				if (constraint.getTemplate() == ConstraintTemplate.Alternate_Succession) { //Extension of a sequence must have incoming Alternate Succession from all activities in that sequence  
+			if (constraint.getTargetActivity() == nextSeqFlowActivity && pnContainer.getActivities().contains(constraint.getActivationActivity())) { //nextSeqFlowActivity is targeted by an activity that is already in the net
+				if (constraint.getTemplate() == ConstraintTemplate.Alternate_Succession) {
+					//Extension of a sequence must have incoming Alternate Succession from all activities in that sequence  
 					matchingSeqFlowConstraints.add(constraint);
-				} else if (constraint.getTemplate() == ConstraintTemplate.Not_Chain_Succession && constraint.getActivationActivity() != prevSeqFlowActivity) {  //Extension of a sequence must have incoming Not Chain Succession from all activities preceding the last activity in that sequence
+				} else if (constraint.getTemplate() == ConstraintTemplate.Not_Chain_Succession && constraint.getActivationActivity() != prevSeqFlowActivity) {
+					//Extension of a sequence must have incoming Not Chain Succession from all activities preceding the last activity in that sequence
 					matchingSeqFlowConstraints.add(constraint);
 				}
+			} else if (constraint.getActivationActivity() == nextSeqFlowActivity && pnContainer.getActivities().contains(constraint.getTargetActivity())) { //nextSeqFlowActivity targets an activity that is already in the net
+				if (constraint.getTemplate() == ConstraintTemplate.Not_Chain_Succession && constraint.getTargetActivity() != pnContainer.getStartActivity()) {
+					//Extension of a sequence must have an outgoing Not Chain Succession to all activities of that sequence, except for the initial activity (in cases where the sequence can be repeated)
+					matchingSeqFlowConstraints.add(constraint);
+				}
+			} else if (constraint.getActivationActivity() == prevSeqFlowActivity && constraint.getTargetActivity() == pnContainer.getStartActivity() && constraint.getTemplate() == ConstraintTemplate.Not_Chain_Succession) {
+				//Even if the sequence is repeated, then extension of the sequence means that prevSeqFlowActivity must have a Not Chain Succession even to the initial activity
+				matchingSeqFlowConstraints.add(constraint);
 			}
 		}
 		
