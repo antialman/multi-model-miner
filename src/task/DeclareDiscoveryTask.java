@@ -86,7 +86,7 @@ public class DeclareDiscoveryTask extends Task<DeclareDiscoveryResult> {
 	protected DeclareDiscoveryResult call() throws Exception {
 		try {
 			long taskStartTime = System.currentTimeMillis();
-			System.out.println("Discovering Declare model started at: " + taskStartTime);
+			System.out.println(this.getClass().getSimpleName() + " started at: " + taskStartTime);
 
 			Configuration configuration = new Configuration();
 			xLog = LogUtils.convertToXlog(logFile.getAbsolutePath());
@@ -225,13 +225,6 @@ public class DeclareDiscoveryTask extends Task<DeclareDiscoveryResult> {
 			
 			
 			
-			
-			
-			
-			
-			
-			
-			
 			// Result object of the process discovery task
 			DeclareDiscoveryResult discoveryResult = new DeclareDiscoveryResult();
 			discoveryResult.setActivities(discoveredActivities);
@@ -239,13 +232,13 @@ public class DeclareDiscoveryTask extends Task<DeclareDiscoveryResult> {
 			discoveryResult.setEventLog(xLog);
 
 
-			System.out.println("Discovering Declare model finished at: " + taskStartTime + " - total time: " + (System.currentTimeMillis() - taskStartTime));
+			System.out.println(this.getClass().getSimpleName() + " finished at: " + taskStartTime + " - total time: " + (System.currentTimeMillis() - taskStartTime));
 
 			return discoveryResult;
 
 
 		} catch (Exception e) {
-			System.err.println("Discovering Declare model failed: " + e.getMessage());
+			System.err.println(this.getClass().getSimpleName() + " failed: " + e.getMessage());
 			e.printStackTrace();
 			throw e;
 		}

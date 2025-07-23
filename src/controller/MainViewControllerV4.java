@@ -21,8 +21,10 @@ import javafx.scene.control.TabPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
+import model.v4.HybridModelSet;
 import task.DeclareDiscoveryResult;
 import task.DeclareDiscoveryTask;
+import task.v4.SeqFlowTask;
 import utils.AlertUtils;
 import utils.ConstraintTemplate;
 import utils.DeclarePruningType;
@@ -55,6 +57,7 @@ public class MainViewControllerV4 {
 	private DeclareDiscoveryResult declareDiscoveryResult;
 	private BidiMap<DiscoveredActivity, String> activityToEncodingsMap;
 
+	private HybridModelSet seqFlowModel;
 
 
 	//Setup methods
@@ -143,14 +146,34 @@ public class MainViewControllerV4 {
 			mainHeader.setDisable(false);
 			resultTabPane.setDisable(false);
 
-			//TODO: Construct PN fragments
+			SeqFlowTask seqFlowTask = new SeqFlowTask();
+			seqFlowTask.setDeclareDiscoveryResult(declareDiscoveryResult);
+			addSeqFlowTaskHandlers(seqFlowTask);
+			executorService.execute(seqFlowTask);
 		});
 
 		//Handle task failure
 		delcareDiscoveryTask.setOnFailed(event -> {
 			mainHeader.setDisable(false);
-			AlertUtils.showError("Running Declare Miner failed!");
+			AlertUtils.showError(delcareDiscoveryTask.getClass().getSimpleName() + " failed!");
 		});
+	}
+
+	private void addSeqFlowTaskHandlers(SeqFlowTask seqFlowTask) {
+		seqFlowTask.setOnSucceeded(event -> {
+			seqFlowModel = seqFlowTask.getValue();
+			
+			
+			//TODO: Show results
+			
+			//TODO: Start parallelism task
+		});
+
+		//Handle task failure
+		seqFlowTask.setOnFailed(event -> {
+			AlertUtils.showError(seqFlowTask.getClass().getSimpleName() + " failed!");
+		});
+
 	}
 
 	private void sortDiscoveredActivities(List<DiscoveredActivity> discoveredActivities) {

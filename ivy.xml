@@ -63,6 +63,7 @@
        -->
        
        <dependency org="prom" name="DeclareMinerVisualizer" rev="latest" changing="true" transitive="true" />
+       <dependency org="prom" name="PetriNets" rev="latest" changing="true" transitive="true" />
        
     </dependencies>
 </ivy-module>
