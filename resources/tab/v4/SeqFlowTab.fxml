@@ -6,6 +6,7 @@
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.web.WebView?>
 
@@ -39,6 +40,38 @@
                </VBox.margin>
             </Button>
             <ListView fx:id="modelListView" prefWidth="150.0" VBox.vgrow="ALWAYS" />
+            <VBox>
+               <children>
+                  <Label text="Constraint statistics:" />
+                  <HBox>
+                     <children>
+                        <Label text="Discovered: " />
+                        <Label fx:id="discoveredCountLabel" />
+                     </children>
+                     <VBox.margin>
+                        <Insets left="10.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <Label text="Translated: " />
+                        <Label fx:id="translatedCountLabel" />
+                     </children>
+                     <VBox.margin>
+                        <Insets left="10.0" />
+                     </VBox.margin>
+                  </HBox>
+                  <HBox>
+                     <children>
+                        <Label text="Remaining: " />
+                        <Label fx:id="remainingCountLabel" />
+                     </children>
+                     <VBox.margin>
+                        <Insets left="10.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
          </children>
       </VBox>
       <SplitPane fx:id="splitPane2" dividerPositions="0.8" orientation="VERTICAL">

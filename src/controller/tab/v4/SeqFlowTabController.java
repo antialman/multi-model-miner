@@ -18,6 +18,7 @@ import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SplitPane;
 import javafx.scene.control.cell.CheckBoxListCell;
@@ -49,6 +50,12 @@ public class SeqFlowTabController {
 	private SplitPane splitPane2;
 	@FXML
 	private WebView seqFlowWebView;
+	@FXML
+	private Label discoveredCountLabel;
+	@FXML
+	private Label translatedCountLabel;
+	@FXML
+	private Label remainingCountLabel;
 	@FXML
 	private ListView<String> constraintLabelListView;
 	
@@ -132,6 +139,15 @@ public class SeqFlowTabController {
 	
 	public void updateTabContents(HybridModelSet seqFlowModelSet) {
 		this.seqFlowModelSet = seqFlowModelSet;
+		
+		int translatedCount = 0;
+		for (PnContainer pnContainer : seqFlowModelSet.getPnContainers()) {
+			translatedCount = translatedCount + pnContainer.getMatchingConstraints().size();
+		}
+		discoveredCountLabel.setText(String.valueOf(seqFlowModelSet.getRemainingConstraints().size()+translatedCount));
+		translatedCountLabel.setText(String.valueOf(translatedCount));
+		remainingCountLabel.setText(String.valueOf(seqFlowModelSet.getRemainingConstraints().size()));
+		
 		populateModelFilters();
 		updateVisualization();
 	}
