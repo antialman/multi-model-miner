@@ -14,8 +14,6 @@ import org.processmining.ltl2automaton.plugins.automaton.Automaton;
 import org.processmining.ltl2automaton.plugins.automaton.State;
 import org.processmining.ltl2automaton.plugins.automaton.Transition;
 import org.processmining.models.graphbased.directed.petrinet.Petrinet;
-import org.processmining.models.graphbased.directed.petrinet.elements.Place;
-
 import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import model.v4.PnContainer;

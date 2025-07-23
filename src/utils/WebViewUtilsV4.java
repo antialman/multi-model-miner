@@ -1,6 +1,5 @@
 package utils;
 
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -10,7 +9,6 @@ import data.DiscoveredActivity;
 import data.DiscoveredConstraint;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.web.WebView;
-import model.v4.HybridModelSet;
 import model.v4.PnContainer;
 
 public class WebViewUtilsV4 {

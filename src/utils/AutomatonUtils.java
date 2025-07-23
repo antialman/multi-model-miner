@@ -1,15 +1,10 @@
 package utils;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
 import org.apache.commons.collections15.BidiMap;
 import org.processmining.ltl2automaton.plugins.automaton.Automaton;
 import org.processmining.ltl2automaton.plugins.automaton.DeterministicAutomaton;
-import org.processmining.ltl2automaton.plugins.automaton.State;
-import org.processmining.ltl2automaton.plugins.automaton.Transition;
 import org.processmining.ltl2automaton.plugins.formula.DefaultParser;
 import org.processmining.ltl2automaton.plugins.formula.Formula;
 import org.processmining.ltl2automaton.plugins.formula.conjunction.ConjunctionFactory;
