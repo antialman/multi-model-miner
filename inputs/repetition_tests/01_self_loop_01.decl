@@ -1,0 +1,58 @@
+activity _start_
+activity _end_
+activity A
+activity B
+activity C
+activity D
+Not Chain Succession[A, _start_] | | |
+Succession[_start_, B] | | |
+Not Chain Succession[A, C] | | |
+Not Chain Succession[A, D] | | |
+Succession[B, C] | | |
+Not Chain Succession[_start_, _end_] | | |
+Succession[B, D] | | |
+Not Chain Succession[C, _end_] | | |
+Not Chain Succession[D, _start_] | | |
+Not Chain Succession[B, A] | | |
+Succession[B, _end_] | | |
+Not Chain Succession[B, D] | | |
+Not Chain Succession[C, _start_] | | |
+Succession[A, B] | | |
+Not Chain Succession[C, A] | | |
+Not Chain Succession[C, B] | | |
+Not Chain Succession[_end_, D] | | |
+Not Chain Succession[_end_, C] | | |
+Not Chain Succession[_start_, D] | | |
+Not Chain Succession[_end_, B] | | |
+Not Chain Succession[_end_, A] | | |
+Not Chain Succession[A, _end_] | | |
+Alternate Response[A, B] | | |
+Alternate Response[_start_, B] | | |
+Alternate Precedence[B, C] | | |
+Alternate Precedence[B, D] | | |
+Alternate Precedence[B, _end_] | | |
+Alternate Succession[A, C] | | |
+Alternate Succession[_start_, C] | | |
+Alternate Succession[A, D] | | |
+Alternate Succession[_start_, A] | | |
+Alternate Succession[C, D] | | |
+Alternate Succession[_start_, D] | | |
+Alternate Succession[_start_, _end_] | | |
+Alternate Succession[C, _end_] | | |
+Alternate Succession[D, _end_] | | |
+Alternate Succession[A, _end_] | | |
+Not Chain Succession[B, _start_] | | |
+Not Chain Succession[_end_, _start_] | | |
+Not Chain Succession[_start_, B] | | |
+Not Chain Succession[_start_, C] | | |
+Not Chain Succession[D, A] | | |
+Not Chain Succession[D, B] | | |
+Not Chain Succession[D, C] | | |
+Not Chain Succession[B, _end_] | | |
+Not Chain Succession[A, A] | | |
+Not Chain Succession[_start_, _start_] | | |
+Not Chain Succession[C, C] | | |
+Not Chain Succession[D, D] | | |
+Not Chain Succession[_end_, _end_] | | |
+Exactly1[_start_] | |
+Exactly1[_end_] | |
